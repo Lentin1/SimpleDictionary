@@ -1,0 +1,2163 @@
+# 2026 BEAT《托福必考2000词》List 01-30
+# 格式：单词 | 音标 | 中文释义 | 词性 | 例句（可选）
+# PDF 原文未提供例句，因此例句字段暂留空。
+
+[List 01]
+summary | ['sʌməri] | 总结; 概要 | n. |
+species | ['spiʃiz] | 物种 | n. |
+indicate | ['indikeit] | 指示, 表明 | v. |
+essential | [i'sen∫əl] | 本质的, 基本的 | adj. |
+region | ['ri:dӡən] | 区域, 领域 | n. |
+fossil | ['fɔsl] | 化石 | n. |
+even | ['i:vən] | 偶数的；甚至, 即使；平等均分 | adj. adv. v. |
+temperature | ['temprɪt∫ə(r)] | 温度 | n. |
+select | [si'lekt] | 选择, 挑选 | vt. |
+brief | [bri:f] | 摘要, 简介；短暂的 | n. v. adj. |
+planet | ['plænɪt] | 行星 | n. |
+predator | ['predətə] | 掠夺者; 食肉动物 | n. |
+sound | [saund] | 健康的；声音；听起来 | adj. n. v. |
+community | [kə'mju:niti] | 社区; 社团; 生物群落 | n. |
+minor | ['mainə] | 辅修；较小的 | n. adj. |
+rate | [reit] | 比率; 速度；估价; 定级 | n. v. |
+factor | ['fæktə] | 因素; 代理人 | n. |
+ancient | ['ein∫ənt] | 古代的; 过时的；古代人 | adj. n. |
+organism | ['ɔ:ɡənizəm] | 生物, 有机体 | n. |
+flow | [fləu] | 流动; 流程 | n. |
+yawn | [jɔ:n] | 打呵欠 | v. |
+highlight | ['haɪlaɪt] | 显著强调 | n. v. |
+termite | ['tə:mait] | 白蚁 | n. |
+infant | ['infənt] | 婴幼儿 | n. |
+source | [sɔ:s] | 来源, 源头 | n. |
+crop | [krɔp] | 农作物, 庄稼；种植收获 | n. v. |
+create | [kri'eit] | 创造发明 | v. |
+extinction | [iks'tiŋk∫ən] | 灭绝 | n. |
+resource | [ri'sɔ:s] | 资源; 财力物力 | n. |
+groundwater | ['graʊnd'wɔtɚ] | 地下水 | n. |
+layer | ['leiə] | 层；分层 | n. v. |
+event | [i'vent] | 事件活动 | n. |
+affect | [ə'fekt] | 影响, 感动；感情 | vt. n. |
+sediment | ['sedimənt] | 沉淀(物) | n. |
+involve | [in'vɔlv] | 包含, 牵涉, 介入 | v. |
+determine | [di'tə:min] | 确定, 下决心 | v. |
+deposit | [di'pɔzit] | 沉淀(物); 存款 | n. v. |
+mean | [mi:n] | 表示; 打算；平均数；刻薄的 | v. n. adj. |
+cycle | ['saikl] | 周期, 循环 | n. |
+pottery | ['pɔtəri] | 陶器 | n. |
+pacific | [pə'sifik] | 和平的; 平静的；(Pacific 太平洋) | adj. |
+glacier | [ˈgleɪʃər] | 冰川 | n. |
+individual | [͵indi'vidjuəl] | 个人；单独个体的 | n. adj. |
+rub | [rʌb] | 摩擦 | v. |
+gas | [ɡæs] | 气体; 汽油; 瓦斯 | n. |
+signal | ['siɡnl] | 信号 | n. |
+site | [sait] | 地点, 遗址；坐落安置于 | n. v. |
+behavior | [bi'heivjə] | 举止, 行为 | n. |
+aquifer | ['ækwifə] | 蓄水层 | n. |
+beg | [beɡ] | 乞讨; 恳求(原谅) | v. |
+charge | [t∫ɑ:dӡ] | 费用; 掌管; 电荷；装满; 充电 | n. v. |
+hypothesis | [hai'pɔθisis] | 假设 | n. |
+impact | ['impækt] | 碰撞, 影响 | n. v. |
+primary | ['praiməri] | 主要, 初步的；第一 | adj. n. |
+economy | [ɪˈkɑnəmi] | 经济 | n. |
+vary | ['vεəri] | 改变 | v. |
+view | [vju:] | 观点; 风景；看待 | n. v. |
+cover | ['kʌvə] | 掩盖 | n. v. |
+survive | [sə'vaiv] | 幸存, 生还 | v. |
+physical | ['fizikəl] | 身体的, 物质的 | adj. |
+researcher | [ˈriːsɜːrtʃər] | 研究员 | n. |
+sometime | ['sʌmtaim] | 过去或将来的；某个时间 | adj. adv. |
+tend | [tend] | 趋向 | vi. |
+thus | [ðʌs] | 因此 | adv. |
+terrestrial | [ti'restriəl] | 陆地的; 地球的 | adj. |
+mediterranean | [͵meditə'reinjən] | 地中海的 | adj. |
+mineral | ['minərəl] | 矿物 | n. |
+exchange | [iks't∫eindӡ] | 交换, 交流；交易, 兑换 | n. vt. |
+complex | ['kɔmpleks] | 复杂的；建筑群 | adj. n. |
+volcano | [vɔl'keinəu] | 火山 | n. |
+
+[List 02]
+feature | ['fi:t∫ə] | 特征；使有特色 | v. n. |
+channel | ['t∫ænl] | 海峡; 频道; 途径；引导 | v. n. |
+statement | ['steitmənt] | 声明, 陈述 | n. |
+presence | ['prezns] | 出现, 到场; 存在 | n. |
+buck | [bʌk] | 雄鹿; <美语> 元 | n. |
+influence | ['influəns] | 影响 | n. v. |
+location | [ləu'kei∫ən] | 位置, 场所 | n. |
+settlement | ['setlmənt] | 沉淀; 定居; 解决; 结算 | n. |
+statue | ['stætju:] | 雕像 | n. |
+product | ['prɔdəkt] | 产品; 作品; 乘积 | n. |
+still | [stil] | 平静；静止的；仍然 | adj. adv. n. |
+ecosystem | [i:kə'sistəm] | 生态系统 | n. |
+evolve | [i'vɔlv] | 发展, 进化 | v. |
+across | [ə'krɔs] | 穿过, 越过 | adv. |
+grain | [ɡrein] | 谷物; 颗粒 | n. |
+stimulus | ['stimjuləs] | 刺激物 | n. |
+stream | [stri:m] | 小河; 流 | n. v. |
+reservoir | ['rezəvwɑ:] | 水库, 蓄水池 | n. |
+local | ['ləukəl] | 地方的, 当地的 | adj. |
+phrase | [freiz] | 短语; 措辞 | n. |
+turtle | ['tə:tl] | 乌龟; 海龟 | n. |
+available | [əˈveɪləbl] | 可行的, 有空的；可获得的 | adj. |
+route | [ru:t] | 路线, 渠道 | n. |
+significant | [siɡ'nifikənt] | 重要的; 显著的 | adj. |
+establish | [is'tæbli∫] | 建立, 设置 | vt. |
+identify | [ai'dentifai] | 鉴别, 确定 | v. |
+jaw | [dӡɔ:] | 下颚, 下巴 | n. |
+observe | [əb'zə:v] | 观察, 观测; 遵守 | v. |
+composition | [kɔmpə'zi∫ən] | 组成; 作品; 作文 | n. |
+engine | ['endӡin] | 发动机; 机车 | n. |
+origin | ['ɔridӡin] | 起源; 出身 | n. |
+stability | [stə'biliti] | 稳定性 | n. |
+range | [reindӡ] | 山脉; 范围 | n. |
+solar | ['səulə] | 太阳, 日光的 | adj. |
+coast | [kəust] | 海岸 | n. |
+melt | [melt] | (；(使)融化, 熔化 | v. |
+decline | [di'klain] | 下降; 衰落; 婉拒 | v. |
+claim | [kleim] | 主张, 断言 | n. |
+attic | ['ætik] | 阁楼 | n. |
+marine | [mə'ri:n] | 海洋的；海军陆战队士兵 | n. adj. |
+unite | [ju(:)'nait] | 联合, 团结 | v. |
+religious | [ri'lidӡəs] | 宗教的; 虔诚的 | adj. |
+urban | ['ə:bən] | 城市的 | adj. |
+irrigate | [ˈɪrɪɡeɪt] | 灌溉 | v. |
+benefit | ['benifit] | 利益; 受益; 有益于 | n. v. |
+matter | ['mætə] | 事件; 物质; 重要性；有重要性 | v. n. |
+periodic | [piəri'ɔdik] | 周期, 定期的 | adj. |
+characteristic | [͵kæriktə'ristik] | 特点, 品质, 特有的 | adj. |
+atmosphere | ['ætməsfiə] | 大气层; 气氛 | n. |
+crater | ['kreitə] | 火山口, 陨石坑; 弹坑 | n. |
+visual | ['vizjuəl] | 视觉的, 可见的 | adj. |
+migration | [mai'ɡrei∫ən] | 迁徙, 移居 | n. |
+emphasize | ['emfəsaɪz] | 强调突出 | vt. |
+maintain | [meɪnˈteɪn] | 维持, 保养; 坚持 | vt. |
+replace | [ri(:)'pleis] | 代替 | vt. |
+illustrate | ['iləstreit] | 举例说明, 图解 | vt. |
+internal | [ɪnˈtɜrnl] | 内部的, 国内的 | adj. |
+mound | [maund] | 土墩; 一堆 | n. |
+meter | ['mi:tə] | 米；计量, 测量 | v. n. |
+climax | ['klaimæks] | 高潮, 顶点 | n. |
+property | ['prɔpəti] | 财产, 特性 | n. |
+contribute | [kən'tribju:t] | 贡献, 捐助 | v. |
+decrease | [di:'kri:s] | 减少 | n. v. |
+glacial | [ˈgleɪʃl] | 冰川的 | adj. |
+Dutch | ['dʌt∫] | 荷兰 (人, 语, 的) | n. adj. |
+ant | [ænt] | 蚂蚁 | n. |
+oxygen | ['ɔksidӡən] | 氧气; 元素氧 | n. |
+pressure | [`pre∫ə(r)] | 压力; 施压 | n. v. |
+reflection | [ri'flek∫ən] | 反射, 反省, 反映 | n. |
+geothermal | [,dʒio'θɝml] | 地热的 | adj. |
+
+[List 03]
+ceramic | [si'ræmik] | 陶器(的) | n. adj. |
+contrast | ['kɔntræst] | 对比, 对照 | n. |
+nest | [nest] | 巢, 窝 | n. |
+blood | [blʌd] | 血; 血统 | n. |
+continent | ['kɔntinənt] | 大陆, 陆地 | n. |
+reveal | [ri'vi:l] | 揭示; 展现, | vt. |
+Cretaceous | [krɪˈteɪʃəs] | 白垩纪(的) | n. adj. |
+represent | [͵ri:pri'zent] | 象征; 代表 | v. |
+throughout | [θru(:)'aut] | 贯穿 | prep. adv. |
+clay | [klei] | 粘土 | n. |
+cellar | ['selə] | 地下室, 酒窖 | n. |
+enable | [i'neibl] | 使能够 | vt. |
+locate | [ləu'keit] | 定位, 位于 | v. |
+extend | [iks'tend] | 延伸, 扩展 | v. |
+density | ['densiti] | 密度 | n. |
+stratum | ['streitəm] | 地层; 阶层 | n. |
+sequence | ['si:kwəns] | 顺序, 序列 | n. |
+Egyptian | [ɪ'dӡɪp∫(ə)n] | 埃及 (人, 的) | adj. |
+current | ['kʌrənt] | 水流, 电流; 趋势；当前的 | n. adj. |
+shell | [∫el] | 外壳; 炮弹 | n. |
+nutrient | ['nju:triənt] | 营养 (的) | n. adj. |
+canal | [kə'næl] | 运河, 沟渠 | n. |
+style | [stail] | 风格, 类型, 样式 | n. |
+meteorite | ['mi:tjərait] | 流星; 陨石 | n. |
+expand | [iks'pænd] | 扩大, 扩展 | v. |
+host | [həust] | 主人；主持 | n. v. |
+particle | ['pɑ:tikl] | 微粒; 颗粒; 粒子 | n. |
+Martian | ['mɑ:∫iən] | 火星人 | n. |
+relative | ['relətiv] | 相关的；亲戚 | adj. n. |
+mill | [mil] | 磨坊, 工厂; 研磨 | n. v. |
+against | [əˈgɛnst] | 反对; 倚靠 | prep. |
+specific | [spi'sifik] | 具体特定的 | adj. |
+import | [im'pɔ:t] | 进口, 输入 | n. v. |
+consist | [kən'sist] | 由...组成 (of) | vi. |
+advantage | [əd'vɑ:ntidӡ] | 优势, 利益 | n. |
+algae | ['ældʒi] | 藻类 | n. |
+geology | [dʒiˈɑlədʒi] | 地质(学) | n. |
+vase | [vɑ:z] | 花瓶 | n. |
+military | ['militəri] | 军事的, 军用的 | adj. |
+shift | [∫ift] | 移动; 更替; 轮班；换挡 | n. v. |
+vessel | ['vesl] | 船; 容器; 血管 | n. |
+diversity | [dai'və:siti] | 多样性, 差异 | n. |
+adapt | [əˈdæpt] | 适应, 改编 | v. |
+original | [ə'ridӡənəl] | 最初原始的；原件; 原文 | adj. n. |
+preserve | [pri'zə:v] | 保护, 保存 | vt. |
+characterize | ['kærɪktəraɪz] | 描述特性, 塑造人物 | v. |
+mechanical | [mi'kænikl] | 机械的 | adj. |
+Jovian | [ˈdʒoviən] | 木星的 | adj. |
+obtain | [əb'tein] | 拿到, 获得 | vt. |
+global | ['ɡləubəl] | 全球的; 球形的 | adj. |
+associate | [ə'səu∫ieit] | 联系, 联合; 联想；同事伙伴 | v. n. |
+extensive | [iks'tensiv] | 广阔的; 大量的 | adj. |
+dinosaur | ['dainəsɔ:] | 恐龙 | n. |
+draw | [drɔ:] | 绘画; 拖; 引起注意 | v. |
+carbon | ['kɑ:bən] | 碳 | n. |
+architecture | ['ɑ:kitekt∫ə] | 建筑, 建筑学 | n. |
+sign | [sain] | 标记; 签名; 手语 | n. |
+potential | [pə'ten∫(ə)l] | 潜在, 可能的；潜力; [物理]电势 | adj. n. |
+craft | [krɑ:ft] | 手工艺；手工制作 | n. v. |
+timberline | ['tɪmbəlaɪn] | 树带界线; 林线 | n. |
+pore | [pɔr] | 空隙; 毛孔 | n. |
+hare | [hεə] | 野兔；飞跑 | n. v. |
+occupy | [ˈɑkjupaɪ] | 占领; 从事 | vt. |
+civilization | [ˌsɪvələˈzeɪʃn] | 文明, 文化 | n. |
+nestling | ['nesliŋ] | 雏鸟, 幼鸟 | n. |
+autobiography | [ˌɔːtəbaɪˈɑːɡrəfi] | 自传 | n. |
+inhabitant | [in'hæbitənt] | 居民, 住户 | n. |
+account | [ə'kaunt] | 帐目; 账户；解释; 认为是 | n. v. |
+generate | ['dӡenə͵reit] | 产生; 发电 | vt. |
+volume | [ˈvɑljum] | 体积, 容量; 音量 | n. |
+
+[List 04]
+herd | [hə:d] | 兽群, 牧群；放牧 | n. v. |
+drift | [drift] | 漂流; 漂泊 | n. |
+association | [ə͵səusi'ei∫ən] | 协会, 社团; 联合; 联；想 | n. |
+Rome | [rəum] | 罗马 (意大利首都) | n. |
+habitat | ['hæbitæt] | 栖息地, 住处 | n. |
+commercial | [kə'mə:∫əl] | 商业的, 贸易的；广告 | adj. n. |
+fort | [fɔ:t] | 堡垒；设置要塞保卫 | n. v. |
+male | [meil] | 男性的, 雄性的；男性; 雄性动物 | adj. n. |
+estimate | ['estimeit] | 评估判断, 预测 | n. v. |
+extinct | [iks'tiŋkt] | 灭绝的 | adj. |
+tissue | ['tisju:] | 动、植物的组织; 薄；纸; 面巾纸 | n. |
+emerge | [i'mə:dӡ] | 出现浮现; 暴露 | vi. |
+challenge | ['t∫ælindӡ] | 挑战; 质疑; 驳斥 | n. v. |
+marsh | [mɑ:∫] | 湿地, 沼泽 | n. |
+Nile | [nail] | 尼罗河 (非洲东北；部) | n. |
+right-handed | ['rait'hændid] | 用右手 (的,；地) | adj. adv. |
+archaeologist | [͵ɑ:ki'ɔlədӡist] | 考古学家 | n. |
+cue | [kju:] | 暗示, 提示; 线索；给...暗示 | n. vt. |
+prey | [prei] | 被捕食者; 受害者 | n. |
+advance | [əd'vɑ:ns] | 前进; 预支付；进展; 预付款；预先的 | v. n. adj. |
+ecologist | [i'kɔlədӡist] | 生态学家 | n. |
+atomic | [ə'tɔmik] | 原子的；原子能的 | adj. |
+mammal | ['mæməl] | 哺乳动物 | n. |
+boundary | ['baundəri] | 分界线; 范围 | n. |
+residence | ['rezidəns] | 住处; 居住 | n. |
+evaporation | [i͵væpə'rei∫ən] | 蒸发 | n. |
+succession | [sək'se∫ən] | 连续; 继承；生物演替 | n. |
+observation | [͵əbzə:'vei∫ən] | 观察, 观测 | n. |
+imply | [im'plai] | 暗示, 意味 | vt. |
+city-state | ['siti'steit] | 城邦 | n. |
+pastoralism | [ˈpæstərəlɪzəm] | 田园主义 | n. |
+elite | [eɪ'li:t] | 上层精英 | n. |
+principle | ['prinsəpl] | 原则, 原理 | n. |
+visible | ['vizəbl] | 看得见, 明显的 | adj. |
+petroleum | [pəˈtrəʊliəm] | 石油 | n. |
+combine | [kəm'bain] | (使)联合, 结合 | v. |
+share | [∫εə] | 股份; 市场占有率；共享 | n. v. |
+external | [eks'tə:nl] | 外部的 | adj. |
+drop | [drɔp] | 落下; 降低; 退出；滴落; 少量 | v. n. |
+dominant | ['dɔminənt] | 占优势,支配地位的 | adj. |
+phenomenon | [fi'nɔminən] | 现象 | n. |
+opportunity | [͵ɔpə'tju:niti] | 机会, 时机 | n. |
+insect | ['insekt] | 昆虫; 卑鄙小人 | n. |
+Netherlands | ['nεðələndz] | 荷兰 | n. |
+transition | [træn'ziӡən] | 过渡, 转变, 变迁 | n. |
+sophisticated | [sə'fistikeitid] | 复杂精致的；富有经验的 | adj. |
+avoid | [ə'vɔid] | 避开, 预防 | vt. |
+capacity | [kə'pæsiti] | 容量; 性能; 才能 | n. |
+crystal | [ˈkrɪstl] | 晶体; 水晶；透明清楚的 | n. adj. |
+case | [keɪs] | 实例; 情况; 案件；容器盒子 | n. |
+rhythm | ['riðəm] | 节奏, 韵律 | n. |
+skeleton | [ˈskelɪtn] | 骨骼, 梗概 | n. |
+ritual | [ˈrɪtʃuəl] | 典礼, (宗教)仪式 | n. |
+assume | [əˈsju:m] | 假定, 认为; 承担 | vt. |
+innovation | [ˌɪnəˈveɪʃn] | 改革, 创新 | n. |
+accumulate | [əˈkju:mjəleɪt] | 堆积,积累 | v. |
+landscape | [ˈlændskeɪp] | 风景, 地形 | n. |
+reliable | [rɪˈlaɪəbl] | 可靠的, 可信赖的 | adj. |
+invention | [ɪnˈvenʃn] | 发明, 创造 | n. |
+millennium | [mɪˈleniəm] | 一千年 | n. |
+desertification | [dɪˌzɜ:tɪfɪˈkeɪʃn] | 沙漠化 | n. |
+asteroid | [ˈæstərɔɪd] | 小行星 | n. |
+situation | [ˌsɪtʃuˈeɪʃn] | 情况; 形势; 位置 | n. |
+define | [dɪˈfaɪn] | 定义; 规定 | v. |
+fantasy | ['ˈfæntəsi] | 幻想; 想像 | n. v. |
+drought | [draʊt] | 干旱 | n. |
+solution | [səˈlu:ʃn] | 解决; 溶解; 溶液 | n. |
+decade | [ˈdekeɪd] | 十年 | n. |
+propose | [prəˈpoʊz] | 提议; 计划; 求婚 | v. |
+fracture | [ˈfræktʃə(r)] | 破裂; 骨折, 折断 | n. v. |
+
+[List 05]
+liquid | [ˈlɪkwɪd] | 液体；液体的 | n. adj. |
+arise | [əˈraɪz] | 产生; 出现; 起立；起源于 | v. |
+substance | [ˈsʌbstəns] | 物质; 实质 | n. |
+porosity | [pɔ:ˈrɒsəti] | 多孔性 | n. |
+carve | [kɑ:v] | 雕刻, 切开 | v. |
+abundance | [əˈbʌndəns] | 丰富, 充裕 | n. |
+aspect | [ˈæspekt] | 方面; 面貌 | n. |
+raw | [rɔ:, rɔ] | 生的, 未加工的 | adj. |
+considerable | [kənˈsɪdərəbəl] | 相当大或多的 | adj. |
+cereal | [ˈsɪəriəl] | 谷物; 谷类(食品) | n. |
+obsidian | [ɑbˈsɪdiən] | 黑曜石 | n. |
+efficient | [ɪˈfɪʃnt] | 有效率的 | adj. |
+fee | [fi:] | 费用 | n. |
+consequence | [ˈkɒnsɪkwəns] | 结果, 成果; 结论 | n. |
+crisis | [ˈkraɪsɪs] | 危机 | n. |
+scholar | [ˈskɒlə(r)] | 学者 | n. |
+dioxide | [daɪˈɒksaɪd] | 二氧化物 | n. |
+toxic | [ˈtɒksɪk] | 有毒, 中毒的 | adj. |
+coastal | [ˈkəʊstl] | 沿海的;海岸的 | adj. |
+lie | [lai] | 躺; 坐落于; 说谎；谎言 | v. n. |
+access | [ˈækses] | 入口; 查阅权限；访问存取信息 | n. vt. |
+expose | [ɪk'spəʊz] | 揭露揭发; 使曝光 | vt. |
+indeed | [ɪnˈdi:d] | 的确; 实际上 | adv. |
+favorable | ['feɪvərəbl] | 赞同称赞的; 有利的 | adj. |
+pot | [pɒt] | 锅; 罐子; 茶壶; 陶盆 | n. |
+migrate | [maɪˈgreɪt] | 移居; 迁徙 | v. |
+secondary | [ˈsekəndri] | 第二的; 次要辅助的；中等中学的 | adj. |
+retain | [rɪˈteɪn] | 保持保留; 记住 | vt. |
+capable | [ˈkeɪpəbl] | 有能力的; 胜任的 | adj. |
+annual | [ˈænjuəl] | 每年; 一年的；年刊；一年生植物 | adj. n. |
+tectonic | [tekˈtɒnɪk] | 构造的 | adj. |
+freshwater | [ˈfreʃwɔ:tə(r)] | 淡水的；淡水(河湖) | adj. n. |
+numerous | [ˈnju:mərəs] | 许多的；数不清的 | adj. |
+explosion | [ɪkˈspləʊʒn] | 爆炸; 爆发 | n. |
+navigate | [ˈnævɪgeɪt] | 导航；成功应对困难 | v. |
+rarely | [ˈreəli] | 少有罕见地 | adv. |
+responsible | [rɪˈspɒnsəbl] | 尽责的；有责任的 | adj. |
+spice | [spaɪs] | 香料调味品 | n. |
+geometric | [ˌdʒi:əˈmetrɪk] | 几何学的 | adj. |
+originate | [əˈrɪdʒɪneɪt] | 引起; 创作；创始起源于 | v. |
+variation | [ˌveəriˈeɪʃn] | 变化; 变量 | n. |
+erosion | [ɪ'rəʊʒn] | 腐蚀侵蚀; 磨损 | n. |
+bison | [ˈbaɪsn] | 美洲野牛 | n. |
+rural | [ˈrʊərəl] | 乡村的 | adj. |
+favor | ['feɪvə] | 赞同；偏袒; 更喜爱 | n. vt. |
+breed | [bri:d, brid] | 繁殖；品种 | v. n. |
+conduct | [kənˈdʌkt] | 行为举止；执行; 指挥 | n. v. |
+cessation | [sɛˈseʃən] | (暂时)停止, 休止 | n. |
+drain | [dreɪn] | 排水; 耗尽；排水(系统) | v. n. |
+project | [ˈprɑdʒekt] | 项目; 放映投射；伸出突出 | v. |
+scrape | [skreɪp] | 刮去；擦刮; 刮痕 | vt. n. |
+league | [li:g] | 联盟; 联赛；使结盟 | n. v. |
+archaeological | [ˌɑ:kɪə'lɒdʒɪkl] | 考古学的 | adj. |
+female | [ˈfi:meɪl] | 女性的,雌性的；雌性动植物 | adj. n. |
+permanent | [ˈpɜ:mənənt] | 永久的; 耐久的 | adj. |
+dominate | [ˈdɒmɪneɪt] | 支配; 占优势 | v. |
+mine | [maɪn] | 矿; 矿井；开采 | n. v. |
+availability | [əˌveɪlə'bɪlətɪ] | 有效性; 可用性 | n. |
+apparent | [əˈpærənt] | 明显的; 貌似的 | adj. |
+extent | [ɪkˈstent] | 程度; 长度; 广大地域 | n. |
+isolate | [ˈaɪsəleɪt] | 使隔离孤立; 绝缘 | v. |
+trap | [træp] | 诱骗; 困住；圈套陷阱 | v. n. |
+physiological | [ˌfɪziə'lɑdʒɪk(ə)l] | 生理的,生理学的 | adj. |
+competitor | [kəmˈpetɪtə(r)] | 竞争者 | n. |
+regional | [ˈri:dʒənl] | 地区的;区域的 | adj. |
+arch | [ɑ:tʃ, ɑrtʃ] | 拱门, 拱形；拱起 | n. v. |
+stigma | [ˈstɪɡmə] | 花朵柱头; 污名耻辱 | n. |
+encode | [ɪnˈkəʊd] | 加密; 编码 | vt. |
+approximately | [əˈprɒksɪmətli] | 大约近似 | adv. |
+stem | [stem, stɛm] | 植物的茎秆；(from) 起源于 | n. v. |
+
+[List 06]
+detect | [dɪˈtekt] | 查明发现; 侦察 | vt. |
+cylinder | [ˈsɪlɪndə(r)] | 圆筒, 圆柱; 汽缸 | n. |
+parasite | [ˈpærəsaɪt] | 寄生物, 寄生虫 | n. |
+permeability | [ˌpɜ:mɪə'bɪlətɪ] | 渗透性 | n. |
+concentration | [ˌkɑnsnˈtreɪʃn] | 集中; 专心; 关注; 浓度 | n. |
+amnesia | [æmˈniʒə] | 健忘症 | n. |
+glaciation | [ˌɡleɪsiˈeɪʃn] | 冻成冰, 冰河作用 | n. |
+demonstrate | [ˈdɛmənˌstret] | 示范, 证明, 论证 | v. |
+inhabit | [ɪnˈhæbɪt] | 居住于, 栖息 | vt. |
+elevation | [ˌɛləˈveʃən] | 高度, 海拔 | n. |
+flipper | [ˈflɪpɚ] | 脚蹼; 鳍足 | n. |
+frequency | [ˈfrikwənsi] | 频率; 发生次数 | n. |
+rabbit | [ˈræbɪt] | 兔, 野兔 | n. |
+course | [kɔ:s] | 课程; 航线; 河道；一道菜 | n. |
+fault | [fɔ:lt] | 缺点; 故障; 地壳断层 | n. |
+invest | [ɪnˈvest] | 投资; 投入 | n. |
+pebble | [ˈpebl] | 卵石 | n. |
+gravity | [ˈɡrævɪti] | 引力, 重力 | n. |
+pastoralist | ['pɑstərəlɪst] | 牧民, 田园派作家 | n. |
+overcome | [ˌəʊvəˈkʌm] | 战胜, 克服 | v. |
+colonize | [ˈkɑlənaɪz] | 建立殖民地; 大批繁殖 | v. |
+empire | [ˈempaɪə(r)] | 帝国; 企业集团 | n. |
+porcelain | [ˈpɔ:səlɪn] | 瓷, 瓷器；瓷制的; 精美的 | n. adj. |
+nebula | [ˈnɛbjələ] | 星云 | n. |
+contemporary | [kənˈtemprəri] | 当代的; 同代的；同代人 | adj. n. |
+plankton | [ˈplæŋktən] | 浮游生物 | n. |
+feed | [fi:d] | 喂食; 供应; 满足；饲料 | v. n. |
+proportion | [prəˈpɔrʃn] | 比率; 比例; 相称 | n. |
+perception | [pəˈsepʃn] | 知觉; 觉察; 观念 | n. |
+organic | [ɔ:ˈgænɪk] | 有机的; 生物的；自然的; 器官的 | adj. |
+countercurrent | ['kaʊntəˌkʌrənt] | 逆流；相反地 | n. adv. |
+analysis | [əˈnælɪsɪs] | 分析 | n. |
+existence | [ɪɡˈzɪstəns] | 存在; 逆境中生活 | n. |
+spot | [spɑt] | 地点; 斑点; 污点; 职务；弄上污渍; 污辱 | n. v. |
+collision | [kəˈlɪʒən] | 碰撞, 冲突 | n. |
+parlor | ['pɑ:lə] | 客厅; 起居室; 休息室 | n. |
+infantile | [ˈɪnfəntaɪl] | 婴儿的; 婴儿期的 | adj. |
+long-term | [lɒŋ tɜ:m] | 长期的 | adj. |
+appropriate | [əˈproʊpriət] | 适当的, 恰当的 | adj. |
+whereas | [ˌwerˈæz] | 然而 | conj. |
+transform | [trænsˈfɔ:m] | 转换; 改变; 改造 | v. |
+era | [ˈɪrə] | 纪元, 年代 | n. |
+artisan | [ˌɑ:tɪˈzæn] | 工匠, 技工 | n. |
+adopt | [əˈdɑpt] | 采取, 采纳; 收养 | vt. |
+verbal | [ˈvɜrbl] | 言语的; 口头的；动词的 | adj. |
+fluctuation | [ˌflʌktʃʊˈeʃən] | 波动, 涨落 | n. |
+concern | [kənˈsɜ:n] | 影响涉及; 关心；担心 | vt. n. |
+recall | [rɪˈkɔl] | 召回; 回想 | n. vt. |
+peninsula | [pəˈnɪnsələ] | 半岛 | n. |
+output | [ˈaʊtˌpʊt] | 产量; 输出 | n. v. |
+sculpture | [ˈskʌlptʃɚ] | 雕刻; 塑像 | n. v. |
+celebrity | [səˈlɛbrɪti] | 名人; 名气 | n. |
+seafloor | ['si:flɒə] | 海底 | n. |
+mislead | [ˌmɪsˈli:d] | 误导; 引入歧途 | vt. |
+transformation | [ˌtrænsfəˈmeɪʃn] | 变化; 转换 | n. |
+reject | [rɪˈdʒekt] | 拒绝; 排斥 | v. |
+core | [kɔ:(r)] | 核心; 果核 | n. |
+sample | [ˈsɑ:mpl] | 样品; 取样；抽样调查; 体验 | n. v. |
+average | [ˈævərɪdʒ] | 平均一般的；平均值；算平均值; 拉平 | adj. n. v. |
+variability | [ˌveəriəˈbɪləti] | 变化性, 易变 | n. |
+appeal | [əˈpi:l] | 上诉; 恳求; 打动；有吸引力; 呼吁 | n. v. |
+inclusion | [ɪnˈkluʒən] | 包含, 内含物 | n. |
+tension | [ˈtɛnʃən] | 紧张; 分歧; 拉力张力；拉紧 | n. v. |
+corridor | [ˈkɒrɪdɔ:(r)] | 走廊, 通道 | n. |
+distribution | [ˌdɪstrəˈbjuʃən] | 分配; 分布; 分销 | n. |
+enormous | [ɪˈnɔrməs] | 巨大庞大的 | adj. |
+distinguish | [dɪˈstɪŋɡwɪʃ] | 区别, 辨别 | v. |
+acquire | [əˈkwaɪr] | 获得取得; 学到 | vt. |
+lung | [lʌŋ] | 肺 | n. |
+guild | [ɡɪld] | 同业公会; 行会 | n. |
+
+[List 07]
+episode | [ˈepɪsoʊd] | 插曲; 片段; 一集 | n. |
+furthermore | [ˌfɜrðərˈmɔr] | 此外; 而且 | adv. |
+seal | [sil] | 密封; 印章; 海豹；密封; 盖章 | n. v. |
+depict | [dɪˈpɪkt] | 描绘, 描述 | vt. |
+engraving | [ɪnˈɡreɪvɪŋ] | 版画; 雕刻；雕刻 | n. v. |
+productivity | [ˌprɑ:dʌkˈtɪvəti] | 生产率, 生产力 | n. |
+enhance | [ɪnˈhæns] | 提高, 加强 | vt. |
+similarity | [ˌsɪməˈlærɪti] | 类似; 相似物 | n. |
+character | [ˈkærəktɚ] | 性格; 特点; 字母；角色 | n. |
+reflective | [rɪˈflɛktɪv] | 反射的, 反映的；反省的; 反光的 | adj. |
+massive | [ˈmæsɪv] | 巨大; 大而重的 | adj. |
+colonization | [kɑːlə nɪˈzeɪʃən] | 殖民 | n. |
+concept | [ˈkɑnsept] | 概念; 观点 | n. |
+dramatic | [drəˈmætɪk] | 戏剧的, 戏剧性的；引人注目的 | adj. |
+stencil | [ˈstɛnsəl] | 图案模板；用模板印刷 | n. vt. |
+virtually | [ˈvɜrtʃuəli] | 实际上, 事实上 | adv. |
+conclude | [kənˈklud] | 得结论; 结束终止 | vi. |
+productive | [prəˈdʌktɪv] | 有成效多产的 | adj. |
+approach | [əˈprəʊtʃ] | 接近; 处理；途径; 接近 | v. n. |
+instrumental | [ˌɪnstrəˈmentl] | 乐器的; 仪器的 | adj. |
+polar | [ˈpəʊlə(r)] | 极地的, 两极的 | adj. |
+consumer | [kənˈsumə(r)] | 消费者, 客户 | n. |
+round | [raʊnd] | 圆弧的; 整数的；圆形; 回合；绕行 | adj. n. v. |
+response | [rɪˈspɑns] | 反应; 回答 | n. |
+cell | [sɛl] | 细胞; 牢房; 电池；囚禁 | n. v. |
+retreat | [rɪˈtrit] | 撤退 | n. |
+projection | [prəˈdʒɛkʃən] | 预测; 规划; 投射；突起物 | n. |
+electron | [ɪˈlektrɑn] | 电子 | n. |
+dependent | [dɪˈpɛndənt] | 依靠的; 有瘾的; 取决于 | adj. |
+edge | [ɛdʒ] | 边线; 优势；给什么什么加边 | n. v. |
+adjust | [əˈdʒʌst] | 适应, 调整, 校正 | v. |
+ice-free | ['aɪsˌfri] | 不冰冻的 | adj. |
+diverse | [daɪˈvɜrs] | 多种多样的 | adj. |
+muscle | [ˈmʌsəl] | 肌肉; 力量; 权威 | n. |
+dissolve | [dɪˈzɑlv] | 溶解; 解除 | v. |
+eliminate | [ɪˈlɪməˌnet] | 消除; 淘汰 | vt. |
+undergo | [ˌʌndərˈgoʊ] | 经历; 承受 | vt. |
+bear | [ber] | 熊；忍受; 承担; 支撑; 生育 | n. v. |
+sandstone | [ˈsændstoʊn] | 砂岩; 砂石 | n. |
+interior | [ɪnˈtɪriə(r)] | 内部内地；内部的; 国内的 | n. adj. |
+distinctive | [dɪˈstɪŋktɪv] | 独特的; 有有特色 | adj. |
+achieve | [əˈtʃiv] | 取得; 实现 | v. |
+belief | [bɪˈlif] | 信任; 信念; 看法 | n. |
+diameter | [daɪˈæmɪtɚ] | 直径 | n. |
+temperate | [ˈtɛmpərɪt] | 适度的, 温和的 | adj. |
+surplus | [ˈsɜrpləs] | 过剩多余的；余额; 盈余 | adj. n. |
+birth | [bɜrθ] | 出生分娩; 出身 | n. |
+absence | [ˈæbsəns] | 缺席; 缺乏 | n. |
+sufficient | [səˈfɪʃənt] | 充足, 充分的 | adj. |
+comparison | [kəmˈpærɪsən] | 比较, 对照 | n. |
+despite | [dɪˈspaɪt] | 尽管; 虽然 | prep. |
+dynasty | [ˈdaɪnəsti] | 朝代, 王朝 | n. |
+shale | [ʃeɪl] | 页岩 | n. |
+silt | [sɪlt] | 淤泥; 泥沙 | n. |
+tendency | [ˈtɛndənsi] | 倾向趋势; 癖好 | n. |
+derive | [dɪˈraɪv] | 起源于, 来自; 获得 | v. |
+abandon | [əˈbændən] | 放弃; 丢弃; 中止 | vt. |
+cultivate | [ˈkʌltɪveɪt] | 耕作种植；培养栽培 | vt. |
+category | [ˈkætəgɔri] | 种类; 类别 | n. |
+aboriginal | [ˌæbəˈrɪdʒənəl] | 原产的; 土著的；澳大利亚土著 | adj. n. |
+argument | [ˈɑrgjumənt] | 争论; 辩论; 论据理由 | n. |
+extract | [ɪkˈstrækt] | [ɛkˈstrækt]；提取; 选取; 提炼；摘录; 引文 | n. vt. |
+profit | [ˈprɑfɪt] | 利润; 好处；得益于; 获益 | n. v. |
+series | [ˈsɪriz] | 系列, 连续; 串联 | n. |
+audience | [ˈɔdiəns] | 观众, 听众, 读者 | n. |
+dense | [dɛns] | 密集的; 浓的 | adj. |
+hunter-gatherer | [ˈhʌntɚ ˈɡæðərər] | 靠采猎生活的人 | n. |
+arid | [ˈærɪd] | 干旱的; 贫瘠的；枯燥的 | adj. |
+orient | [ˈɔriənt] | 标定方向；以...为参照；东方; 亚洲 | v. n. |
+seemingly | [ˈsiːmɪŋli] | 看来似乎; 表面上貌似 | adv. |
+
+[List 08]
+countryside | [ˈkʌntriˌsaɪd] | 乡村 | n. |
+finch | [fɪntʃ] | 雀类小鸟 | n. |
+fin | [fɪn] | 鱼鳍; 鳍状物 | n. |
+mosaic | [moʊˈzeɪɪk] | 马赛克；镶嵌图案 | n. v. |
+intensity | [ɪnˈtɛnsɪti] | 强烈; 强度 | n. |
+equilibrium | [ˌikwəˈlɪbriəm] | 平衡; 均衡; 平静 | n. |
+communication | [kəˌmjunɪˈkeʃən] | 通讯; 交流 | n. |
+comparative | [kəmˈpærətɪv] | 相对比的; 比较的；比较级 | adj. n. |
+livestock | [ˈlaɪvstɑk] | 家畜, 牲畜 | n. |
+symbiotic | [ˌsɪmbaɪ'ɒtɪk] | 共生的 | adj. |
+severe | [sɪˈvɪr] | 严峻的; 严厉的; 艰难 | adj. |
+eruption | [ɪˈrʌpʃən] | 爆发 | n. |
+fern | [fɜrn] | 蕨类植物 | n. |
+Greece | [ɡris] | 希腊 | n. |
+trail | [trel] | 追踪；足迹; 小径; 一缕 | v. n. |
+ratio | [ˈreɪʃioʊ] | 比率; 比例 | n. |
+alternative | [ɔlˈtɜrnətɪv] | 替代的,；备选的；可选择的事物 | adj. n. |
+quartz | [kwɔrts] | 石英 | n. |
+myth | [mɪθ] | 神话；奇人奇事 | n. |
+document | [ˈdɑkjumənt] | 文档; 文件；记录 | n. vt. |
+frontier | [frʌnˈtɪr] | 边界; 前沿, 新领域 | n. |
+efficiency | [ɪˈfɪʃənsi] | 效率; 效能 | n. |
+remarkable | [rɪˈmɑrkəbl] | 异常的; 卓越的; 显著的 | adj. |
+isotope | [ˈaɪsətoʊp] | 同位素 | n. |
+perceive | [pərˈsi:v] | 意识到; 发觉; 理解 | v. |
+possess | [pəˈzɛs] | 拥有; 具备; 控制 | vt. |
+engage | [ɪn'gedʒ] | 参与; 吸引; 雇佣；引起注意 | v. |
+medieval | [ˌmidiˈivəl] | 中世纪的, 中古的 | adj. |
+runoff | [ˈrʌnˌɔf] | 径流; 流入河的雨水溢 | n. |
+copper | [ˈkɑpə(r)] | 铜; 铜币；铜色的,；红棕色的 | n. adj. |
+stimulate | [ˈstɪmjəˌlet] | 刺激; 激励 | v. |
+disappear | [ˌdɪsəˈpɪr] | 消失; 消亡 | vi. |
+offspring | [ˈɔfsprɪŋ] | 子孙后代 | n. |
+strait | [stret] | 海峡 | n. |
+enclosure | [ɪnˈkloʊʒə(r)] | 围场; 圈地 | n. |
+shallow | [ˈʃæloʊ] | 浅的；肤浅的; 微弱的 | adj. |
+rite | [raɪt] | 仪式典礼 | n. |
+yield | [jild] | 产生; 让步; 放弃；产量; 收益 | v. n. |
+prior | [ˈpraɪɚ] | 优先的; 在...之前 | adj. |
+cease | [sis] | 停止; 终止 | v. |
+lichen | [ˈlaɪkən] | 地衣 | n. |
+independent | [ˌɪndɪˈpendənt] | 独立地; 自立地; 无关 | adj. |
+reduction | [rɪˈdʌkʃən] | 减少; 降低 | n. |
+lowland | [ˈloʊlənd] | 低地；低地的 | n. adj. |
+debate | [dɪˈbet] | 辩论; 争论；讨论; 考虑 | n. vt. |
+accumulation | [əˌkjumjəˈleʃən] | 积累; 堆积物 | n. |
+multiple | [ˈmʌltəpəl] | 多重的；多个的；倍数; 并联 | adj. n. |
+highland | [ˈhaɪlənd] | 高地的；高地 | adj. n. |
+bacteria | [bækˈtɪriə] | 细菌 | n. |
+injury | [ˈɪndʒəri] | 伤害, 损害 | n. |
+mantle | [ˈmæntl] | 地幔; 覆盖物; 斗篷 | n. |
+storage | [ˈstɔrɪdʒ, ˈstor-] | 储藏; 存储 | n. |
+constant | [ˈkɑnstənt] | 持续不断的; 永恒的；常量 | adj. n. |
+assign | [əˈsaɪn] | 分派; 布置; 赋予 | vt. |
+unique | [juˈnik] | 唯一独特的 | adj. |
+dramatically | [drə'mætɪkli] | 戏剧地; 显著地 | adv. |
+status | [ˈstetəs] | 地位; 状态; 身份 | n. |
+widespread | [ˈwaɪdˈsprɛd] | 分布广的; 普遍的 | adj. |
+forehead | [ˈfɔrhed] | 前额, 前部 | n. |
+overall | ['əuvərɔ:l] | 全部的；全体地；外套工作服 | adj. adv. n. |
+interpret | [ɪnˈtɜrprɪt] | 解释; 诠释; 口译 | v. |
+decorative | [ˈdekəreɪtɪv] | 装饰性的 | adj. |
+niche | [niʃz] | 生态位; 壁龛 | n. |
+consistent | [kənˈsɪstənt] | 一致连贯的 | adj. |
+portray | [pɔrˈtreɪ] | 描绘; 扮演 | vt. |
+modify | [ˈmɑdɪfaɪ] | 修改; 限定 | v. |
+gravel | [ˈɡrævəl] | 沙砾; 碎石 | n. |
+stoneware | [ˈstoʊnwer] | 粗陶器 | n. |
+resistance | [rɪˈzɪstəns] | 抵抗; 阻力; 电阻 | n. |
+gap | [ɡæp] | 缺口; 间隔; 差距 | n. |
+
+[List 09]
+punctuate | [ˈpʌŋktʃuˌet] | 加标点; 不时打断；加强 | vt. |
+stress | [strɛs] | 精神压力；强调; 加压 | n. vt. |
+aim | [em] | 瞄准; 致力于；目标; 意图；很好精美 | v. n. adj. adv. |
+fine | [faɪn] | 罚款；罚款 | n. vt. |
+altitude | [ˈæltɪtud] | 海拔高度 | n. |
+convince | [kənˈvɪns] | 使相信; 说服 | vt. |
+reproduce | [ˌriprəˈdus] | 复制; 重现; 繁殖 | v. |
+evaporate | [ɪˈvæpəˌret] | 蒸发; 消失 | v. |
+velocity | [vəˈlɑsəti] | 速率; 速度 | n. |
+flutter | [ˈflʌtɚ] | 摆动, 颤动; 飘飞 | n. v. |
+cluster | [ˈklʌstɚ] | 团; 丛; 群；聚集 | n. v. |
+substratum | [ˈsʌbstreɪtəm] | 下层土壤 | n. |
+metamorphosis | [ˌmetəˈmɔrfəsɪs] | 变形 | n. |
+specialize | [ˈspɛʃəˌlaɪz] | 专门从事；详细说明 | v. |
+accompany | [əˈkʌmpəni] | 陪伴; 伴奏 | v. |
+earthenware | [ˈɜrθnwer] | 陶器；陶制的 | n. adj. |
+shortage | [ˈʃɔrtɪdʒ] | 不足; 缺少 | n. |
+complicate | [ˈkɑmplɪkeɪt] | 使复杂化 | v. |
+proxy | [ˈprɑksi] | 代理人; 替代物 | n. |
+hinder | [ˈhɪndɚ] | 阻碍 | v. |
+engrave | [ɛnˈɡrev] | 雕刻; 铭记 | vt. |
+combination | [ˌkɑmbɪˈneɪʃn] | 结合; 联合体 | n. |
+superior | [suˈpɪriə(r)] | 更高级; 优良的；上级 | adj. n. |
+neonate | [ˈnioʊneɪt] | 新生儿 | n. |
+handle | [ˈhændl] | 把手；处理应付; 驾驭 | n. v. |
+territory | [ˈterətɔri] | 领土; 地盘, 范围 | n. |
+domestic | [dəˈmɛstɪk] | 家庭的; 国内的；驯养的 | adj. |
+context | [ˈkɑntekst] | 背景; 上下文 | n. |
+apart | [əˈpɑrt] | 相距; 分离; 除外 | adv. |
+moreover | [mɔrˈoʊvər] | 此外 | adv. |
+fluctuate | [ˈflʌktʃuˌet] | 波动; 涨落 | v. |
+endure | [ɪnˈdʊr] | 忍耐; 持续 | v. |
+regulate | [ˈrɛɡjəˌlet] | 调节; 控制; 管理 | vt. |
+fungus | [ˈfʌŋɡəs] | 真菌; 霉菌 | n. |
+invertebrate | [ɪnˈvɜrtɪbrət] | 无脊椎动物 | n. |
+flourish | [ˈflɜrɪʃ] | 茂盛; 繁荣; 挥动；挥舞 | v. n. |
+dome | [doʊm] | 圆屋顶; 穹顶 | n. |
+authority | [əˈθɔrəti] | 权威; 权限; 当权者 | n. |
+expedition | [ˌɛkspɪˈdɪʃən] | 远征; 探险队 | n. |
+ecology | [iˈkɑlədʒi] | 生态学 | n. |
+nestle | [ˈnɛsəl] | 安居安置; 紧贴 | v. |
+artificial | [ˌɑrtɪˈfɪʃl] | 人造的; 人为的 | adj. |
+distribute | [dɪˈstrɪbjut] | 分配; 分销; 撒播 | vt. |
+calcium | [ˈkælsiəm] | 钙 | n. |
+screen | [skrin] | 屏幕; 屏风；放映; 遮挡; 筛查 | n. v. |
+credit | [ˈkrɛdɪt] | 信用; 贷款; 赞扬；学分；信任; 归功于 | n. vt. |
+predictable | [prɪˈdɪktəbl] | 可预见的 | adj. |
+release | [rɪ'lis] | 释放; 发布; 发行 | n. vt. |
+mud | [mʌd] | 烂泥; 污物 | n. |
+eject | [ɪ'dʒekt] | 喷出, 驱逐 | v. |
+hence | [hɛns] | 因此 | adv. |
+reclamation | [ˌrɛkləˈmeʃən] | 开垦开拓; 改造 | n. |
+molecule | [ˈmɑlɪkjul] | 分子; 微小颗粒 | n. |
+linguistic | [lɪŋˈɡwɪstɪk] | 语言的, 语言学的 | adj. |
+conventional | [kənˈvɛnʃənəl] | 传统的; 通常的 | adj. |
+bronze | [brɑnz] | 青铜; 青铜色；铜牌；青铜色的 | n. adj. |
+migratory | [ˈmaɪgrətɔri] | 迁移的 | adj. |
+redistribution | [ˌridɪstrɪ'bjuʃn] | 重新分配 | n. |
+faithful | [ˈfeθfəl] | 忠诚的; 如实的 | adj. |
+vast | [væst] | 广阔巨大的；大量的; 巨额的 | adj. |
+survival | [sərˈvaɪvl] | 生存; 幸存 | n. |
+carnivore | [ˈkɑːrnɪvɔːr] | 食肉动物 | n. |
+advertiser | [ˈædvərtaɪzə(r)] | 广告客户 | n. |
+issue | [ˈɪʃu] | 问题争论; 发行；发布; 流出 | n. v. |
+wealthy | [ˈwɛlθi] | 充分富有的 | adj. |
+herder | [ˈhɚdɚ] | 牧民 | n. |
+fluid | [ˈfluɪd] | 液体, 流体；流动的; 流畅的 | n. adj. |
+coordinate | [ko'ɔrdəˈnet] | 协调; 调和；坐标 | v. n. |
+initiate | [ɪˈnɪʃieɪt] | 开始; 发起; 创始 | v. |
+seepage | [ˈsipɪdʒ] | 渗漏; 渗液 | n. |
+
+[List 10]
+motif | [moʊˈtif] | 主题; 动机; 装饰图案 | n. |
+psychology | [saɪˈkɑːlədʒi] | 心理学 | n. |
+division | [dɪˈvɪʒən] | 分开, 分隔; 部门; 除法 | n. |
+rat | [ræt] | 大老鼠 | n. |
+grind | [ɡraɪnd] | 磨碎; 折磨；碾压; 碾压 | v. n. |
+professional | [prəˈfɛʃənəl] | 专业职业的；专业人士 | adj. n. |
+exaggerate | [ɪgˈzædʒəreɪt] | 夸张; 夸大 | v. |
+ridge | [rɪdʒ] | 山脉; 山脊 | n. |
+occupation | [ˌɑkjuˈpeɪʃn] | 职业; 工作; 占领; 占 | n. |
+cultivation | [ˌkʌltəˈveʃən] | 栽培; 耕种; 培养 | n. |
+plentiful | [ˈplɛntɪfəl] | 丰富的; 大量的 | adj. |
+previous | [ˈpriviəs] | 先前的; 以前的 | adj. |
+resist | [rɪˈzɪst] | 抵抗; 反对; 克制 | v. |
+household | [ˈhaʊshoʊld] | 家庭; 全家人 | n. |
+anthropologist | [ˌænθrəˈpɑlədʒɪst] | 人类学家 | n. |
+occurrence | [əˈkɜrəns] | 发生, 出现; 遭遇, 事件 | n. |
+aware | [əˈwer] | 意识到的; 知道的 | adj. |
+resistant | [rɪˈzɪstənt] | 有抵抗力的; 顽固的 | adj. |
+inspire | [ɪnˈspaɪr] | 鼓舞; 激励; 启发 | vt. |
+enlarge | [ɪnˈlɑrdʒ] | 扩大, 放大 | v. |
+timber | [ˈtɪmbɚ] | 木材, 木料 | n. |
+ancestor | [ˈænsestər] | 祖先 | n. |
+threat | [θrɛt] | 威胁; 恐吓 | n. |
+consumption | [kənˈsʌmpʃən] | 消费; 消耗 | n. |
+format | [ˈfɔrmæt] | 版式; 形式；格式化; 设计版面 | n. v. |
+fertility | [fərˈtɪləti] | 土地肥沃; 富饶; 繁殖 | n. |
+switch | [swɪtʃ] | 开关; 转换；改变; 调换 | n. v. |
+crustal | ['krʌstəl] | 地壳的 | adj. |
+norm | [nɔrm] | 标准; 规范; 准则 | n. |
+trace | [tres] | 追踪; 追溯；踪迹; 微量 | v. n. |
+motivation | [ˌmotəˈveʃən] | 动力; 动机 | n. |
+emergence | [ɪˈmədʒəns] | 出现; 兴起 | n. |
+turnpike | [ˈtɜrnpaɪk] | 公路；付费公路 | n. |
+mature | [məˈtʃʊr] | 成熟的; 成年的；成熟; 到期 | adj. v. |
+fairly | [ˈferli] | 适当地; 公平地；简直 | adv. |
+shelter | [ˈʃɛltɚ] | 居所; 收容所; 遮蔽；避难; 庇护 | n. v. |
+bull | [bʊl] | 公牛; 大型雄性动物 | n. |
+diet | [ˈdaɪɪt] | 日常饮食；节制饮食 | n. v. |
+loan | [loʊn] | 贷款；借出 | n. v. |
+shield | [ʃild] | 盾; 护罩；保护; 掩护 | n. vt. |
+airway | [ˈerweɪ] | 航线; 呼吸道 | n. |
+circumstance | [ˈsɜrkəmstæns] | 环境, 情形 | n. |
+deficiency | [dɪˈfɪʃənsi] | 缺乏; 缺陷 | n. |
+partner | [ˈpɑrtnə(r)] | 搭档; 合伙人；合作合伙 | n. v. |
+equatorial | [ˌikwəˈtɔriəl] | 赤道的 | adj. |
+surmise | [sərˈmaɪz] | 猜测 | v. |
+limestone | [ˈlaɪmstoʊn] | 石灰岩 | n. |
+shrub | [ʃrʌb] | 灌木 | n. |
+export | [ˈekspɔrt] | 出口, 输出 | n. v. |
+vital | ['vaɪtl] | 必需的; 至关重要的 | adj. |
+semiarid | [ˌsɛmiˈærɪd] | 半干旱的 | adj. |
+irregular | [ɪˈrɛɡjəlɚ] | 不规则的; 无规律的 | adj. |
+ideal | [aɪˈdiəl] | 理想的; 不实际的；完美典范 | adj. n. |
+alter | [ˈɔltɚ] | 改变; 更改 | v. |
+glamor | ['glæmə] | 魔法, 迷人的美；迷惑 | n. v. |
+perceptual | [pərˈseptʃuəl] | 理解的; 感知的 | adj. |
+tiredness | [ˈtaɪrdnɪs] | 疲劳, 疲倦 | n. |
+surveyor | [sərˈveɪə(r)] | 测量员; 鉴定人 | n. |
+investigation | [ɪnˌvɛstɪˈɡeʃən] | 调查; 审查 | n. |
+microscopic | [ˌmaɪkrəˈskɑpɪk] | 极小的, 微观的 | adj. |
+manufacture | [ˌmænjəˈfæktʃɚ] | 制造, 生产; 捏造；批量工业品 | vt. n. |
+barrier | [ˈbæriɚ] | 障碍壁垒; 关卡栅栏 | n. |
+dietary | [ˈdaɪɪˌtɛri] | 饮食的；规定的食物 | adj. n. |
+provincial | [prəˈvɪnʃəl] | 省的; 乡下的；守旧的；外省人 | adj. n. |
+festival | [ˈfɛstəvəl] | 节日; 节庆 | n. |
+continuous | [kənˈtɪnjuəs] | 连续不断的 | adj. |
+fortify | [ˈfɔrtɪfaɪ] | 加强；构筑防御工事 | v. |
+subsidence | [səbˈsaɪdns] | 沉降; 下沉 | n. |
+blame | [blem] | 指责; 责备 | n. vt. |
+voyage | [ˈvɔɪɪdʒ] | 航海; 航行 | n. v. |
+
+[List 11]
+villa | [ˈvɪlə] | 乡间别墅 | n. |
+swamp | [swɑmp] | 沼泽; 湿地；淹没; 陷入困境 | n. v. |
+chant | [tʃænt] | 圣歌, 祷文；反复呼喊 | n. vt. |
+subterranean | [ˌsʌbtəˈreniən] | 地表下的 | adj. |
+sustain | [səˈsten] | 维持; 支持; 遭受; 救济 | vt. |
+nitrogen | [ˈnaɪtrədʒən] | 氮, 氮气 | n. |
+facilitate | [fəˈsɪlɪteɪt] | 促进助长 | vt. |
+centigrade | [ˈsɛntɪˌɡred] | 摄氏度 | n. |
+gene | [dʒin] | 基因 | n. |
+figurative | [ˈfɪɡjərətɪv] | 比喻的; 修饰性的 | adj. |
+tropical | [ˈtrɑpɪkl] | 热带的 | adj. |
+exhibitor | [ɪɡˈzɪbɪtər] | 展出者; 参展商 | n. |
+readily | [ˈredɪli] | 乐意地; 快捷容易地 | adv. |
+reverse | [rɪˈvɜrs] | 使反转；反面颠倒的；反向; 倒转 | v. adj. n. |
+crab | [kræb] | 蟹 | n. |
+metabolic | [ˌmetə'bɒlɪk] | 新陈代谢的 | adj. |
+clam | [klæm] | 蚌蛤; 钳子 | n. |
+peak | [pik] | 山峰; 顶点；达到高峰；最高的 | n. vi. adj. |
+initial | [ɪˈnɪʃəli] | 最初的；首字母；姓名首字母签名 | adj. n. v. |
+dehydration | [ˌdihaɪˈdreʃən] | 脱水; 干燥 | n. |
+textile | [ˈtɛksˌtaɪl] | 纺织品 | n. |
+aggression | [əˈɡrɛʃən] | 侵略性; 好斗性 | n. |
+mechanism | [ˈmɛkəˌnɪzəm] | 机制; 途径; 机械装置 | n. |
+substantial | [səbˈstænʃəl] | 重大的; 大量的；结实的 | adj. |
+hot-spot | ['hɒtsp'ɒt] | 热点 | n. |
+plume | [plum] | (烟尘、火焰、水流的)；一股一团 | n. |
+compass | [ˈkʌmpəs] | 罗盘, 指南针; 圆规 | n. |
+disclaimer | [dɪsˈklemɚ] | 否认 (免责声明); 放弃 | n. |
+intersect | [ˌɪntərˈsekt] | 横断横穿; 交叉 | v. |
+recruit | [rɪˈkrut] | 新兵新成员；招聘征募 | n. v. |
+drag | [dræɡ] | 拖拽；拖拉; 累赘 | v. n. |
+pose | [poʊz] | 摆姿势; 提出；姿态 | v. n. |
+compose | [kəmˈpoʊz] | 构成; 创作撰写 | v. |
+aid | [eɪd] | 帮助; 辅助；有助于; 援助 | n. v. |
+specialist | [ˈspɛʃəlɪst] | 专家; 专科医生 | n. |
+terrace | [ˈtɛrɪs] | 台地梯台; 平台 | n. |
+lava | ['lɑvə] | 熔岩, 火山岩 | n. |
+hemisphere | [ˈhemɪsfɪr] | 半球 | n. |
+stretch | [strɛtʃ] | 伸展; 延伸；舒展; 一段时间 | v. n. |
+resemble | [rɪˈzɛmbəl] | 与...相像,类似 | vt. |
+porous | [ˈpɔrəs] | 多孔的; 渗透的 | adj. |
+crystalline | [ˈkrɪstəlɪn] | 结晶的; 清澈的 | adj. |
+literature | [ˈlɪtərəˌtʃʊr] | 文学; 文献 | n. |
+confirm | [kənˈfɜrm] | 确认; 证实 | v. |
+secure | [sɪˈkjʊr] | 安全的; 牢固的；保卫; 实现; 固定 | adj. v. |
+precipitation | [prɪˌsɪpɪˈteʃən] | 降水; 沉淀 | n. |
+explore | [ɪkˈsplɔr] | 探险; 探测; 勘查 | v. |
+tolerate | [ˈtɑləreɪt] | 忍耐; 容忍宽容 | vt. |
+discipline | [ˈdɪsəplɪn] | 训练; 处罚；纪律; 学科 | v. n. |
+critic | [ˈkrɪtɪk] | 批评家; 评论员 | n. |
+scale | [skel] | 规模; 比例; 鱼鳞; 等级；攀登; 去鳞 | n. v. |
+forth | [fɔrθ] | 向前 | adv. |
+mercantile | [ˈmɜrkəntaɪl] | 商贸的; 商人的 | adj. |
+code | [koʊd] | 准则; 代码; 法典；编码; 加密 | n. v. |
+sedimentary | [ˌsɛdəˈmɛntəri] | 沉积的 | adj. |
+crude | [krud] | 粗糙的; 粗鲁的；天然的；原材料; 原油 | adj. n. |
+horn | [hɔrn] | 角; 号角喇叭 | n. |
+financial | [faɪˈnænʃl] | 财政的; 金融的 | adj. |
+aside | [əˈsaɪd] | 在旁边; 撇开 | adv. |
+scarce | [skers] | 缺乏的; 罕见的 | adj. |
+condense | [kənˈdɛns] | 凝结; 压缩; 冷凝 | v. |
+ancestral | [ænˈsɛstrəl] | 祖先的; 祖传的 | adj. |
+criticize | [ˈkrɪtɪˌsaɪz] | 批评; 评价 | v. |
+principal | [ˈprɪnsəpəl] | 主要的; 本金的；负责人；主角; 本金 | adj. n. |
+spear | [spɪr] | 矛; 枪；刺; 戳 | n. v. |
+formal | [ˈfɔrml] | 正规的; 正式的 | adj. |
+frontality | [frʌn'tælɪtɪ] | 正面描绘 | n. |
+warm- | [ˈwɔrmˈblʌdɪd] | 暖血的; 恒温的 | adj. |
+blooded | [sneɪl] | 蜗牛, 迟钝的人 | n. |
+confuse | [kənˈfjuz] | 使困窘; 使混乱 | v. |
+
+[List 12]
+presentation | [ˌpriːzenˈteɪʃn] | 介绍; 陈述；外观; 表演 | n. |
+cast | [kæst] | 铸造; 投射；全体演员; 铸型 | v. n. |
+bound | [baʊnd] | 弹跳; 增长；界限; 跃起；注定; 相连 | v. n. adj. |
+wakefulness | [ˈwekfəlnɪs] | 难以入睡 | n. |
+influential | [ˌɪnfluˈɛnʃəl] | 有权势的；有影响的人 | adj. n. |
+restrict | [rɪˈstrɪkt] | 限制; 约束 | vt. |
+devoid | [dɪˈvɔɪd] | 缺乏的 | adj. |
+drainage | [ˈdrenɪdʒ] | 排水系统; 排水 | n. |
+slope | [sloʊp] | 斜坡; 斜面；倾斜; 悄悄潜行 | n. v. |
+expense | [ɪkˈspɛns] | 费用; 开销 | n. |
+genetic | [dʒəˈnɛtɪk] | 遗传的; 基因的 | adj. |
+contaminate | [kənˈtæməˌnet] | 污染; 弄脏 | v. |
+specimen | [ˈspɛsəmən] | 标本; 样品 | n. |
+sector | [ˈsɛktɚ] | 行业; 领域; 扇形 | n. |
+saturate | [ˈsætʃəˌret] | 浸透; 使充满饱和 | vt. |
+interfere | [ˌɪntərˈfɪr] | 干涉; 妨碍 | v. |
+rib | [rɪb] | 肋骨 | n. |
+enrich | [ɛnˈrɪtʃ] | 充实; 使富足 | vt. |
+cement | [sɪˈmɛnt] | 水泥; 胶合剂；粘牢; 巩固 | n. vt. |
+diminish | [dɪˈmɪnɪʃ] | 减少; 减弱 | v. |
+overland | [ˈoʊvərlænd] | 经由陆路的 | adj. |
+resident | [ˈrɛzɪdənt] | 居住的; n. 居民 | adj. |
+stock | [stɑk] | 股份; 股票; 库存；存货的；囤积 | n. adj. v. |
+sort | [sɔ:t] | 种类; 排序；分类 | n. v. |
+precise | [prɪˈsaɪs] | 明确的; 精确的 | adj. |
+scribe | [skraɪb] | 抄写员 | n. |
+corn | [kɔrn] | 谷物; 玉米 | n. |
+upwelling | [ʌp'welɪŋ] | (水流的) 上涌 | n. v. |
+data | [ˈdetə] | 数据 | n. |
+season | [ˈsizən] | 季节; 时令；调味 | n. v. |
+gradient | [ˈɡrediənt] | 梯度; 变化率 | n. |
+signature | [ˈsɪɡnətʃɚ] | 签名; 标志特征 | n. |
+marble | [ˈmɑrbl] | 大理石 | n. |
+elongate | [ɪˈlɔŋgeɪt] | 延长加长 | vt. |
+maritime | [ˈmærɪˌtaɪm] | 海上的 | adj. |
+Venus | ['vi:nəs] | 金星; 爱神维纳斯 | n. |
+intense | [ɪnˈtɛns] | 强烈的, 紧张的; 热情的 | adj. |
+Oceania | [ˌoʊʃiˈɑniə] | 大洋洲 | n. |
+vigorous | [ˈvɪɡərəs] | 精力旺盛, 充满活力的 | adj. |
+minute | [ˈmɪnɪt] | [maɪˈnjut]；分钟; 会议记录；微小的 | adj. n. |
+epoch | [ˈepək] | 时代; 纪元 | n. |
+scatter | [ˈskætɚ] | 散开; 分散；撒开, 散播 | v. n. |
+critical | [ˈkrɪtɪkəl] | 批评的; 关键的; 严重的 | adj. |
+depression | [dɪˈprɛʃən] | 沮丧; 萧条; 洼地; 低气压 | n. |
+discharge | [dɪsˈtʃɑrdʒ] | 释放排出; 免职 | n. v. |
+predation | [prɪˈdeʃən] | 捕食, 掠夺 | n. |
+graze | [ɡreɪz] | 放牧 | n. v. |
+sibling | [ˈsɪblɪŋ] | 兄弟, 姐妹 | n. |
+bond | [bɑnd] | 纽带联系; 债券；紧密结合 | n. v. |
+scent | [sɛnt] | 香味, 气味；闻到; 察觉 | n. v. |
+reward | [rɪˈwɔrd] | 报酬; 回报；酬谢; 奖励 | n. v. |
+schedule | [ˈʃedjuːl] | 日程计划；时间安排 | n. vt. |
+meteor | [ˈmitiɚ, -ˌɔr] | 流星; 大气现象 | n. |
+determination | [dɪˌtɜrmɪˈneɪʃn] | 决心, 果断 | n. |
+ware | [wer] | 器皿 | n. |
+retrieve | [rɪˈtriv] | 取回; 找回; 挽回;恢复 | v. |
+policy | [ˈpɑləsi] | 政策 | n. |
+settler | [ˈsɛtlɚ] | 定居者; 侨民 | n. |
+duration | [duˈreɪʃn] | 持续时间; 期间 | n. |
+employ | [ɛmˈplɔɪ] | 雇用; 使用采用 | v. |
+sentence | [ˈsɛntəns] | 句子; 宣判；判决 | n. vt. |
+latitude | [ˈlætɪtud] | 纬度 | n. |
+proceed | [proʊˈsid] | 继续进行; 持续不断 | vi. |
+depletion | [dɪˈpliʃən] | 大量消耗 | n. |
+specialization | [ˌspɛʃəlɪˈzeʃən] | 专门从事; 专攻 | n. |
+sheer | [ʃɪr] | 完全地; 陡峭地 | adj. adv. |
+freight | [fret] | 货物, 货运；装货, 运输 | n. vt. |
+matrix | [ˈmetrɪks] | 矩阵; 环境 | n. |
+inability | [ˌɪnəˈbɪlɪti] | 无能, 无力 | n. |
+industrialize | [ɪnˈdʌstriəˌlaɪz] | 使工业化 | vt. |
+
+[List 13]
+variable | [ˈveriəbl] | 可变的; 变量的；变量 | adj. n. |
+entertainment | [ˌentərˈteɪnmənt] | 娱乐节目 | n. |
+olfactory | [ɑlˈfæktəri] | 嗅觉的 | adj. |
+exposure | [ɪkˈspoʊʒə(r)] | 暴露; 揭发; 曝光 | n. |
+gypsum | [ˈdʒɪpsəm] | 石膏 | n. |
+systematic | [ˌsɪstəˈmætɪk] | 系统的；成体系的 | adj. |
+govern | [ˈgʌvərn] | 统治; 支配 | v. |
+beneficial | [ˌbɛnəˈfɪʃəl] | 有利的, 有益的 | adj. |
+compact | [ˈkɑmˈpækt] | 紧凑的 | adj. |
+conquest | [ˈkɑŋkwest] | 征服; 占领 | n. |
+gulf | [ɡʌlf] | 海湾; 鸿沟 | n. |
+distinction | [dɪˈstɪŋkʃən] | 差别; 荣誉; 卓越 | n. |
+virus | [ˈvaɪrəs] | 病毒 | n. |
+inequality | [ˌɪnɪˈkwɑləti] | 不平等; 不均等 | n. |
+populate | [ˈpɑpjuleɪt] | 居住于; 生活于 | vt. |
+perennial | [pəˈrɛniəl] | 持续的; 多年生的；多年生植物 | adj. n. |
+decay | [dɪˈke] | 腐烂; 衰败; 衰落 | n. v. |
+adjacent | [əˈdʒesənt] | 邻近的 | adj. |
+enclose | [ɪnˈkloʊz] | 包围; 封入 | vt. |
+debris | [dəˈbri] | 碎片, 残骸 | n. |
+intellectual | [ˌɪntlˈɛktʃuəl] | 智力的; 才智的；知识分子 | adj. n. |
+refine | [rɪˈfaɪn] | 提炼; 改善 | vt. |
+elaborate | [ɪˈlæbəret] | 详尽说明; 精心制作；精致详尽的 | v. adj. |
+regularity | [ˌrɛɡjəˈlærətɪ] | 规律; 正规整齐 | n. |
+prosperity | [prɑˈsperəti] | 繁荣; 兴旺; 成功 | n. |
+aggressive | [əˈɡrɛsɪv] | 好斗的; 积极进取的 | adj. |
+symbiosis | [ˌsɪmbaɪˈoʊsɪs] | 共生互利关系 | n. |
+classify | [ˈklæsəˌfaɪ] | 分类,归类 | vt. |
+neolithic | [ˌniə'lɪθɪk] | 新石器时代的 | adj. |
+dairy | [ˈderi] | 牛奶场; 乳品店；奶制的 | n. adj. |
+intermediate | [ˌɪntərˈmidiət] | 中间的, 居中的；中级的 | adj. |
+syllable | [ˈsɪləbəl] | 音节 | n. |
+imitate | [ˈɪmɪˌtet] | 模仿; 仿效, | vt. |
+circulate | [ˈsɜrkjəleɪt] | 循环; 流通; 散布 | v. |
+item | [ˈaɪtəm] | 条款; 项目; 清单中一件 | n. |
+tremendous | [trɪˈmɛndəs] | 极大的; 极好的 | adj. |
+nevertheless | [ˌnevərðəˈles] | 然而; 不过 | adv. |
+aluminum | [ə'ljuminəm] | 铝 | n. |
+toddler | [ˈtɑdlə(r)] | 学步的孩童 | n. |
+achievement | [əˈtʃivmənt] | 完成达到; 成就 | n. |
+bore | [bɔr] | 令人厌烦; 钻孔打洞 | v. |
+helium | [ˈhiliəm] | 氦 | n. |
+fragile | [ˈfrædʒl] | 易碎的; 虚弱的 | adj. |
+perspective | [pərˈspektɪv] | 观点; 透视图；透视画法的 | n. adj. |
+muscular | [ˈmʌskjəlɚ] | 肌肉的; 强壮的 | adj. |
+regiment | [ˈrɛdʒəmənt] | 大量的人或物 | n. |
+cheap | [tʃip] | 便宜的; 劣质的；吝啬的 | adj. |
+realistic | [ˌriəˈlɪstɪk] | 现实逼真的；现实主义的 | adj. |
+terrain | [təˈren] | 地形; 地势; 地面 | n. |
+disperse | [dɪˈspɜːrs] | 分散; 散播 | v. |
+split | [splɪt] | 分裂; 分开；区分; 裂缝 | v. n. |
+mythology | [mɪˈθɑlədʒi] | 神话 | n. |
+intricate | [ˈɪntrɪkɪt] | 错综复杂的 | adj. |
+lavishly | [ˈlævɪʃlɪ] | 浪费挥霍地 | adv. |
+cubic | [ˈkjubɪk] | 立方体的 | adj. |
+batch | [bætʃ] | 一批一组 | n. |
+Arctic | [ˈɑrktɪk, ˈɑrtɪk] | 北极的; 寒带的；北极地区 | adj. n. |
+curvilinear | [ˌkɜrvɪˈlɪniə(r)] | 曲线的 | adj. |
+recreation | [ˌrɛkriˈeʃən] | 休闲娱乐; 重建 | n. |
+genus | [ˈdʒinəs] | (动植物的)属; 种类 | n. |
+mundane | [mʌnˈdeɪn] | 平凡世俗的 | adj. |
+pertinent | [ˈpɜrtnənt] | 有关相关的 | adj. |
+siltation | [sɪl'teɪfən] | 淤积沉淀 | n. |
+accentuate | [ækˈsɛntʃuˌet] | 强调; 加重 | vt. |
+epitomize | [ɪˈpɪtəˌmaɪz] | 成为...的缩影 | v. |
+protrude | [proʊˈtrud] | 突出, 伸出 | v. |
+emission | [ɪˈmɪʃən] | (气体、热量、光线的)；散发 | n. |
+renowned | [rɪˈnaʊnd] | 有名的, 声誉的 | adj. |
+ventilate | [ˈvɛntlˌet] | 通风; 空气流通 | vt. |
+saliva | [səˈlaɪvə] | 唾液, 口水 | n. |
+
+[List 14]
+skull | [skʌl] | 颅骨, 头盖骨 | n. |
+camel | [ˈkæməl] | 骆驼 | n. |
+browse | [braʊz] | 浏览; 翻阅; 吃草 | n. v. |
+industrialization | [ɪnˌdʌstrɪələˈzeʃən] | 工业化 | n. |
+evident | [ˈɛvɪdənt] | 明显的; 清楚地 | adj. |
+large-scale | [ˈlɑrdʒˈskel] | 大规模的, 大范围 | adj. |
+orientation | [ˌɔriɛnˈteʃən] | 方向; 定位; 取向 | n. |
+regardless | [rɪˈgɑrdləs] | 不管怎样,；无论如何 | adj. adv. |
+freeze | [friz] | 冰冻冷藏; 冻僵；停止不动 | v. |
+obstacle | [ˈɑbstəkl] | 障碍; 困难 | n. |
+agreement | [əˈɡrimənt] | 协定, 协议; 赞同一致 | n. |
+profound | [prəˈfaʊnd, pro-] | 深刻强烈的；意义深远的 | adj. |
+well-being | [ˈwɛlˈbiɪŋ] | 健康幸福 | n. |
+domestication | [dəˌmɛstəˈkeʃən] | 驯养, 驯化 | n. |
+investor | [ɪnˈvɛstɚ] | 投资者 | n. |
+arsenal | [ˈɑrsənl] | 军火库; 兵工厂 | n. |
+desirable | [dɪˈzaɪrəbəl] | 令人满意的；受欢迎的 | adj. |
+piston | [ˈpɪstən] | 活塞 | n. |
+bare | [ber] | 光秃赤裸的；勉强仅有的 | adj. |
+subsequent | [ˈsʌbsɪˌkwɛnt] | 后来, 随后的 | adj. |
+twig | [twɪɡ] | 细枝, 嫩枝 | n. |
+overtime | [ˈoʊvərtaɪm] | 加班; 额外加时 | n. |
+barren | [ˈbærən] | 荒芜贫瘠的; 空的；不育的 | adj. |
+prairie | [ˈpreri] | 北美的大草原 | n. |
+threaten | [ˈθrɛtn] | 威胁; 恐吓 | v. |
+shrine | [ʃraɪn] | 圣地; 神龛 | n. |
+trend | [trɛnd] | 趋势; 倾向 | n. |
+percentage | [pərˈsentɪdʒ] | 百分比 | n. |
+literacy | [ˈlɪtərəsi] | 能读能写; 有文化 | n. |
+swallow | [ˈswɑloʊ] | 吞咽; 忍受；燕子; 吞咽量 | v. n. |
+fauna | [ˈfɔːnə] | 动物群 | n. |
+interval | [ˈɪntərvl] | 间隔; 数学区间 | n. |
+competitive | [kəmˈpɛtɪtɪv] | 竞争的; 有竞争力的 | adj. |
+border | [ˈbɔrdə(r)] | 边界; 边疆 | n. |
+clue | [klu] | 线索 | n. |
+small-scale | [ˈsmɔlˈskel] | 小规模的; 小型的 | adj. |
+cope | [koʊp] | 处理; 应付；长袍 | v. n. |
+evaluate | [ɪˈvæljuˌet] | 评价; 估计 | v. |
+volatile | [ˈvɑlətl] | 易变不稳定；易挥发的 | adj. |
+trader | [ˈtredɚ] | 商人; 交易者 | n. |
+reclaim | [rɪˈklem] | 开垦; 收回；改造感化 | vt. n. |
+aesthetic | [ɛsˈθɛtɪk] | 艺术审美的 | adj. |
+communal | [ˈkɑmjunl] | 公共的；社区的 | adj. |
+overseas | [ˌoʊvərˈsiz] | 海外(的地) | adj. adv. |
+carbonate | [ˈkɑrbənət] | 碳酸盐 | n. |
+deform | [dɪˈfɔrm] | 变形; 畸形 | v. |
+noticeable | [ˈnoʊtɪsəbl] | 明显的; 瞩目的；显著的 | adj. |
+twist | [twɪst] | 扭动, 扭曲; 扭伤；转机; 卷曲 | v. n. |
+offshore | [ˌɔfˈʃɔ(r)] | 离岸的；近海的 | adj. adv. |
+exogenous | [ekˈsɑdʒənəs] | 外部原因的 | adj. |
+accuracy | [ˈækjərəsi] | 精确准确性 | n. |
+score | [skɔr, skor] | 得分; 成绩; 配乐；20个；评分 | n. v. |
+correspond | [ˌkɔrəˈspɑnd] | 符合; 相关; 通信 | v. |
+component | [kəmˈpoʊnənt] | 组成部分; 成分；组成的 | n. adj. |
+immigrant | [ˈɪmɪɡrənt] | 外来移民; 侨民 | n. |
+cargo | [ˈkɑrgoʊ] | (船或飞机装载) 货物 | n. |
+purchase | [ˈpɜrtʃəs] | 购买; 采购 | n. v. |
+organ | [ˈɔrgən] | 机构; 器官；风琴 | n. |
+concentrate | [ˈkɑnsntreɪt] | 全神贯注; 浓缩; 集中 | v. |
+column | [ˈkɑləm] | 圆柱; 专栏；纵列竖列 | n. |
+tame | [tem] | 驯服的；乏味的；驯化; 驾驭 | adj. v. |
+sulfide | [ˈsʌlˌfaɪd] | 硫化物 | n. |
+opposite | [ˈɑpəzət] | 对面的；截然相反地；对立面 | adj. adv. n. |
+assemble | [əˈsɛmbəl] | 集合; 装配; 聚集 | v. |
+segment | [ˈsɛɡmənt] | 部分; 片段；划分 | n. v. |
+figurine | [ˌfɪgjəˈrin] | 小雕像 | n. |
+horticulture | [ˈhɔrtɪkʌltʃə(r)] | 园艺 (学) | n. |
+rough | [rʌf] | 粗糙的；粗鲁的; 粗略的 | adj. |
+impressive | [ɪmˈprɛsɪv] | 了不起的；给人印象深刻的 | adj. |
+assessment | [əˈsɛsmənt] | 估价评估; 鉴定 | n. |
+
+[List 15]
+meadow | [ˈmedoʊ] | 草地, 牧场 | n. |
+aggregate | [ˈæɡrɪɡɪt] | 集合体；总计的；总计汇集 | n. adj. v. |
+dam | [dæm] | 水坝；筑坝 | n. v. |
+ensure | [ɛnˈʃʊr] | 确保; 担保 | vt. |
+seep | [sip] | 渗透; 漏出 | v. |
+mobility | [moʊˈbɪləti] | 流动性; 机动性 | n. |
+convert | [kənˈvɜrt] | 转变; 改造; 换算 | v. |
+decorate | [ˈdɛkəˌret] | 装饰; 粉刷 | v. |
+rational | [ˈræʃənəl] | 理性的; 合理的 | adj. |
+insulate | [ˈɪnsəleɪt] | 使隔绝,绝缘,隔音隔热 | v. |
+span | [spæn] | 跨度; 期间；横跨 | n. vt. |
+overcast | [ˌoʊvərˈkæst] | 阴天的 | adj. |
+sale | [sel] | 卖; 销售; 贱卖 | n. |
+pond | [pɑnd] | 池塘 | n. |
+narrative | [ˈnærətɪv] | 记叙文; 叙述；叙述的 | n. adj. |
+nebular | ['nebjulə] | 星云的 | adj. |
+objective | [əbˈdʒɛktɪv] | 客观的；目标; 宾语 | adj. n. |
+presumable | [prɪˈzuməbəl] | 可推测的 | adj. |
+utilize | [ˈjuːtəlaɪz] | 利用, 使用 | vt. |
+gender | [ˈdʒendər] | 性别 | n. |
+trumpet | [ˈtrʌmpɪt] | 喇叭; 小号；大力宣传 | n. v. |
+promote | [prəˈmoʊt] | 促进; 推销; 提升 | vt. |
+moss | [mɔs] | 苔藓 | n. |
+herbivore | [ˈhɜːbɪvɔː(r)] | 食草动物 | n. |
+repetition | [ˌrepəˈtɪʃn] | 重复; 背诵; 重奏 | n. |
+alert | [əˈlɜːrt] | 警戒；报警；警戒机敏的 | n. v. adj. |
+version | [ˈvɜrʒn] | 版本; 说法 | n. |
+catholic | [ˈkæθəlɪk] | 天主教的; 广泛的；天主教徒 | adj. n. |
+tide | [taɪd] | 潮汐; 潮流 | n. |
+constituent | [kənˈstɪtʃuənt] | 成分; 要素; 选民；组成的 | n. adj. |
+preschooler | [ˌpri'skulə] | (美) 学龄前儿童 | n. |
+undoubtedly | [ʌn'daʊtɪdlɪ] | 毋庸置疑地 | adv. |
+private | [ˈpraɪvɪt] | 私有的; 秘密的；私立的；列兵 | adj. n. |
+party | [ˈpɑrti] | 聚会; 党派; 协议的一方 | n. |
+discourage | [dɪsˈkɜrɪdʒ] | 使气馁, 劝阻 | vt. |
+nerve | [nɜrv] | 神经, 胆量 | n. |
+vision | [ˈvɪʒən] | 视力, 视野; 展望 | n. |
+occasion | [əˈkeɪʒn] | 时机; 场合; 原因；导致; 引起 | n. v. |
+tropic | [ˈtrɑpɪk] | (复数) 热带; 回归线 | n. |
+encounter | [ɛnˈkaʊntɚ] | 遭遇, 偶遇: 邂逅 | v. |
+exclude | [ɪk'sklud] | 排除; 阻挡拒绝 | vt. |
+simulation | [ˌsɪmjəˈleʃən] | 模仿, 模拟; 仿真 | n. |
+surpass | [sərˈpæs] | 超过; 优于胜过 | vt. |
+interstellar | [ˌɪntərˈstelə(r)] | 星际的 | adj. |
+devise | [dɪˈvaɪz] | 设计; 发明; 策划 | v. |
+dwelling | [ˈdwɛlɪŋ] | 住处; 居住 | n. |
+planetarium | [ˌplænɪˈteriəm] | 天文馆 | n. |
+resilience | [rɪˈzɪljəns] | 快速恢复的能力; 弹性 | n. |
+bulge | [bʌldʒ] | 膨胀暴涨; 凸出肿块 | n. v. |
+attribute | [əˈtrɪbjut] | 认为是; 把...归于；品质特征 | vt. n. |
+puzzle | [ˈpʌzəl] | 迷惑；难题; 费解的事 | v. n. |
+glassy | [ˈglæsi] | 似玻璃的；眼神呆滞的 | adj. adv. |
+conscience | [ˈkɑnʃəns] | 良心; 良知 | n. |
+stray | [stre] | 走失; 走神；走失离群者；零散走失的 | v. n. adj. |
+hazel | [ˈhezəl] | 榛树; 淡褐色；榛树的 | n. adj. |
+pollinate | [ˈpɑləneɪt] | 给...传授花粉 | vt. |
+fabric | [ˈfæbrɪk] | 织物; 结构 | n. |
+redundancy | [rɪˈdʌndənsi] | 过剩; 冗余; 裁员 | n. |
+toothpaste | [ˈtuθˌpest] | 牙膏 | n. |
+crush | [krʌʃ] | 压碎; 榨出; 击败；(女对男的) 迷恋 | v. n. |
+larva | [ˈlɑrvə] | 幼虫 | n. |
+maize | [meɪz] | 玉米, 玉蜀黍 | n. |
+weaver | [ˈwivɚ] | 织工, 编织者 | n. |
+lighter | [ˈlaɪtɚ] | 打火机; 点火器 | n. |
+prime | [praɪm] | 最好的; 首选的；主要的；全盛时期 | adj. n. |
+gulp | [ɡʌlp] | 狼吞虎咽；大口吸气；吞咽 | v. n. |
+pump | [pʌmp] | 泵; 打气筒；抽取; 泵送 | n. v. |
+procedure | [prəˈsidʒɚ] | 程序, 手续; 步骤 | n. |
+grand | [ɡrænd] | 宏伟壮丽的 | adj. |
+fear | [fɪr] | 害怕; 恐惧; 担忧 | n. v. |
+
+[List 16]
+conceal | [kənˈsil] | 掩盖; 隐藏; 隐瞒 | vt. |
+restless | [ˈrɛstlɪs] | 焦躁不安的 | adj. |
+constitute | [ˈkɑnstətut] | 构成, 组成; 制定, 设立 | vt. |
+birch | [bɜrtʃ] | 桦树 | n. |
+burial | [ˈbɛriəl] | 掩埋; 葬礼 | n. |
+phase | [fez] | 阶段时期; 月相的盈亏 | n. |
+refractory | [rɪˈfræktəri] | 倔强的; 难控制的 | adj. |
+prestige | [prɛˈstiʒ] | 威信; 声望 | n. |
+commodity | [kəˈmɑdəti] | 商品; 日用品 | n. |
+joint | [dʒɔɪnt] | 共同联合的；关节; 接合处 | n. adj. |
+bulk | [bʌlk] | 大体积; 大量; 大批买卖 | n. |
+crucial | [ˈkruʃəl] | 至关重要的 | adj. |
+consume | [kənˈsum] | 消耗, 消费; 吃喝饮用 | vt. |
+weaken | [ˈwikən] | 削弱; 动摇 | v. |
+flora | ['flɔrə] | 植物群 | n. |
+rival | ['raɪvl] | 竞争对手；比得上；竞争的 | v. adj. n. |
+ceremonial | [ˌserɪˈmoʊniəl] | 仪式的；仪式; 礼节 | n. adj. |
+descend | [dɪˈsɛnd] | 下降; 降临 | v. |
+sedentary | [ˈsednteri] | 久坐的; 少活动的 | adj. |
+expressive | [ɪkˈsprɛsɪv] | 表达富于表现力的 | adj. |
+cooperate | [koˈɑpəˌret] | 协作; 配合 | v. |
+fund | [fʌnd] | 基金; 储备; 现款；提供资金 | v. n. |
+nomad | [ˈnoʊmæd] | 游牧民; 流浪者 | n. |
+typical | [ˈtɪpɪkəl] | 典型的; 一贯平常的 | adj. |
+machinery | [məˈʃinəri] | 机器机械; 组织机构 | n. |
+mutualism | ['mjutʃʊrlɪzəm] | 互利共生 | n. |
+elaboration | [ɪˌlæbəˈreʃən] | 精心制作; 详尽阐述; 精致 | n. |
+discard | [dɪsˈkɑrd] | 丢弃, 抛弃；遗弃的人或物 | n. vt. |
+exceptional | [ɪkˈsɛpʃənəl] | 杰出非凡的; 例外的 | adj. |
+mystery | [ˈmɪstəri] | 神秘; 秘密 | n. |
+ore | [ɔr, or] | 矿物; 矿石 | n. |
+respiratory | [ˈrespərətɔri] | 呼吸的 | adj. |
+pastoral | [ˈpæstərəl] | 牧师的; 田园乡村的 | adj. |
+usable | [ˈjuzəbəl] | 可用的; 便于使用的 | adj. |
+liberal | [ˈlɪbərəl] | 开明的; 自由的; 慷慨的；自由主义者 | n. adj. |
+antler | [ˈæntlɚ] | 鹿角 | n. |
+hospitable | [ˈhɑːspɪtəbl] | 好客的; 宜人的 | adj. |
+timekeeper | [ˈtaɪmˌkipɚ] | 计时员; 守时的人 | n. |
+moisture | [ˈmɔɪstʃɚ] | 水分; 潮湿; 降雨量 | n. |
+secular | [ˈsɛkjəlɚ] | 世俗的 | adj. |
+accustom | [əˈkʌstəm] | 使适应, 惯于 | vt. |
+marker | [ˈmɑrkə(r)] | 标识, 标记; 记号笔 | n. |
+charcoal | [ˈtʃɑrkoʊl] | 木炭; 炭画笔 | n. |
+vertical | [ˈvɜrtɪkl] | 垂直的, 竖立的；垂直方向 | n. adj. |
+appreciate | [əˈpriʃiˌet] | 感激; 欣赏; 领会; 升值 | v. |
+detractor | [dɪˈtræktər] | 诋毁者; 贬低者 | n. |
+immense | [ɪˈmɛns] | 极大巨大的 | adj. |
+herb | [ɜrb] | 香草; 药草 | n. |
+realm | [rɛlm] | 领域, 范围; 王国 | n. |
+implement | [ˈɪmpləmənt] | 实施, 履行；工具 | n. vt. |
+probability | [ˌprɑbəˈbɪləti] | 可能性; 几率, 概率 | n. |
+conserve | [kənˈsɜrv] | 保护, 保藏, 保存 | vt. |
+radioactivity | [ˌredioækˈtɪvɪti] | 放射; 辐射 | n. |
+airflow | [ˈerfloʊ] | 空气流动; 气流 | n. |
+atom | [ˈætəm] | 原子 | n. |
+excavate | [ˈekskəveɪt] | 挖掘, 发掘 | v. |
+scheme | [skim] | 计划; 方案；密谋 | v. n. |
+egalitarian | [iˌgælɪˈteriən] | 平等主义的 | adj. |
+perform | [pərˈfɔːrm] | 表演; 执行; 起作用 | n. |
+propagate | [ˈprɑpəgeɪt] | 繁殖; 传播宣传 | v. |
+crust | [krʌst] | 外壳; 地壳; 硬皮 | n. |
+section | [ˈsɛkʃən] | 部分; 章节; 部门; 剖面图；切片, 分段 | v. n. |
+mild | [maɪld] | 温和轻微的; 不强烈的 | adj. |
+reptile | [ˈrɛptɪl] | 爬行动物 | n. |
+Saturn | [ˈsætɜrn] | 土星 | n. |
+deplete | [dɪˈplit] | 大量减少; 消耗 | v. |
+flake | [flek] | 薄片; 碎片; 火星, 火花；剥落, 脱落 | v. n. |
+Jupiter | [ˈdʒupɪtɚ] | 木星 | n. |
+lane | [len] | 小路, 小巷; 航道; 车道 | n. |
+refill | [riˈfɪl] | 再注满; 再补充 | n. v. |
+
+[List 17]
+vulnerable | [ˈvʌlnərəbəl] | 脆弱的；易受伤的; 易患病 | adj. |
+ceremony | [ˈserəmoʊni] | 典礼仪式；礼仪礼节 | n. |
+palm | [pɑm] | 手掌; 棕榈树 | n. |
+survey | [ˈsɜrveɪ] | 调查; 勘测 | n. v. |
+justify | [ˈdʒʌstəˌfaɪ] | 证明...有理；为...解释 | v. |
+enforce | [ɪnˈfɔrs] | 强制执行; 强 | vt. |
+zinc | [zɪŋk] | 锌 | n. |
+questionable | [ˈkwɛstʃənəbəl] | 可疑的 | adj. |
+utilitarian | [ˌjutɪlɪˈteriən] | 功利的；功利主义的; 实用 | adj. |
+comment | [ˈkɑment] | 评论；表达意见 | n. v. |
+intact | [ɪn'tækt] | 完整无缺的 | adj. |
+application | [ˌæplɪˈkeʃən] | 应用, 运用; 申 | n. |
+revise | [rɪˈvaɪz] | 修订; 改变 | n. v. |
+fundamental | [ˌfʌndəˈmɛntl] | 基础根本的；不可或缺的；原理 | adj. n. |
+reliance | [rɪˈlaɪəns] | 依靠; 依赖 | n. |
+vein | [ven] | 静脉; 矿脉; 叶 | n. |
+well-fed | [ˈwɛlˈfɛd] | 营养充足的；吃的好的 | adj. |
+telecommunication | [ˈtɛlɪ-kəˌmjunɪˈkeʃən] | 电信 | n. |
+detach | [dɪˈtætʃ] | 分离, 拆开; 派；使超然 | vt. |
+distinct | [dɪˈstɪŋkt] | 不同的; 清楚；明显的 | adj. |
+incorporate | [ɪnˈkɔrpəreɪt] | 包含; 吸收 | v. |
+renewable | [rɪˈnu:əbl] | 可再生的；可更新的 | adj. |
+behave | [bɪˈhev] | 表现; 举止得体 | v. |
+iodine | [ˈaɪədaɪn] | 碘, 碘酒 | n. |
+moral | [ˈmɔrəl] | 道德的；道德品行 | adj. n. |
+flaw | [flɔ] | 错误; 缺点; 瑕疵 | n. |
+administrative | [ədˈmɪnɪstreɪtɪv] | 管理的, 行政；行政职位 | adj. |
+cent | [sɛnt] | 货币单位分 | n. |
+absorb | [əbˈzɔːrb] | 吸收; 理解; 合 | v. |
+oppose | [əˈpoʊz] | 反对; 阻挠 | v. |
+intensify | [ɪnˈtɛnsəˌfaɪ] | 增强, 加剧 | v. |
+equator | [ɪˈkwetɚ] | 赤道 | n. |
+penetrate | [ˈpɛnɪˌtret] | 穿透; 渗入; 了；洞察 | v. |
+accelerate | [ækˈsɛləˌret] | 加快; 增速 | v. |
+pace | [peɪs] | 速度, 节奏; 步；踱步; 调整步调 | n. v. |
+endogenous | [enˈdɑdʒənəs] | 内源的, 内生的 | adj. |
+harden | [ˈhɑrdn] | 使变硬; 使稳定；使冷酷 | v. |
+arrange | [əˈrendʒ] | 安排; 改编乐曲 | v. |
+erode | [ɪˈroʊd] | 侵蚀; 腐蚀; 贬；削弱 | v. |
+maximum | [ˈmæksəməm] | 最大最高最多；最大的量 | adj. adv. n. |
+harmony | [ˈhɑːrməni] | 融洽和谐; 和声 | n. |
+exclusive | [ɪkˈsklusɪv] | 独有的; 高档；排外的；独家新闻 | adj. n. |
+former | [ˈfɔrmə(r)] | 以前的; 前任 | adj. |
+crowd | [kraʊd] | 人群; 一伙人；挤满; 涌入；聚集在...周围 | n. v. |
+excess | [ˈɛkˌsɛs] | 过量; 无节制；过量的, 额外的 | n. adj. |
+strategy | [ˈstrætədʒi] | 策略, 战略 | n. |
+gland | [ɡlænd] | 腺体 | n. |
+overlie | [ˌoʊvərˈlaɪ] | 躺在...上面 | v. |
+bloom | [blum] | (供观赏的)花；开花; 繁荣；肤色红润 | n. v. |
+biotic | [baɪˈɑtɪk] | 关于生命的；生物的 | adj. |
+rank | [ræŋk] | 阶层; 等级; 队；排列; 分等级 | n. v. |
+auxiliary | [ɔɡˈzɪljəri] | 辅助的; 备用；辅助; 附属机构 | adj. n. |
+autonomous | [ɔˈtɑnəməs] | 自治的 | adj. |
+metabolize | [mə'tæbəlaɪz] | 发生新陈代谢 | v. |
+zoology | [zuˈɑːlədʒi] | 动物学 | n. |
+emotion | [ɪˈmoʊʃn] | 情绪; 强烈的情感 | n. |
+attain | [əˈten] | 获得; 达到 | v. |
+fringe | [frɪndʒ] | 边缘; 次要; 外；次要外围的 | n. adj. |
+rudimentary | [ˌrudəˈmɛntəri] | 基本的; 简陋 | adj. |
+compel | [kəmˈpɛl] | 强迫 | vt. |
+intervention | [ˌɪntə'venʃn] | 干涉; 干预 | n. |
+lunar | [ˈlunɚ] | 月球的; 月亮 | adj. |
+motivate | [ˈmoʊtɪveɪt] | 激发; 激励; 驱 | vt. |
+hierarchy | [ˈhaɪərɑrki] | 分层结构; 等级 | n. |
+fate | [feɪt] | 命运天意 | n. |
+tundra | [ˈtʌndrə] | 冻土; 苔原 | n. |
+Scandinavian | [ˌskændɪ'-neɪvɪrn] | 斯堪的纳维；斯堪的纳维亚 | adj. n. |
+harsh | [hɑrʃ] | 粗糙的; 刺耳；严厉的; 艰苦的 | adj. |
+locomotive | [ˌloʊkəˈmoʊtɪv] | 火车头; 机车；移动的 | n. adj. |
+enzyme | [ˈɛnzaɪm] | 酶 | n. |
+
+[List 18]
+thrive | [θraɪv] | 兴旺兴盛; 茁壮成长 | v. |
+deciduous | [dɪˈsɪdʒuəs] | 每年落叶的 | adj. |
+catalog | [ˈkætlˌɔɡ] | 目录；列入目录 | n. v. |
+nomadic | [noʊ'mædɪk] | 游牧的; 流浪的 | adj. |
+closet | [ˈklɑzət] | 壁橱; 贮藏室；隐藏不公开的；把...关在房间里 | n. adj. v. |
+storytelling | ['stɔrɪtelɪŋ] | 讲故事 | n. |
+log | [lɔ:g] | 日志; 原木；记录; 伐木 | n. v. |
+orbit | [ˈɔrbɪt] | 轨道 | n. |
+withstand | [wɪθˈstænd] | 经受住; 承受 | vt. |
+wilderness | [ˈwɪldərnəs] | 荒野 | n. |
+simultaneous | [ˌsaɪmlˈteɪniəs] | 同时发生的 | adj. |
+Antarctica | [æn'tɑrktɪkə] | 南极洲 | n. |
+impress | [ɪmˈprɛs] | 留下深刻印象；使钦佩 | v. |
+obsolete | [ˌɑbsəˈlit] | 废弃的; 过时的 | adj. |
+oyster | [ˈɔɪstɚ] | 牡蛎; 蚝; 沉默寡言的人 | n. |
+outline | [ˈaʊtˌlaɪn] | 梗概大纲; 外形轮廓；概述; 画轮廓 | n. vt. |
+wage | [wedʒ] | 工资 | n. |
+formulate | [ˈfɔrmjuleɪt] | 构想规划; 明确表达 | vt. |
+tomb | [tum] | 坟墓 | n. |
+retrieval | [rɪˈtrivəl] | 收回, 挽回; 检索 | n. |
+band | [bænd] | 带子; 条纹; 乐队; 一群人；把...分段 | n. vt. |
+impetus | [ˈɪmpɪtəs] | 推动; 促进 | n. |
+cascade | [kæˈskeɪd] | 倾泻; 小瀑布; 串联；大量落下 | n. vi. |
+uncertainty | [ʌnˈsɜrtnti] | 没把握, 不确定 | n. |
+namely | [ˈnemli] | 也就是说; 换言之 | adv. |
+fetus | [ˈfitəs] | 胎儿 | n. |
+volunteer | [ˌvɑlənˈtɪr] | 志愿者; 义工；自告奋勇 | n. v. |
+inhibit | [ɪnˈhɪbɪt] | 抑制; 禁止 | v. |
+fragment | [ˈfræɡmənt] | 碎片; 片段；分裂 | n. v. |
+invade | [ɪnˈved] | 侵略; 入侵; 大量涌入 | v. |
+reshape | [riˈʃep] | 重塑; 打开新局面 | vt. |
+repress | [rɪˈpres] | 抑制; 压抑 | v. |
+abrupt | [əˈbrʌpt] | 突然的;意外的;粗鲁 | adv. |
+tablet | [ˈtæblɪt] | 碑匾; 药片 | n. |
+impose | [ɪmˈpoʊz] | 强制实行 | v. |
+symbol | [ˈsɪmbəl] | 象征; 标志; 符号 | n. |
+friction | [ˈfrɪkʃən] | 摩擦; 冲突 | n. |
+prolong | [prəˈlɔŋ] | 延长, 拉长 | vt. |
+fulfill | [fʊlˈfɪl] | 履行(诺言); 执行(命令；达到(目的) | vt. |
+nervous | [ˈnɜrvəs] | 紧张的; 担忧的; 神经 | adj. |
+wed | [wɛd] | 结婚 | v. |
+theorize | [ˈθiəraɪz] | 创建理论; 使理论化 | v. |
+roof | [ruf,rʊf] | 屋顶; 顶部; 上颚；给...加顶盖 | n. v. |
+ephemeral | [ɪˈfɛmərəl] | 短暂的; 一年生的 | adj. |
+combat | [ˈkɑmbæt] | 战斗; 斗争 | n. v. |
+profession | [prəˈfɛʃən] | 职业; 业界人士 | n. |
+persist | [pərˈsɪst] | 顽强坚持; 继续存在 | v. |
+administration | [ædˌmɪnɪˈstreʃən] | 管理; 施行; 行政机关 | n. |
+garrison | [ˈɡærɪsən] | 守备部队; 驻防地；驻防驻守 | n. vt. |
+mold | [mold] | 模子; 模式; 霉菌；塑造; 浇铸; 发霉 | n. v. |
+feat | [fiːt] | 功绩, 伟业; 技艺 | n. |
+long-lasting | [lɔŋ 'læstɪŋ] | 长期持久的 | adj. |
+representative | [ˌrɛprɪˈzɛntətɪv] | 代表; 议员; 类似物；典型有代表性的 | n. adj. |
+comparable | [ˈkɑmpərəbl] | 可比的; 比得上的 | adj. |
+subduction | [səb'dʌkʃən] | 减去；潜没 (地壳板块下沉) | n. |
+intention | [ɪnˈtɛnʃən] | 意图; 打算 | n. |
+oceanic | [ˌoʊʃiˈænɪk] | 海洋的 | adj. |
+infrastructure | [ˈɪnfrəˌstrʌktʃɚ] | 基础设施; 基础建设 | n. |
+patchy | [ˈpætʃi] | 不调和的; 散落的；时好时坏的 | adj. |
+court | [kɔrt] | 法院; 法庭; 宫廷; 球场；求爱; 讨好; 追求 | n. v. |
+entity | [ˈentəti] | 实体; 独立存在体 | n. |
+spectacular | [spɛkˈtækjəlɚ] | 壮观的; 惊人的；盛大的演出 | adj. n. |
+recur | [rɪˈkɚ] | [不好的事] 复发; 重现 | vi. |
+luxury | [ˈlʌɡʒəri] | 奢侈豪华; 奢侈品；奢华的 | n. adj. |
+trigger | [ˈtrɪɡɚ] | 扳机；引发; 扣扳机 | n. vt. |
+archaeology | [ˌɑrkiˈɑlədʒi] | 考古学 | n. |
+contrary | [ˈkɑntreri] | 相反(的地)；相反的情况 | adj. adv. n. |
+accomplish | [əˈkɑmplɪʃ] | 完成; 达成 | vt. |
+mast | [mæst] | 桅杆 | n. |
+stabilize | [ˈstebəˌlaɪz] | (使) 稳定, 安定 | v. |
+
+[List 19]
+hull | [hʌl] | 船体; 外壳；去壳 | n. v. |
+photosynthesis | [ˌfoʊtoʊˈsɪnθəsɪs] | 光合作用 | adj. |
+removal | [rɪˈmuvəl] | 免职; 去除; 搬迁 | n. |
+mutual | [ˈmjuːtʃuəl] | 互相的 | adj. |
+susceptible | [səˈsɛptəbəl] | 易受影响的;易受感 | adj. |
+tract | [trækt] | 大片土地 | n. |
+economical | [ˌikəˈnɑmɪkl] | 节约的; 精打细算的 | adj. |
+precede | [prɪˈsid] | 发生在...之前 | v. |
+partial | [ˈpɑːrʃl] | 部分的; 偏袒的; 喜欢 | adj. |
+firewood | [ˈfaɪərwʊd] | 木柴 | n. |
+delicate | [ˈdɛlɪkɪt] | 微妙的; 精致的; 纤细的；脆弱的 | adj. |
+rotate | [ˈroʊteɪt] | 旋转; 轮流; 交替 | v. |
+commerce | [ˈkɑmɜrs] | 商业; 贸易 | n. |
+modest | [ˈmɑdɪst] | 不太大; 适中的; 谦虚 | adj. |
+attach | [əˈtætʃ] | 把...固定; 附加；系上贴上; 赋予 | v. |
+blade | [bleɪd] | 刀片; 叶片; 桨叶 | n. |
+backbone | [ˈbækboʊn] | 脊梁骨; 分水岭；骨干; 骨气 | n. |
+portion | [ˈpɔrʃn] | 一部分；把...按份额分配 | n. v. |
+coral | [ˈkɔrəl] | 珊瑚；珊瑚色的 | n. adj. |
+static | [ˈstætɪk] | 静止的; 不变的; 静电；静电 | adj. n. |
+conspicuous | [kənˈspɪkjuəs] | 明显的；惹人注意的 | adj. |
+crack | [kræk] | 破裂折断;瓦解破解；缝隙; 爆裂声 | v. n. |
+mammoth | [ˈmæməθ] | 猛玛 (象)；庞大的 | n. adj. |
+nucleus | [ˈnukliəs] | 原子核; 组织核心 | n. |
+spectator | [ˈspekteɪtər] | (看比赛表演的)观众 | n. |
+classic | [ˈklæsɪk] | 典型的; 经典的; 古朴；经典作品 | adj. n. |
+shaft | [ʃæft] | 轴, 杆; 竖井; 一束(阳 | n. |
+confine | [kənˈfaɪn] | 限制, 禁闭；边界; 界限 | vt. n. |
+miniature | [ˈmɪnətʃər] | 小型的, 微小的；小模型; 微型画像 | adj. n. |
+soak | [soʊk] | 浸泡, 湿透; 沉浸在 | v. |
+tenfold | [ˈtenfoʊld] | 十倍的 | adj. |
+stunt | [stʌnt] | 特技表演；引人注意的；阻碍 (生长), 抑制(发展 | n. adj. v. |
+turbulence | [ˈtɜrbjələns] | 骚动, 骚乱; 湍流; 动荡 | n. |
+fade | [fed] | 褪去; 褪色; 淡出; 暗淡 | v. |
+unwilling | [ʌnˈwɪlɪŋ] | 不情愿的 | adj. |
+suppress | [səˈprɛs] | 镇压; 抑制; 阻止 | vt. |
+aquatic | [əˈkwætɪk] | 水生的; 水中的; 水产 | adj. |
+lord | [lɔrd] | 领主; 上帝; 阁下 | n. |
+reserve | [rɪˈzɜrv] | 储备; 保护区; 替补队；保留; 预约; 拥有 | n. v. |
+collide | [kəˈlaɪd] | 碰撞; 冲突; 抵触 | vi. |
+commission | [kəˈmɪʃən] | 委员会; 佣金手续费；委任 | n. v. |
+converge | [kənˈvɜrdʒ] | 汇聚; 汇合; 趋同 | v. |
+pigment | [ˈpɪɡmənt] | 颜料; 色料; 色素 | n. |
+handicraft | [ˈhændikræft] | 手工艺; 手工艺品; 手；者 | n. |
+symptom | [ˈsɪmtəm] | 症状; 征兆 | n. |
+proton | [ˈproʊtɑn] | 质子 | n. |
+philosophy | [fəˈlɑsəfi] | 哲学; 哲理 | n. |
+compress | [kəmˈprɛs] | 压缩; 精简 | vt. |
+pollute | [pəˈlutnt] | 污染; 弄脏 | v. |
+copious | [ˈkoʊpiəs] | 丰富的; 大量的; 充足 | adj. |
+standstill | [ˈstændˌstɪl] | 停顿; 停滞 | n. |
+diplomatic | [ˌdɪpləˈmætɪk] | 外交的; 有手腕策略的 | adj. |
+utensil | [juˈtɛnsəl] | 器具; 器皿; 厨房用具 | n. |
+girdle | [ˈgɜrdl] | 腰带; 环形物；围绕, 包围 | n. vt. |
+preliminary | [prɪˈlɪmɪneri] | 初步的; 预备的; 开端；准备工作; 预赛; 初步 | adj. n. |
+appendage | [əˈpɛndɪdʒ] | 附属物; 附加物 | n. |
+van | [væn] | 厢式货车; 先锋先驱 | n. |
+convex | [ˈkɑnveks] | 凸起的; 凸面的 | adj. |
+optical | [ˈɑptɪkl] | 视力的; 视觉的; 光学的 | adj. |
+calm | [kɑm] | 镇定的;风平浪静；(使)平静; 镇痛；宁静 | adj. v. n. |
+pretend | [prɪˈtend] | 假装; 扮作; 自诩 | v. |
+enlist | [ɛnˈlɪst] | 入伍; 取得; 赢得 | v. |
+amply | ['æmplɪ] | 大量地; 充足地 | adv. |
+stylish | [ˈstaɪlɪʃ] | 时髦流行的 | adj. |
+dynamic | [daɪˈnæmɪk] | 活力的; 动态的；精力充沛的 | n. |
+stab | [stæb] | 刺入, 捅刀子 | v. |
+amenity | [əˈmenəti] | 愉快舒适; 便利设施 | n. |
+claw | [klɔ] | 爪子; 钳子；用爪子抓或撕 | n. v. |
+barter | [ˈbɑrtə(r)] | 以物易物 | n. v. |
+mason | [ˈmesən] | 石匠, 泥瓦匠 | n. |
+
+[List 20]
+cosmic | [ˈkɑzmɪk] | 宇宙的; 外太空的 | adj. |
+herbivorous | [həˈbɪvərəs] | 食草的 | adj. |
+optimum | [ˈɑptɪməm] | 最优的; 最适宜的；最佳条件 | n. adj. |
+consort | [ˈkɑnsɔrt] | 统治者的配偶; 伙伴；来往; 厮混 | v. n. |
+pupa | [ˈpjupə] | 蛹 | n. |
+disturb | [dɪˈstɜːrb] | 打扰; 搅乱; 妨碍 | v. |
+desiccate | [ˈdɛsɪˌket] | 弄干, 使脱水 | vt. |
+allegedly | [ə'ledʒɪdlɪ] | 涉嫌的; 据说 | adv. |
+package | [ˈpækɪdʒ] | 包装；包裹; 一揽子提议 | n. vt. |
+pronounce | [prəˈnaʊns] | 发音; 宣称 | v. |
+urchin | [ˈɜrtʃɪn] | 海胆 | n. |
+excessive | [ɪkˈsɛsɪv] | 过分的; 过多的 | adj. |
+strain | [stren] | 拉紧; 拉伤；压力;张力; 血统, 品种; 气质 | n. v. |
+Easter | [ˈistɚ] | 复活节 | n. |
+warn | [wɔrn] | 警告, 告诫 | v. |
+deprive | [dɪˈpraɪv] | 剥夺; 使丧失 | vt. |
+exhaust | [ɪɡˈzɔst] | 耗尽; 精疲力竭；尾气, 废气 | n. v. |
+mustard | [ˈmʌstərd] | 芥末, 芥菜 | n. |
+underlie | [ˌʌndərˈlaɪ] | 构成...的基础起因 | v. |
+steady | [ˈstɛdi] | 稳定的; 镇定的; 沉着的；使稳定坚定 | v. adj. |
+interplay | [ˈɪntərpleɪ] | 相互作用 | n. |
+calculate | [ˈkælkjuleɪt] | 计算; 估计 | v. |
+slop | [slɑp] | 溢出; 溅出；废水; 剩饭 | n. v. |
+compound | [ˈkɑmpaʊnd] | 化合物; 混合物；有围墙的场地 | n. |
+lengthy | [ˈlɛŋkθi, ˈlɛŋ-] | 漫长的; 长篇大论的 | adj. |
+equivalent | [ɪˈkwɪvələnt] | 相等的, 相当的；对应物 | n. adj. |
+tidal | [ˈtaɪdl] | 潮水的; 潮汐的 | adj. |
+standardize | [ˈstændərdaɪz] | 使标准化 | vt. |
+vicinity | [vɪˈsɪnɪti] | 邻近地区; 附近 | n. |
+inhale | [ɪnˈhel] | 吸入; 吸气 | v. |
+sorghum | [ˈsɔrgəm] | 高粱 | n. |
+pollinator | ['pɒlɪneɪtə] | 传粉媒介; 传粉昆虫 | n. |
+collapse | [kəˈlæps] | 倒塌; 崩溃；垮台; 暴跌 | n. v. |
+symbolic | [sɪmˈbɑlɪk] | 象征的; 符号的 | adj. |
+temporary | [ˈtempəreri] | 短暂的; 临时的 | adj. |
+unearth | [ʌnˈɜːrθ] | 发现; 揭露; 挖掘 | vt. |
+windmill | [ˈwɪndˌmɪl] | 风车 | n. |
+sparse | [spɑrs] | 稀少的 | adj. |
+cap | [kæp] | 盖子; 帽子 | n. |
+security | [səˈkjʊrəti] | 安全; 防卫; 证券; 抵押品 | n. |
+far-reaching | [ˈfɑrˈritʃɪŋ] | 影响深远的 | adj. |
+partnership | [ˈpɑrtnərʃɪp] | 伙伴; 合作关系 | n. |
+wagon | [ˈwæɡən] | 运货马车; 车皮 | n. |
+stationary | [ˈsteɪʃəneri] | 静止的; 不动的 | adj. |
+long-lived | [ˈlɔŋˈlaɪvd,] | 长命的, 持久的 | adj. |
+implicate | [ˈɪmplɪkeɪt] | 使牵连其中; 涉及 | v. |
+relief | [rɪˈlif] | 宽慰, 安心; 免除, 减轻；救援物资 | n. |
+watercraft | ['wɔtəˌkrɑft] | 船只; 船舶 | n. |
+rebound | [ˈriˈbaʊnd] | 弹回; 恢复; 回响 | n. v. |
+maple | [ˈmepəl] | 枫树 | n. |
+via | [ˈvaɪə, ˈviə] | 经过; 凭借 | prep. |
+isle | [aɪl] | 小岛 | n. |
+spin | [spɪn] | 旋转; 甩干; 头晕; 纺纱；吐丝 | n. v. |
+meager | [ˈmiɡɚ] | 贫乏的; 不足的; 粗劣的 | adj. |
+multiply | [ˈmʌltəˌplaɪ] | 相乘; 增加; 繁殖 | v. |
+silicate | [ˈsɪlɪˌket] | 硅酸盐 | n. |
+texture | [ˈtɛkstʃɚ] | 质地; 纹理; 结构 | n. |
+weave | [wiv] | 编织；编造; 迂回行进 | v. n. |
+rigid | [ˈrɪdʒɪd] | 严格的; 刚性的; 僵硬的；顽固的 | adj. |
+workshop | [ˈwɜrkʃɑp] | 车间; 研讨会 | n. |
+monumental | [ˌmɑnjuˈmentl] | 极大的; 不朽的 | adj. |
+durable | [ˈdʊrəbl] | 耐用的; 持久的 | adj. |
+tribe | [traɪb] | 部落, 部族; 一伙人 | n. |
+agriculture | [ˈæɡrɪkʌltʃər] | 农业; 农学 | n. |
+cavity | [ˈkævɪti] | 腔洞; 蛀牙 | n. |
+bark | [bɑrk] | 树皮; 吠叫；吼叫; 厉声叫喊 | v. n. |
+pinpoint | [ˈpɪnˌpɔɪnt] | 准确指出; 精准定位；针尖; 精确位置；精确地 | n. adj. vt. |
+leak | [lik] | 漏出; 泄露; 漏电, 漏水 | n. v. |
+cliff | [klɪf] | (；(海边的) 悬崖 | n. |
+astronomy | [əˈstrɑːnəmi] | 天文学 | n. |
+
+[List 21]
+exceed | [ɪkˈsid] | 超过; 超越 | v. |
+illuminate | [ɪˈluməˌnet] | 照亮; 阐明 | v. |
+harness | [ˈhɑrnɪs] | 马具；利用; 控制 | n. v. |
+courtship | [ˈkɔrtʃɪp] | 求爱; 求偶 | n. |
+turbine | [ˈtɜrbaɪn] | 涡轮机 | n. |
+lens | [lɛnz] | 透镜, 镜头; 晶状体 | n. |
+portable | [ˈpɔːrtəbl] | 轻便的; 便于携带 | adj. |
+realize | [ˈriːəlaɪz] | 认识到; 实现 | v. |
+jewelry | [ˈdʒuəlri] | 珠宝首饰 | n. |
+herbicide | [ˈɜrbɪsaɪd] | 除草剂 | n. |
+spite | [spaɪt] | 恶意; 怨恨 | n. |
+mission | [ˈmɪʃən] | 使命; 天职；代表团 | n. |
+dangle | [ˈdæŋɡəl] | 悬挂; 悬摆; 悬而未定 | v. |
+anatomy | [əˈnætəmi] | 解剖; 剖析 | n. |
+precursor | [priˈkɜrsə(r)] | 先驱先锋; 前身 | n. |
+drawback | [ˈdrɔˌbæk] | 缺点; 不利条件 | n. |
+luminous | [ˈlumənəs] | 发光的; 明亮的；清楚的 | adj. |
+radiate | [ˈrediˌet] | 辐射; 流露; 散发 | vt. |
+nectar | [ˈnɛktɚ] | 花蜜; 甘露 | n. |
+petal | [ˈpɛtl] | 花瓣 | n. |
+sturdy | [ˈstɜrdi] | 坚固的; 强壮的 | adj. |
+leather | [ˈlɛðɚ] | 皮革; 皮外套 | n. |
+remnant | [ˈrɛmnənt] | 剩余; 残存; 边角料 | n. |
+lush | [lʌʃ] | 草木丰盛的; 豪华的 | adj. |
+stealthy | [ˈstɛlθi] | 鬼鬼祟祟的; 悄悄 | adj. |
+passive | [ˈpæsɪv] | 被动的; 消极的 | adj. |
+whisk | [wɪsk] | 搅拌; 飞奔；搅拌器 | v. n. |
+detrimental | [ˌdɛtrəˈmɛntl] | 有害的; 不利的 | adj. |
+dampen | [ˈdæmpən] | 弄湿; 抑制; 减弱 | v. |
+shark | [ʃɑrk] | 鲨鱼; 诈骗者 | n. |
+carpet | [ˈkɑrpɪt] | 地毯; 覆盖物；铺地毯; 覆盖 | n. v. |
+thermal | [ˈθɜrml] | 热的; 保暖的 | adj. |
+panel | [ˈpænəl] | 嵌板; 控制板; 专门小 | n. |
+disorder | [dɪsˈɔrdə(r)] | 混乱; 失调 | n. |
+linear | [ˈlɪniər] | 直线的; 线性的 | adj. |
+pulverize | [ˈpʌlvəˌraɪz] | 弄碎; 磨成粉; 摧毁 | vt. |
+sift | [sɪft] | 筛面粉筛沙子; 审查 | v. |
+forbid | [fərˈbɪd] | 禁止; 妨碍 | v. |
+articulate | [ɑːrˈtɪkjuleɪt] | 清晰表达；善于表达的 | v. adj. |
+optic | [ˈɑptɪk] | 眼睛视觉的 | adj. |
+impersonate | [ɪmˈpɜrsəneɪt] | 扮演; 模仿 | v. |
+fair | [fer] | 公平合理的；交易会 | adj. adv. n. |
+concession | [kənˈsɛʃən] | 让步; 优惠; 特许权 | n. |
+exempt | [ɪɡˈzɛmpt] | 免除, 豁免 | v. |
+register | [ˈrɛdʒɪstɚ] | 登记; 注册；表达流露情绪 | n. v. |
+attempt | [əˈtɛmpt] | 试图; 尝试 | v. |
+abbreviate | [əˈbriviˌet] | 缩写; 缩略 | v. |
+creek | [krik] | 小湾, 小河, 小溪 | n. |
+wine | [waɪn] | 葡萄酒; 深红色 | n. |
+courier | [ˈkʊriɚ] | 快递员; 快递公司 | n. |
+beak | [bik] | (猛禽等的)嘴, 喙 | n. |
+constipation | [ˌkɑnstɪˈpeɪʃn] | 便秘 | n. |
+assembly | [əˈsɛmbli] | 议会; 集会; 装配组装 | n. |
+fur | [fɚ] | 皮草; 软毛 | n. |
+dust | [dʌst] | 灰尘, 尘土 | n. |
+continual | [kənˈtɪnjuəl] | 连续的, 频繁的 | adj. |
+alliance | [əˈlaɪəns] | 联盟; 同盟 | n. |
+piracy | [ˈpaɪrəsi] | 海盗行为; 盗版行为 | n. |
+well-defined | [ˈwɛldɪˈfaɪnd] | 定义明确的 | adj. |
+peanut | [ˈpiˌnʌt] | 花生 | n. |
+ever-changing | ['evərtʃ'eɪndʒɪŋ] | 日新月异的 | adj. |
+logistic | [loˈdʒɪstɪk] | 后勤的;物流的;组 | adj. |
+capital | [ˈkæpɪtl] | 首都; 资本; 柱头；大写字母；资本的; 首都的 | n. adj. |
+colony | [ˈkɑːləni] | 殖民地;群落 | n. |
+radiocarbon | [ˌreɪdioʊˈkɑrbən] | 放射性碳 | n. |
+troop | [trup] | 军队; 一群；成群移动 | n. v. |
+delta | [ˈdɛltə] | (河流的)三角洲 | n. |
+hint | [hɪnt] | 迹象; 微量; 暗示；暗示 | n. v. |
+characterization | [kærəktəraɪ'zeɪʃn] | 人物塑造 | n. |
+meteorology | [ˌmiːtiəˈrɑːlədʒi] | 气象学 | n. |
+
+[List 22]
+vapor | [ˈveɪpər] | 水汽, 水蒸气 | n. |
+forage | [ˈfɔrɪdʒ] | 饲料；觅食; 搜寻 | n. v. |
+depose | [dɪˈpoʊz] | 免职; 罢免 | v. |
+relic | [ˈrɛlɪk] | 遗物, 遗迹; 废墟; 纪念物 | n. |
+opposition | [ˌɑpəˈzɪʃn] | 反对; 对手 | n. |
+withdraw | [wɪðˈdrɔː] | 撤退; 取钱; 收回 | v. |
+disrupt | [dɪsˈrʌpt] | 使中断; 扰乱 | v. |
+abstract | [æbˈstrækʃən] | 抽象的；摘要；提取 | adj. n. v. |
+medium | [ˈmidiəm] | 中等的; 平均的；五分熟的；媒介; 方式; 中庸 | adj. n. |
+controversial | [ˌkɑntrəˈvɜrʃl] | 有争议的 | adj. |
+inconclusive | [ˌɪnkənˈklusɪv] | 不确定的; 无结论的 | adj. |
+shipyard | [ˈʃɪpjɑrd] | 船坞; 造船厂 | n. |
+shoreline | [ˈʃɔrlaɪn] | 海岸线 | n. |
+gully | [ˈɡʌli] | 溪谷; 建筑雨水口 | n. |
+proponent | [prəˈpoʊnənt] | 支持者, 拥护者; 提倡者 | n. |
+council | [ˈkaʊnsəl] | 委员会; 市政管理机构 | n. |
+odd | [ɑd] | 古怪的; 奇数的；少量的 | adj. |
+perplex | [pərˈpleks] | 使困惑; 迷惑 | vt. |
+motionless | [ˈmoʊʃnləs] | 静止不动的 | adj. |
+obliterate | [əˈblɪtəˌret] | 消灭; 清除; 忘却 | v. |
+widen | [ˈwaɪdn] | 加宽 | v. |
+magnetic | [mæɡˈnɛtɪk] | 有磁性的; 吸引力的 | adj. |
+altogether | [ˌɔltəˈɡɛðɚ] | 全部地; 总共; 总之 | adv. |
+caravan | [ˈkærəˌvæn] | 拖车大篷车; 商队 | n. |
+aristocratic | [əˌrɪstəkrætɪk] | 贵族的 | adj. |
+recount | [rɪˈkaʊnt] | 详述; 重新计算 | v. |
+thesis | [ˈθisɪs] | 论文; 论点; 命题 | n. |
+superiority | [suˌpɪriˈɔrəti] | 优势, 优越性 | n. |
+contend | [kənˈtɛnʃən] | 声称; 对付; 争夺 | v. |
+contract | [ˈkɑntrækt] | 合同; 契约；收缩; 缩小 | n. v. |
+compensate | [ˈkɑmpenseɪt] | 补偿; 报酬; 抵消 | v. |
+informal | [ɪnˈfɔrml] | 非正式; 随意的 | adj. |
+earthquake | [ˈɜrθkweɪk] | 地震 | n. |
+assess | [əˈsɛs] | 评估; 估价 | vt. |
+hydrology | [haɪˈdrɑlədʒi] | 水文, 水文学 | n. |
+tar | [tɑr] | 柏油; 沥青; 焦油 | n. |
+Caucasian | [kɔˈkeɪʒən] | 白种人；高加索人的; 白种人的 | n. adj. |
+bind | [baɪnd] | 约束; 装订; 捆绑；联系紧密 | vt. |
+undertake | [ˌʌndərˈteɪk] | 承担, 从事 | vt. |
+impede | [ɪmˈpiːd] | 妨碍; 阻碍; 阻止 | v. |
+negotiate | [nɪˈgoʊʃieɪt] | 谈判协商; 顺利通过 | v. |
+pillar | [ˈpɪlɚ] | 柱子; 中坚核心 | n. |
+rectangular | [rɛkˈtæŋɡjəlɚ] | 矩形; 长方形的 | adj. |
+plumage | [ˈplumɪdʒ] | 鸟的全身羽毛; 漂亮衣服 | n. |
+mate | [met] | 伙伴; 配偶配对物；交配 | n. v. |
+being | [ˈbiɪŋ] | 存在; 生物 | n. |
+kneel | [nil] | 跪, 下跪 | v. |
+petrify | [pɛtrəˈfækʃən] | 吓呆; 停止发展 | v. |
+engulf | [ɛnˈɡʌlf] | 吞没吞食; 陷入某种情绪 | v. |
+informant | [ɪnˈfɔrmənt] | 信息提供人; 告密者 | n. |
+shed | [ʃed] | 棚屋; 工棚；蜕皮; 脱毛; 落叶; 去除 | n. v. |
+indigenous | [ɪnˈdɪdʒənəs] | 土生土长的; 固有的 | adj. |
+outweigh | [aʊtˈwe] | 重于; 大于; 超过 | v. |
+antiquity | [ænˈtɪkwɪti] | 古老; 古迹; 古物; 古人 | n. |
+neglect | [nɪˈɡlɛkt] | 疏忽; 忽略; 疏漏 | n. v. |
+hectare | [ˈhekter] | 公顷 (=1万平米) | n. |
+preference | [ˈprɛfərəns,] | 偏爱; 优先权 | n. |
+spectrum | [ˈspɛktrəm] | 光谱; 范围 | n. |
+fiber | ['faɪbə] | 纤维; 光纤 | n. |
+rope | [roʊp] | 绳索; 一串；捆绑; 用套索抓捕 | n. v. |
+humidity | [hjuˈmɪdɪti] | 湿度; 潮湿; 湿热 | n. |
+hydrogen | [ˈhaɪdrədʒən] | 氢 | n. |
+bite | [baɪt] | 咬; 叮；一点儿食物 | v. n. |
+Pluto | [ˈplutoʊ] | 冥王星 | n. |
+correlate | [kɔːrəleɪt] | 使互相关联 | v. |
+perfume | [pərˈfjum] | 香水; 香料; 香味 | n. |
+distract | [dɪˈstrækt] | 使分心; 使混乱 | v. |
+versus | [ˈvɜrsəs] | 对抗 | prep. |
+clarify | [ˈklærəˌfaɪ] | 澄清; 清醒; 使清楚 | v. |
+seafarer | [ˈsiferə(r)] | 船员, 航海家 | n. |
+
+[List 23]
+parallel | [ˈpærəˌlɛl] | 平行的; 类似的; 并联；平行; 相似物类比；使平行; 与...媲美 | adj. n. v. |
+lump | [lʌmp] | 块, 肿块；结块成团 | n. v. |
+deliver | [dɪˈlɪvər] | 发表; 递送; 交付; 分娩 | v. |
+Neptune | [ˈneptjuːn] | 海王星 | n. |
+maintenance | [ˈmentənəns] | 维持; 保养; 维护 | n. |
+habituation | [həˌbɪtʃu'eɪʃən] | 适应; 惯于 | n. |
+paradigm | [ˈpærədaɪm] | 范例, 样式, 模范 | n. |
+mixture | [ˈmɪkstʃɚ] | 混合; 混合物 | n. |
+by-product | [ˈbaɪˌprɑdəkt] | 副产品; 副作用 | n. |
+dormant | [ˈdɔrmənt] | 潜伏的, 休眠的 | adj. |
+privilege | [ˈprɪvəlɪdʒ] | 特权; 权益；给与...特权 | n. v. |
+metabolism | [mɪˈtæbəˌlɪzəm] | 新陈代谢 | n. |
+auditory | [ˈɔdətɔri] | 听觉的 | adj. |
+slip | [slɪp] | 滑倒; 脱落; 下跌；时间飞逝；跌倒; 过失; 片条 | v. n. |
+transplant | [trænsˈplænt] | 移植 | n. v. |
+consequent | [ˈkɑnsɪˌkwɛnt] | 随之发生的; 必然的 | adj. |
+ornament | [ˈɔrnəmənt] | 装饰; 装饰物 | n. |
+quantify | [ˈkwɑntɪfaɪ] | 量化, 确定...的数量 | vt. |
+equip | [ɪˈkwɪp] | 装备, 配备; 使有能力 | v. |
+updraft | ['ʌpˌdrɑft] | 上升气流; 向上排气 | n. |
+tactic | [ˈtæktɪk] | 手段; 策略; 战术 | n. |
+offset | [ˈɔfset] | 抵消; 补偿; 并列 | n. v. |
+strengthen | [ˈstrɛŋkθən] | 加强, 巩固 | v. |
+heredity | [həˈredəti] | 遗传(过程) | n. |
+anecdote | [ˈænɪkdoʊt] | 轶事; 趣闻 | n. |
+afield | [əˈfild] | 在野外; 在远方；在战场上 | adv. |
+peach | [pitʃ] | 桃子; 桃红色; 迷人的人 | n. |
+prominent | [ˈprɑmɪnənt] | 突出的, 杰出的 | adj. |
+supersede | [ˌsupərˈsid] | 取代; 替代 | v. |
+capture | [ˈkæptʃɚ] | 俘获; 夺取; 引起; 拍摄 | v. |
+solidarity | [ˌsɑlɪˈdærəti] | 团结一致 | n. |
+secrete | [sɪˈkrit] | 分泌; 隐藏 | vt. |
+irritate | [ˈɪrɪteɪt] | 刺激; 激怒 | n. |
+measurable | [ˈmɛʒərəbəl] | 可测量的; 显著的 | adj. |
+canyon | [ˈkænjən] | 峡谷, 溪谷 | n. |
+grey | [ɡre] | 灰色；灰色的; 灰白头发的；阴暗的 | n. adj. |
+spherical | [ˈsfɪrɪkəl] | 球形的, 球面的 | adj. |
+elicit | [ɪˈlɪsɪt] | 引出; 诱出 | v. |
+finance | [fəˈnæns] | 财政; 金融；提供资金; 资助 | n. v. |
+fuse | [fjuz] | 熔化; 融合；保险丝 | v. n. |
+currency | [ˈkɜrənsi] | 货币; 流通; 流行 | n. |
+cohesive | [koʊˈhisɪv] | 统一的; 团结的 | adj. |
+reflex | [ˈriˌflɛks] | 本能反应; 条件反射 | n. |
+intimate | [ˈɪntəmɪt] | 亲密的; 私下的；至交；暗示; 提示 | adj. n. v. |
+oak | [oʊk] | 橡树 | n. |
+intrigue | [ˈɪnˌtriɡ] | 阴谋; 诡计；迷住; 激起好奇心 | n. v. |
+obscure | [əbˈskjʊr] | 昏暗的; 晦涩的; 无名；遮掩; 使费解; 模糊不清 | adj. v. |
+examination | [ɪɡˌzæmɪˈneɪʃn] | 检查; 考试 | n. |
+imperial | [ɪmˈpɪriəl] | 帝国的; 英制单位的 | adj. |
+reset | [riˈsɛt] | 重置;重排;重装 | n. v. |
+notable | [ˈnoʊtəbl] | 显著的; 著名的；显要人物 | adj. n. |
+arable | [ˈærəbəl] | 适于耕种的 | adj. |
+old- | [ˈoldˈfæʃənd] | 老式, 过时的 | adj. |
+fashionedoutgo | [ˌaʊt'goʊ] | 超过; 优于 | v. |
+emperor | [ˈɛmpəɚ] | 皇帝, 君主 | n. |
+reform | [rɪˈfɔrm] | 改革; 改良; 改造 | n. v. |
+sunrise | [ˈsʌnˌraɪz] | 日出 | n. |
+abroad | [əˈbrɔːd] | 到国外 | adv. |
+timescale | [ˈtaɪmˌskeɪl] | 时段; 时间表 | n. |
+precision | [prɪˈsɪʒən] | 精确; 精密 | n. |
+persistent | [pərˈsɪstənt] | 持续; 坚持不懈的 | adj. |
+livable | ['lɪvəbəl] | 适于居住的 | adj. |
+margin | [ˈmɑrdʒən] | 边缘; 盈余; 页边空白 | n. |
+mule | [mjul] | 骡子; 顽固的人 | n. |
+willow | [ˈwɪloʊ] | 柳树 | n. |
+salinity | [sə'lɪnətɪ] | 盐分; 含盐浓度 | n. |
+shiny | [ˈʃaɪni] | 发光的; 闪耀的 | adj. |
+sag | [sæɡ] | 下垂;消沉;萎靡 | n. v. |
+deteriorate | [dɪˈtɪriəreɪt] | 恶化; 变坏; 衰退 | v. |
+propulsion | [prəˈpʌlʃən] | 推进力 | n. |
+
+[List 24]
+universal | [ˌjunɪˈvɜrsl] | 普遍全体的；全球的; 宇宙的 | adj. |
+alive | [əˈlaɪv] | 活着的; 活泼的; 有生气的 | adj. |
+sulfate | [ˈsʌlˌfet] | 硫酸盐；硫酸盐化(处理) | n. v. |
+selfish | [ˈsɛlfɪʃ] | 自私的 | adj. |
+progressive | [prəˈɡrɛsɪv] | 进步的; 进行的 | adj. |
+naturalist | [ˈnætʃərəlɪst] | 博物学家 | n. |
+guarantee | [ˌɡærənˈti] | 保证; 保证书; 抵押品；保证, 担保 | n. v. |
+coconut | [ˈkoʊkənʌt] | 椰子; 椰肉 | n. |
+contradict | [ˌkɑntrəˈdɪkt] | 反驳; 违背 | v. |
+granule | [ˈɡrænjul] | 小颗粒, 小硬粒 | n. |
+aboard | [əˈbɔrd] | 在船(或飞机, 车) | prep. adv. |
+recovery | [rɪˈkʌvəri] | 恢复; 收回; 痊愈; 矫正 | n. |
+convey | [kənˈve] | 传递; 运送; 表达 | v. |
+mere | [mɪr] | 仅仅, 只不过; 微不足道 | adj. |
+novel | [ˈnɑːvl] | 长篇小说；新奇新颖的 | n. adj. |
+identity | [aɪˈdɛntɪti] | 身份; 个性 | n. |
+worsen | [ˈwɜrsn] | (使) 变得更坏, 恶化 | v. |
+exterminate | [ɪkˈstɜːrmɪneɪt] | 消灭; 根除 | vt. |
+religion | [rɪˈlɪdʒən] | 宗教; 教派 | n. |
+prevalent | [ˈprɛvələnt] | 流行的; 普遍的 | adj. |
+educate | [ˈɛdʒəˌket] | 教育, 教导; 培养 | v. |
+successor | [səkˈsɛsɚ] | 继承人, 继任者 | n. |
+jay | [dʒe] | 松鸦; 多嘴的人 | n. |
+dormancy | ['dɔmənsɪ] | 冬眠 | n. |
+patron | [ˈpetrən] | 赞助人; 老主顾 | n. |
+embed | [ɛmˈbɛd] | 嵌入; 植根于 | v. |
+succulent | [ˈsʌkjələnt] | 汁多味美的；肉质植物 | adj. n. |
+isthmus | [ˈɪsməs] | 地峡 | n. |
+flexible | [ˈflɛksəbəl] | 灵活的; 可弯曲的 | adj. |
+publish | [ˈpʌblɪʃ] | 出版, 发行; 发表, 颁布 | v. |
+await | [əˈwet] | 等候; 即将发生 | v. |
+spray | [spre] | 喷洒; 喷射; 飞溅; 扫射；喷雾; 浪花; 飞沫 | v. n. |
+progress | [ˈprɑːɡres] | [prəˈɡres]；进步, 进展, 进程 | v. n. |
+ensue | [ɪnˈsu] | 接踵发生 | v. |
+violent | [ˈvaɪələnt] | 暴力的; 剧烈的 | adj. |
+outdated | [aʊtˈdetɪd] | 过时的, 落伍的 | adj. |
+dimension | [dɪˈmɛnʃən] | 尺寸; 次元, 维度 | n. |
+bellow | [ˈbeloʊ] | 吼叫, 咆哮；鼓风机 | v. n. |
+analyze | [ˈænəˌlaɪz] | 分析; 解释 | v. |
+client | [ˈklaɪənt] | 顾客; 当事人 | n. |
+aboveground | [ə'bʌvˌgraʊnd] | 在地上 | adv. |
+monopoly | [məˈnɑpəli] | 垄断 | n. |
+furnace | [ˈfɜrnɪs] | 熔炉, 火炉 | n. |
+integral | [ˈɪntɪɡrəl] | 完整的; 基本的; 必须的 | adj. |
+minimum | [ˈmɪnəməm] | 最小量；最小最少的 | n. adj. |
+fashion | [ˈfæʃən] | 时尚; 方法 | n. |
+horizon | [həˈraɪzn] | 水平; 地平线; 眼界见识 | n. |
+ingredient | [ɪnˈgridiənt] | 原料; 成分; 要素 | n. |
+divert | [daɪˈvɜrt] | 转移; 转向; 转接; 分散 | v. |
+advent | [ˈædˌvɛnt] | 出现; 到来 | n. |
+pipeline | [ˈpaɪpˌlaɪn] | 管道; 管线 | n. |
+capillary | [ˈkæpəleri] | 毛细血管 | n. |
+decompose | [ˌdikəmˈpoʊz] | 分解, 腐烂 | v. |
+relevant | [ˈreləvənt] | 有关的; 有重要性的 | adj. |
+lobe | [loʊb] | 耳垂; 肺叶; 脑叶 | n. |
+fossilize | [ˈfɑsəlaɪz] | 石化, 变成化石; 使僵化 | v. |
+primate | [ˈpraɪmɪt] | 灵长目动物; 大主教 | n. |
+likewise | [ˈlaɪkˌwaɪz] | 同样地; 也 | adv. |
+invasion | [ɪnˈveʒən] | 入侵; 大批涌入; [医]发病 | n. |
+immature | [ˌɪməˈtʃʊr] | 不成熟的; 鲁莽的 | adj. |
+underneath | [ˌʌndərˈniθ] | 在下面；在...之下；底部 | adv. prep. n. |
+converse | [kənˈvɜːrs] | [ˈkɑnˌvɜrs]；交谈, 谈话；相反(的) | n. v. adj. |
+impoverish | [ɪmˈpɑvərɪʃ] | 使贫穷; 使贫瘠 | vt. |
+substantiate | [səbˈstænʃieɪt] | 用事实证明 | v. |
+Jurassic | [dʒʊˈræsɪk] | 侏罗纪的；侏罗纪 | adj. n. |
+silicon | [ˈsɪlɪkən] | 硅 | n. |
+temporal | [ˈtɛmpərəl] | 时间的; 世俗的; 暂存的；暂时的事物; 俗事 | adj. n. |
+deepen | [ˈdipən] | 加深; 加剧; 变低沉 | v. |
+plausible | [ˈplɔzəbəl] | 似乎真实的; 貌似有理的 | adj. |
+generic | [dʒəˈnɛrɪk] | 一般的;普通的; 生物属类的 | adj. |
+
+[List 25]
+bevel | ['bevl] | 斜边和斜面 | n. |
+descendant | [dɪˈsɛndənt] | 后代; 后裔；派生物 | n. adj. |
+slide | [slaɪd] | 滑动; 滑落; 下跌；幻灯片; 滑梯 | v. n. |
+vanish | [ˈvænɪʃ] | 消失; 灭绝 | v. |
+recognize | [ˌrɛkəɡˈnɪʃən] | 识别; 承认; 赞赏 | v. |
+accessible | [ækˈsɛsəbəl] | 易接近的; 可理解的；相处的 | adj. |
+dye | [daɪ] | 染料, 染色；给...染色 | n. v. |
+instinct | [ˈɪnˌstɪŋkt] | 本能, 天性; 冲动; 天资 | n. |
+igneous | [ˈɪɡniəs] | (岩石)火成的 | adj. |
+familiarity | [fəˌmɪlˈjærɪti] | 熟悉, 通晓, 亲密 | n. |
+warrior | [ˈwɔriə(r)] | 战士, 勇士; 武士 | n. |
+extraordinary | [ɪkˈstrɔrdəneri] | 非常的, 特别的, 非凡 | adj. |
+mist | [mɪst] | 薄雾 | n. |
+percolate | [ˈpɜrkəleɪt] | 渗透; 蔓延 | n. |
+plug | [plʌɡ] | 插头; 塞子；塞住堵塞 | n. vt. |
+lick | [lɪk] | 舔; 战胜；舔; 少量 | vt. n. |
+artifact | [ˈɑrtəˌfækt] | 人工制品; 手工艺品 | n. |
+ease | [iz] | 轻松, 舒适; 容易；缓解; 减轻; 松弛 | n. v. |
+conflict | [ˈkɑnflɪkt] | 冲突; 战斗; 矛盾；抵触; 争斗 | n. v. |
+juxtaposition | [ˌdʒʌkstəpəˈzɪʃən] | 并列; 毗邻 | n. |
+sensible | [ˈsɛnsəbəl] | 有感觉的, 明智的 | adj. |
+basalt | [bəˈsɔlt] | 玄武岩 | n. |
+conquer | [ˈkɑŋkə(r)] | 征服; 克服 | v. |
+participate | [pɑrˈtɪsɪpeɪt] | 参加某事 | v. |
+adequate | [ˈædɪkwɪt] | 充足的; 适当的; 胜任 | adj. |
+coke | [koʊk] | 焦炭 | n. |
+Mesoamerica | [ˌmɛzoəˈmɛrɪkə] | 中美洲 | n. |
+ingenuity | [ˌɪndʒəˈnuəti] | 足智多谋; 独创性；设计新颖 | n. |
+explicit | [ɪkˈsplɪsɪt] | 明确的, 清楚的 | adj. |
+coexist | [ˌkoʊɪgˈzɪst] | 同时共存; 共处 | v. |
+so-called | [ˈsoˈkɔld] | 所谓的, 号称的 | adj. |
+milder | [maildə] | 温柔的; 轻微的; 不浓 | adj. |
+theatrical | [θiˈætrɪkəl] | 戏剧的; 夸张的; 做作的；戏剧表演 | adj. n. |
+slab | [slæb] | 厚板; 混凝土板 | n. |
+speculate | [ˈspekjuleɪt] | 猜想; 推断; 投机 | v. |
+topography | [təˈpɑgrəfi] | 地形学; 地貌 | n. |
+exotic | [ɪgˈzɑtɪk] | 异国的; 外来的; 奇异 | adj. |
+tourism | [ˈtʊrɪzəm] | 旅游; 旅游业 | n. |
+chip | [tʃɪp] | 芯片; 碎片; 缺口; 薯片；打破; 凿下 | n. v. |
+ion | [ˈaɪən] | 离子 | n. |
+cop | [kɑp] | 〈俚〉警察；遭受; 注意到 | n. v. |
+millet | [ˈmɪlɪt] | 小米, 粟; 稷 | n. |
+diffuse | [dɪˈfjuz] | 散开的; 弥漫的；传播; 舒缓 | adj. v. |
+deforest | [ˌdiˈfɔrɪst] | 砍伐森林 | v. |
+manganese | [ˈmæŋɡəˌniz] | 锰 | n. |
+ignore | [ɪɡˈnɔr] | 忽视 | v. |
+alteration | [ˌɔltəˈreʃən] | 改变; 变更 | n. |
+mismatch | [mɪsˈmætʃ] | 不匹配;不协调 | v. |
+tanker | [ˈtæŋkɚ] | 油罐车; 油轮 | n. |
+spill | [spɪl] | 溢出泼出；泄露机密；溢出量 | v. n. |
+mercury | [ˈmɜrkjəri] | 汞, 水银 | n. |
+cobalt | [ˈkoʊbɔlt] | 钴; 深蓝色 | n. |
+collective | [kəˈlɛktɪv] | 集体的; 共同的；集体集团 | adj. n. |
+saline | [ˈseɪlin] | 含盐的, 咸的 | adj. |
+sodium | [ˈsoʊdiəm] | 钠 | n. |
+evergreen | [ˈevərgrin] | 常绿植物 | n. |
+compromise | [ˈkɑmprəmaɪz] | 妥协; 折中; 让步 | n. v. |
+prone | [proʊn] | 有...倾向; 很可能的 | adj. |
+chloride | [ˈklɔrˌaɪd] | 氯化物; 漂白粉 | n. |
+ritualize | ['rɪtʃʊrlaɪz] | 使仪式化 | v. |
+ounce | [aʊns] | 盎司; 少量一点儿 | n. |
+spout | [spaʊt] | 喷嘴; 水柱；喷射; 夸夸其谈 | n. v. |
+doorway | [ˈdɔrweɪ] | 出入口 | n. |
+arrow | [ˈæroʊ] | 箭头 | n. |
+disastrous | [dɪˈzæstrəs] | 灾难性的; 极其糟糕 | adj. |
+constrain | [kənˈstreɪn] | 限制; 约束 | n. |
+county | [ˈkaʊnti] | 县, 郡 | n. |
+nobility | [noʊˈbɪləti] | 贵族; 高尚的品质 | n. |
+solitary | [ˈsɑləteri] | 独自的; 单个的 | adj. |
+sword | [sɔrd] | 刀剑 | n. |
+
+[List 26]
+garment | [ˈgɑrmənt] | 衣服; 服装；给...穿衣服 | n. v. |
+windborne | ['wɪndbɔːn] | 靠风传送的 | adj. |
+haze | [heɪz] | 雾霭烟雾; 懵懂迷糊 | n. |
+delineate | [dɪˈlɪniˌet] | 勾画, 描述 | v. |
+pour | ['autpɔ:riŋ] | 倾泄; 连续流出 | v. |
+infrared | [ˌɪnfrəˈrɛd] | 红外线的 | adj. |
+degrade | [dɪˈɡreɪd] | 降解; 贬低; 降级; 退化 | v. |
+snatch | [snætʃ] | 抢; 一阵子; 很小的数量；抢夺 | n. v. |
+vagary | [ˈveɡəri] | 奇异多变; 难以预测 | n. |
+perish | [ˈpɛrɪʃ] | 死亡; 毁灭; 腐烂; 老化 | v. |
+curt | [kə:t] | 简短的; 草率无礼的 | adj. |
+receipt | [ri'si:t] | 收据 | n. |
+mush | [mʌ∫] | 糊状物; 胆怯；碾碎; 弄烂 | n. v. |
+clumsy | ['klʌmzi] | 笨拙的; 难懂的；不便的 | adj. |
+embryo | [ˈembrioʊ] | 胚胎；萌芽初期的 | n. adj. |
+chew | [t∫u:] | 咀嚼; 咬碎 | n. v. |
+cannibal | ['kænibəl] | 同类相食的动物；食人者 | n. |
+inscribe | [in'skraib] | 雕刻; 题写 | vt. |
+archive | [`ɑ:kaɪv] | 档案; 档案馆; 记录 | n. |
+canine | ['keinain] | 犬的; 犬科的；犬齿 | adj. n. |
+hallmark | ['hɔ:lmɑ:k] | 检验印记; 质量证明；盖上品质证明印记 | n. v. |
+coerce | [koʊˈɜrs] | 强迫; 控制 | v. |
+occlude | [ɔ'klu:d] | 堵塞; 阻隔 | v. |
+ablaze | [ə'bleiz] | 着火, 发光,；闪耀(的地) | adj. adv. |
+etc | [ɪt'sɛtərə] | 以及其他; 等等 | adv. |
+jar | [dӡɑ:] | 罐子; 一坛子；令人不安; 使震动 | n. v. |
+array | [ə'rei] | 一大批; 数组；排列; 布置 | n. v. |
+starve | [stɑ:v] | 挨饿 | v. |
+entangle | [in'tæŋɡl] | 缠住; 卷入, 连累 | v. |
+bargain | ['bɑ:ɡin] | 便宜货；讨价还价; 谈判 | n. v. |
+hospice | ['hɔspis] | 收容所, 救济院 | n. |
+filament | ['filəmənt] | 细丝; 丝状物 | n. |
+inn | [in] | 小旅馆; 小客栈 | n. |
+chest | [t∫est] | 胸部, 胸腔; 大箱子 | n. |
+mint | [mint] | 薄荷; 铸币厂；铸币; 创造；崭新的, 完美的 | n. v. adj. |
+insure | [ɪnˈʃʊr] | 上保险, 投保 | v. |
+insight | [ˈɪnsaɪt] | 洞悉; 洞察力; 深刻见解 | n. |
+squid | [skwid] | 乌贼; 鱿鱼 | n. |
+shroud | [∫raud] | 覆盖物; 护罩；覆盖; 隐瞒; 保密 | n. vt. |
+nuclear | ['nju:kliə] | 原子核的; 原子能的 | adj. |
+formidable | ['fɔrmɪdəbl] | 可怕的；令人敬畏的 | adj. |
+earn | [ə:n] | 赚得; 获得; 赢得 | v. |
+prophecy | ['prɔfisi] | 预言 | n. |
+Athenian | [ə`θi:njən] | 雅典人；雅典的,雅典人的 | n. adj. |
+fasten | ['fɑ:sn] | 系牢; 固定; 附着; 专注 | v. |
+condemn | [kən'dem] | 谴责; 宣判 | v. |
+corrupt | [kə'rʌpt] | 堕落的; 贪污的; 腐烂；使腐败; 使堕落; 使腐烂 | adj. v. |
+receptive | [rɪ'sɛptɪv] | 有接受力的; 能容纳的 | adj. |
+slushy | [`slʌ∫ɪ] | 泥泞的 | adj. |
+flyby | [`flaɪbaɪ] | 飞越 | n. |
+diverge | [dɪˈvɜːrdʒ] | 分化; 分歧; 偏离 | v. |
+plate | [pleit] | 盘子; 平板薄板；车辆牌照 | n. |
+convulse | [kənˈvʌlʃən] | 抽搐痉挛; 剧烈抖动 | v. |
+discount | ['diskaunt] | 打折出售；减价折扣 | v. n. |
+chamber | ['t∫eimbə] | 大房间; 腔体; 议会 | n. |
+goodness | ['ɡudnis] | 善良; 美德 | n. |
+precaution | [pri'kɔ:∫ən] | 防备; 预防措施 | n. |
+inferior | [in'fiəriə] | 低劣的; 下等的；下属; 次品; 晚辈 | adj. n. |
+enthusiastic | [ɪnˌθuziˈæstɪk] | 非常感兴趣的; 热心的 | adj. |
+vaporize | ['veɪpəraɪz] | 蒸发, 汽化 | v. |
+oppress | [əˈpres] | 压迫, 压制; 使苦恼 | v. |
+homogeneity | [͵hɔməudӡe'ni:iti] | 同种同质; 均匀一致 | n. |
+sporadic | [spə'rædɪk] | 时有时无的；零星分散的 | adj. |
+reciprocity | [͵risi'prɔsiti] | 相互性; 相互作用 | n. |
+kin | [kin] | 亲戚; 家属 | n. |
+saint | [seint] | 圣人; 圣徒 | n. |
+shear | [∫iə] | 剪羊毛; 切断 | v. |
+flock | [flɔk] | 鸟群; 羊群; 群众；成群结队 | n. v. |
+symbolize | ['simbəlaiz] | 象征; 代表 | v. |
+rendition | [ren'di∫ən] | 演绎; 给予 | n. |
+
+[List 27]
+emanate | ['eməneit] | 散发; 表现出; 散发出 | v. |
+thread | [θred] | 细线; 主线; 螺纹；穿成串; 穿针引线 | n. v. |
+loom | [lu:m] | 织布机；迫近; 挥之不去 | n. v. |
+legend | ['ledӡənd] | 传说; 传奇大师；说明图例 | n. |
+ranch | [ræntʃ] | 大牧场大农场 | n. |
+detritus | [dɪˈtraɪtəs] | 侵蚀形成的岩屑；残垣断壁 | n. |
+oxidize | ['ɔksi͵daiz] | 氧化; 生锈 | v. |
+carcass | ['kɑ:kəs] | 尸体; 骨架 | n. |
+foreground | ['fɔ:ɡraund] | 前景; 引人注目 | n. |
+laborer | [ˈleɪbərər] | 体力劳动者; 工人 | n. |
+dune | [du:n] | 沙丘 | n. |
+turbidity | [tɜ'bɪdətɪ] | 混浊; 混浊度 | n. |
+pelvic | ['pelvik] | 骨盆的 | adj. |
+scour | ['skauə] | 冲刷擦亮; 四处搜索 | v. |
+feeble | ['fi:bl] | 虚弱的; 牵强的 | adj. |
+ax | [æks] | 斧头; 倒闭；削减; 解雇: | n. v. |
+bow | [boʊ] | 弯弓; 鞠躬; 屈服于 | n. |
+stubby | [ˈstʌbi] | 短粗的;矮壮的 | adj. |
+flop | [flɑp] | 猛然落下；彻底失败 | v. n. |
+median | [ˈmidiən] | 中位数的; 中间值 | adj. |
+requisite | [ˈrɛkwɪzɪt] | 必需品;必要条件；必要的 | n. adj. |
+anticipate | [ænˈtɪsəˌpet] | 预料, 预期 | v. |
+segregate | [ˈsɛɡrɪˌɡet] | 分开; 隔离 | v. |
+trait | [tret] | 特点; 特性 | n. |
+buoyancy | [ˈbɔɪənsi] | 浮力; 乐观; 经济繁 | n. |
+gamble | ['ɡæmbl] | 赌博; 打赌；下赌注; 冒险 | v. n. |
+slim | [slɪm] | 苗条的; 微薄的；减肥 | adj. v. |
+powdery | [ˈpaʊdəri] | 粉末状的 | adj. |
+glide | [ɡlaɪd] | 滑动; 滑行; 滑音；悄悄地走 | n. |
+vice versa | [ˌvaɪs ˈvɜrsə] | 反之亦然 | adv. |
+repercussion | [ˌripərˈkʌʃn] | 不良反响; 声光反射 | n. |
+allergy | [ˈælərdʒi] | 过敏; 反感 | n. |
+ambitious | [æmˈbɪʃəs] | 有雄心的; 有野心；间距的 | adj. |
+inevitable | [ɪnˈɛvɪtəbəl] | 不可避免的 | adj. |
+beam | [bim] | 横梁; 光线; 笑容；发光发热; 照射 | n. v. |
+landform | [ˈlændfɔrm] | 地貌 | n. |
+remote | [rɪˈmoʊt] | 遥远的; 偏僻的；微小的 | adj. |
+aerodynamic | [ˌeəroʊdaɪ'næmɪk] | 空气动力学的 | adj. |
+squeeze | [skwiz] | 挤捏; 榨取 | v. |
+droplet | [ˈdrɑplət] | 微滴; 小水珠 | n. |
+boom | [bum] | 繁荣; 激增; 隆隆 | n. v. |
+incentive | [ɪnˈsɛntɪv] | 动机; 刺激; 奖励 | n. |
+humble | [ˈhʌmbəl] | 谦逊的; 简陋的；低下的；轻松打败; 低声下气 | adj. v. |
+upcoming | [ˈʌpˌkʌmɪŋ] | 即将来到的 | adj. |
+plaster | [ˈplæstə(r)] | 灰泥; 熟石膏；抹灰浆; 贴满 | n. v. |
+endeavor | [ɪn'devə] | 尝试; 竭力 | n. v. |
+militaristic | [ˌmɪlɪtə'rɪstɪk] | 军国主义的; 黩武 | adj. |
+waterfowl | [ˈwɔtərfaʊl] | 水鸟, 水禽 | n. |
+synchronize | [ˈsɪŋkrənaɪz] | 使同步 | v. |
+broadcast | [ˈbrɔdkæst] | 广播; 散播 | n. v. |
+tap | [tæp] | 开发利用; 轻打轻拍；跳踢踏舞；龙头; 阀门 | v. n. |
+conversion | [kənˈvɜrʒn] | 转变; 改装物; 兑换 | n. |
+onward | [ˈɑnwərd] | 向前,前进 | adj. adv. |
+unify | [ˈjunəˌfaɪ] | 联合; 统一 | v. |
+typify | [ˈtɪpəˌfaɪ] | 是...典型; 代表 | v. |
+collaborate | [kəˈlæbəreɪt] | 合作协作 | v. |
+amplify | [ˈæmplɪfaɪ] | 放大, 增强 | v. |
+overshadow | [ˌoʊvərˈʃædoʊ] | 使失色; 遮挡 | v. |
+triumph | [ˈtraɪəmf] | 非凡的成功; 极大满；获胜 | n. v. |
+curve | [kɜrv] | 弧线; 曲线；弯曲;沿曲线运动 | n. v. |
+replenish | [rɪˈplɛnɪʃ] | 补充; 装满 | v. |
+clothe | [kloʊð] | 给...提供衣服；覆盖; 赋予 | v. |
+unprecedented | [ʌnˈprɛsɪˌdɛntɪd] | 前所未有的 | adj. |
+bask | [bæsk] | 晒太阳 | v. |
+cellular | [ˈsɛljəlɚ] | 细胞的 | adj. |
+linguist | [ˈlɪŋɡwɪst] | 语言学家 | n. |
+graphically | [ˈɡræfɪklɪ] | 生动地; 轮廓分明地 | adv. |
+polish | [ˈpɑlɪʃ] | 擦亮; 改进；擦亮剂;优美精湛 | v. n. |
+configuration | [kənˌfɪgjəˈreɪʃn] | 布局, 构造; 配置 | n. |
+align | [əˈlaɪn] | 排成一条线; 对准；联合结盟 | v. |
+
+[List 28]
+fodder | [ˈfɑdə(r)] | 草料; 素材 | n. |
+protein | [ˈproʊtin] | 蛋白质 | n. |
+tableware | [ˈteɪblwer] | 餐具 | n. |
+leafy | [ˈlifi] | 多叶的, 叶茂的 | adj. |
+endow | [ɛnˈdaʊ] | 捐赠, 资助; 赋予 | v. |
+entry | [ˈɛntri] | 入场许可; 参加参赛; 输 | n. |
+candid | [ˈkændɪd] | 率直的, 坦白的 | adj. |
+generalize | ['dʒen(ə)rəlaɪz] | 概括归纳; 推广普及 | v. |
+monitor | [ˈmɑnɪtə(r)] | 显示屏; 监控人员；监控; 监听 | n. v. |
+sniff | [snɪf] | 用鼻子嗅; 抽鼻子; 鄙视；吸气; 一股气味 | v. n. |
+coworker | ['koʊˌwɜkə] | 同事, 合作者 | n. |
+built-in | [ˈbɪltˈɪn] | 嵌入的; 内置的 | adj. |
+enigmatic | [ˌɛnɪɡˈmætɪk] | 神秘的; 费解的 | adj. |
+blink | [blɪŋk] | 眨眼睛; 闪烁; 瞬间 | n. v. |
+hibernate | [ˈhaɪbərneɪt] | 冬眠,蛰伏 | v. |
+odor | ['oʊdə] | 气味; 名声 | n. |
+indefinite | [ɪnˈdɛfənɪt] | 无限期; 不明确的 | adj. |
+exterior | [ɪkˈstɪriə(r)] | 外部; 外貌；外面的; 外表的 | n. adj. |
+depart | [dɪˈpɑrt] | 离开; 违背; 去世; 离职 | v. |
+deviate | [ˈdiviˌet] | 背离, 偏离 | v. |
+shun | [ʃʌn] | 避开, 回避 | v. |
+hormone | [ˈhɔrmoʊn] | 荷尔蒙, 激素 | n. |
+command | [kəˈmænd] | 命令; 指挥; 控制 | n. v. |
+lag | [læɡ] | 落后; 赶不上；滞后; 时间差 | v. n. |
+allusion | [əˈluʒən] | 暗指; 影射; 典故 | n. |
+induce | [ɪnˈdus] | 引诱; 引起; 引产 | v. |
+transmit | [trænsˈmɪt] | 传输; 传播; 传染 | v. |
+restore | [rɪˈstɔr] | 恢复; 返还; 修复 | v. |
+vine | [vaɪn] | 藤本植物; 葡萄树 | n. |
+subtle | [ˈsʌtl] | 微妙的; 敏感的; 狡猾；巧妙的 | adj. |
+headquarter | [ˈhedkwɔrtər] | 总部; 司令部；设置总部 | n. v. |
+pristine | [prɪˈstiːn] | 原始状态的; 纯朴的；新鲜的 | adj. |
+fraction | [ˈfrækʃən] | [数]分数; 少量; 片段 | n. |
+duplicate | [ˈduplɪkeɪt] | 复制 | v. |
+adept | [əˈdɛpt] | 熟练擅长的 | adj. |
+notation | [noʊˈteɪʃn] | 音乐数学的符号 | n. |
+qualify | [ˈkwɑːlɪfaɪ] | 达标合格; 取得资格 | v. |
+etch | [ɛtʃ] | 蚀刻; 铭记 | v. |
+approve | [əˈpruv] | 赞成, 同意; 批准 | v. |
+conscious | [ˈkɑnʃəs] | 有意识的; 有知觉的 | adj. |
+animate | [ˈænəˌmet] | 鼓舞；有生命的 | v. adj. |
+patent | [ˈpætnt] | 专利权；显然的；获得专利 | n. adj. vt. |
+resurgence | [rɪˈsɜrdʒəns] | 复兴复苏 | n. |
+discriminate | [dɪˈskrɪməˌnet] | 区别; 辨别; 歧视 | v. |
+apparatus | [ˌæpəˈrætəs] | 器械设备; 机构组织 | n. |
+pacifier | [ˈpæsəˌfaɪɚ] | 橡皮奶嘴; 镇静剂 | n. |
+heighten | [ˈhaɪtn] | 变高; 增强 | v. |
+count | [kaʊnt] | 总数; 计算数字；计算总数; 看做视为 | n. v. |
+photographer | [fəˈtɑgrəfə(r)] | 摄影师 | n. |
+stack | [stæk] | 一堆; 书架；堆起来; 码放整齐 | n. v. |
+mount | [maʊnt] | 攀登; 增加; 安装；山峰; 攀登; 底座 | v. n. |
+authenticity | [ˌɔθənˈtɪsətɪ] | 可靠性, 真实性 | n. |
+verify | [ˈvɛrəˌfaɪ] | 核实; 证明; 判定 | v. |
+backdrop | [ˈbækdrɑp] | 背景幕布; 事件背景 | n. |
+differentiate | [ˌdɪfəˈrɛnʃiˌet] | 区分辨别 | v. |
+reluctant | [rɪˈlʌktənt] | 不情愿的, 勉强的 | adj. |
+gallery | [ˈɡæləri] | 画廊; 边座; 旁听席 | n. |
+dial | [ˈdaɪəl] | 钟面表盘; 拨号盘；打电话 | n. v. |
+flotation | [floʊˈteɪʃn] | 漂浮 | n. |
+smother | [ˈsmʌðɚ] | 使窒息; 抑制 | v. |
+cramp | [kræmp] | 痉挛抽筋; 夹子；使痉挛; 夹紧; 限制；难懂的 | n. v. adj. |
+pit | [pɪt] | 矿井; 地面的坑；使竞争; 有凹陷 | n. v. |
+digest | [daɪˈdʒest] | 消化; 吸收; 领悟 | v. |
+carbohydrate | [kɑrboʊhaɪdreɪt] | 碳水化合物 | n. |
+inadvertently | [ɪnədˈvɜrtəntli] | 漫不经心, 疏忽地 | adv. |
+low-lying | [ˈloˌlaɪɪŋ] | 低洼的 | adj. |
+ultraviolet | [ˌʌltrəˈvaɪəlɪt] | 紫外线的 | adj. |
+institution | [ˌɪnstɪˈtuʃn] | 机构; 惯例, 制度; 建立 | n. |
+notorious | [noʊˈtɔriəs] | 众所周知, 臭名昭著的 | adj. |
+stake | [stek] | 木桩; 股份; 重大利益；用木桩支撑分界 | n. v. |
+
+[List 29]
+welfare | [ˈwelfer] | 健康; 幸福；福利的 | n. adj. |
+fishery | [ˈfɪʃəri] | 渔业; 渔场 | n. |
+harbor | [ˈhɑrbɚ] | 海港; 避难所；庇护; 入港停泊 | n. v. |
+abolish | [əˈbɑlɪʃ] | 废除; 废止 | v. |
+monk | [mʌŋk] | 修道士, 僧侣 | n. |
+infect | [ɪnˈfɛkt] | 传染, 感染; 污染 | v. |
+agency | [ˈedʒənsi] | 代理; 行政部门 | n. |
+posit | [ˈpɑzɪt] | 假定; 假设 | v. |
+loose | [lus] | 松动的; 宽松的; 随便；释放; 松开 | adj. v. |
+inflate | [ɪnˈflet] | 充气膨胀; 物价高涨 | vt. |
+expert | [ˈekspɜrt] | 专家; 行家 | n. |
+creature | [ˈkritʃɚ] | 生物; 人 | n. |
+paradise | [ˈpærəˌdaɪs] | 天堂; 乐园 | n. |
+butterfly | [ˈbʌtərflaɪ] | 蝴蝶 | n. |
+pierce | [pɪrs] | 刺穿; 洞察; 打动 | v. |
+immune | [ɪˈmjoon] | 免疫的; 不受影响的 | adj. |
+defensive | [dɪˈfɛnsɪv] | 防守的; 辩护的; 自卫；守势; 辩护 | adj. n. |
+satisfactory | [ˌsætɪsˈfæktəri] | 令人满意的 | adj. |
+make-up | [ˈmekˌʌp] | 组成; 天性; 化妆(品) | n. |
+cognitive | [ˈkɑgnətɪv] | 认知的 | adj. |
+mosquito | [məˈskitoʊ] | 蚊子 | n. |
+devastate | [ˈdɛvəˌstet] | 破坏; 毁灭; 蹂躏 | v. |
+obstruct | [əbˈstrʌkt] | 阻塞; 阻碍; 阻止 | v. |
+primitive | [ˈprɪmɪtɪv] | 原始的; 低等的; 简陋；原始人; 单纯的人 | adj. n. |
+detachment | [dɪ'tætʃmənt] | 冷漠; 超然；小分队 | n. |
+retire | [rɪˈtaɪərmənt] | 退休; 引退 | v. |
+entitle | [ɛnˈtaɪtl] | 给予资格; 授权; 命名 | v. |
+comfort | [ˈkʌmfərt] | 安慰; 舒适; 缓和 | n. v. |
+lay | [le] | 放置; 铺设; 产卵; 奠定；外行的 | v. adj. |
+firm | [ˈfɜrmli] | 公司；坚固的; 坚定的; 忠实 | n. adj. |
+champion | ['tʃæmpɪən] | 冠军; 捍卫者；捍卫; 支持 | n. v. |
+sharp | [ʃɑrp] | 敏锐的; 锋利的；急剧的；锐利的东西 | adj. adv. n. |
+campaign | [kæmˈpen] | 运动; 战役; 竞选运动 | n. |
+rebellion | [rɪˈbɛljən] | 谋反,叛乱,反抗 | n. |
+envision | [ɛnˈvɪʒən] | 设想; 预想 | vt. |
+cling | [klɪŋ] | 抓紧; 黏着; 坚持 | v. |
+terminal | [ˈtɜrmɪnl] | 终点站, 终端 | n. |
+heterogeneous | [ˌhɛtərəˈdʒiniəs] | 各种各样; 成分混杂 | adj. |
+bubble | [ˈbʌbəl] | 气泡; 泡沫；冒泡; 滔滔不绝; 洋溢 | n. v. |
+crevice | [ˈkrɛvɪs] | (岩石的) 裂缝缺口 | n. |
+consolidate | [kənˈsɑlɪdeɪt] | 合并; 巩固; 统一 | v. |
+legitimate | [ləˈdʒɪtəmɪt] | 合理地, 合法的, 正当 | adj. |
+cod | [kɑd] | 鳕鱼; 袋, 包；哄骗；骗人的 | n. v. adj. |
+blockage | [ˈblɑkɪdʒ] | 堵塞; 妨碍 | n. |
+install | [ɪnˈstɔl] | 安装; 安置 | vt. |
+empirical | [ɛmˈpɪrɪkəl] | 凭经验的; 经验主义 | adj. |
+penchant | [ˈpɛntʃənt] | (强烈的)倾向爱好 | n. |
+overtake | [ˌoʊvərˈteɪk] | 超越; 压倒; 突然发生 | v. |
+comedy | [ˈkɑmədi] | 喜剧 | n. |
+momentous | [moʊˈmentəs] | 重大重要的 | adj. |
+discord | [ˈdɪskɔrd] | 不一致; 不和 | n. |
+fiction | [ˈfɪkʃən] | 小说; 虚构 | n. |
+drama | [ˈdrɑmə] | 戏剧, 剧本; 戏剧性事件 | n. |
+strife | [straɪf] | 冲突; 争斗 | n. |
+resort | [rɪˈzɔrt] | 采取; 度假胜地；诉诸; 采取 | n. v. |
+athlete | [ˈæθˌlit] | 运动员 | n. |
+surge | [sɜrdʒ] | 汹涌; 激增; 大量 | n. v. |
+divorce | [dɪˈvɔrs] | 离婚; 分离 | n. v. |
+proliferation | [prəˌlɪfəˈreɪʃn] | 增殖, 繁殖; 增生 | n. |
+disprove | [dɪsˈpruv] | 反驳; 证明有误 | v. |
+radical | [ˈrædɪkl] | 根本彻底的, 激进的 | adj. |
+marvel | [ˈmɑrvl] | 奇迹；赞叹; 感到惊奇 | n. v. |
+logical | [ˈlɑdʒɪkl] | 符合逻辑的; 合理的 | adj. |
+flee | [fli] | 逃走; 消失；逃避 | v. |
+confederacy | [kənˈfɛdərəsi] | (国家) 联盟 | n. |
+fellowship | [ˈfeloʊʃɪp] | 友谊; 团体; 研究员职；学术奖金 | n. |
+repudiate | [rɪˈpjudiˌeɪt] | 批判驳斥; 断绝关系 | vt. |
+strip | [strɪp] | 剥光; 除去；长条; 带状地带 | v. n. |
+magic | [ˈmædʒɪk] | 魔法魔术; 魔力；有魔力的; 神奇的 | n. adj. |
+worship | [ˈwɜrʃɪp] | 崇拜;热爱;景仰 | n. v. |
+
+[List 30]
+fluidity | [fluˈɪdəti] | 流动性; 液体流质 | n. |
+spectacle | [ˈspɛktəkəl] | 奇观; 景象; 表演; 眼镜 | n. |
+peripheral | [pəˈrɪfərəl] | 外围的; 次要的; 末梢；外部设备 | adj. n. |
+assert | [əˈsɜrt] | 断言; 声称; 坚持主张 | v. |
+undermine | [ˌʌndərˈmaɪn] | 逐渐削弱; 破坏根基 | v. |
+peculiar | [pɪˈkjuljɚ] | 奇特古怪的; 异常特殊 | adj. |
+consensus | [kənˈsɛnsəs] | 一致看法; 共识 | n. |
+imaginative | [ɪˈmædʒənətɪv] | 富于想像的 | adj. |
+ethic | [ˈɛθɪk] | 道德规范; 伦理 | n. |
+mediocre | [ˌmidiˈoʊkər] | 普通的; 中等的；质量中等偏下的 | adj. |
+feasible | [ˈfizəbəl] | 可行的; 行得通的 | adj. |
+drastic | [ˈdræstɪk] | 激烈的; 极端的; 严厉 | adj. |
+germinate | [ˈdʒɜrmɪneɪt] | 发芽; 发育; 形成; 产生 | v. |
+deliberate | [dɪˈlɪbərɪt] | 故意的；仔细思考 | adj. v. |
+hatch | [hætʃ] | 孵化; 破壳; 谋划；舱门; 小窗口 | v. n. |
+arduous | [ˈɑrdʒuəs] | 困难的; 艰巨的 | adj. |
+frame | [frem] | 框架; 组织; 镜头；制定; 使适合; 加框 | n. v. |
+nursery | [ˈnɜrsəri] | 托儿所; 苗圃 | n. |
+deceive | [dɪˈsiv] | 欺诈 | v. |
+kinetic | [kɪˈnɛtɪk] | 运动的; [物] 动力的 | adj. |
+budget | ['bʌdӡit] | 预算；把...编入预算；低廉的 | n. v. adj. |
+rift | [rɪft] | 裂缝, 裂痕; 争议 | n. |
+pessimistic | [ˌpesɪˈmɪstɪk] | 悲观的 | adj. |
+chart | [tʃɑrt] | 图表; 海图；绘图; 记录 | n. v. |
+onset | [ˈɑnset] | 开始, 攻击; 发病 | n. |
+ammonia | [əˈmoʊniə] | 氨; 氨水; 氨气 | n. |
+methane | [ˈmeθeɪn] | 甲烷, 沼气 | n. |
+descriptive | [dɪˈskrɪptɪv] | 描写的, 叙述的 | adj. |
+endanger | [ɛnˈdendʒɚ] | 危及危害 | v. |
+giant | [ˈdʒaɪənt] | 巨人; 巨物; 伟人；巨大的 | n. adj. |
+sap | [sæp] | 精力元气; 植物汁液；使衰竭; 伤元气 | n. v. |
+Uranus | [ˈjʊrənəs] | 天王星 | n. |
+venture | [ˈvɛntʃɚ] | 冒险事业；冒险行事 | n. v. |
+camouflage | [ˈkæməˌflɑʒ] | 伪装; 掩饰 | n. v. |
+amphibian | [æmˈfɪbiən] | 两栖动物；两栖的 | n. adj. |
+couple | [ˈkʌpəl] | 两个; 配偶; 好几个；加上; 结合 | n. v. |
+submissive | [səbˈmɪsɪv] | 顺从的; 柔顺 | adj. |
+longitude | [ˈlɑndʒətud] | 经度 | n. |
+rear | [rɪr] | 饲养; 养育; 抬起; 高耸；后部; 臀部 | v. n. |
+prospect | [ˈprɑspekt] | 前景; 希望；勘察; 有希望 | n. v. |
+postulate | [ˈpɑstʃəleɪt] | 假定; 先决条件 | n. v. |
+upset | [ʌpˈsɛt] | 使生气; 搅乱；混乱; 肠胃不适；心烦的 | v. n. adj. |
+bold | [boʊld] | 明显的; 大胆的; 莽撞；粗黑体字 | adj. n. |
+analogous | [əˈnæləɡəs] | 可比拟的 | adj. |
+refuse | [rɪˈfjuz] | 拒绝; 回绝 | v. |
+slick | [slɪk] | 光滑的; 娴熟的; 利索；光滑之处；使光滑美观 | adj. n. v. |
+meticulous | [mɪˈtɪkjələs] | 谨慎, 注意细节的 | adj. |
+erratic | [ɪˈrætɪk] | 古怪, 反复无常的 | adj. |
+invoke | [ɪnˈvoʊk] | 援引; 唤起; 祈求 | v. |
+apprentice | [əˈprɛntɪs] | 学徒; 徒弟 | n. |
+chore | [tʃɔr] | 家务活; 琐事 | n. |
+waxy | [ˈwæksi] | 像蜡的; 光滑的 | adj. |
+thorough | [ˈθɜroʊ] | 十分彻底的 | adj. |
+confidence | [ˈkɑnfɪdəns] | 信心; 信任 | n. |
+traumatic | [traʊˈmætɪk] | 外伤的; 创伤的; 痛苦 | adj. |
+valid | [ˈvælɪd] | 有效的 | adj. |
+haul | [hɔl] | 拖, 拉 | v. |
+resume | [rɪ'zjum] | [rezəmeɪ]；重新开始; 恢复职位；简历résumé | n. v. |
+ravage | [ˈrævɪdʒ] | 毁坏; 劫掠 | v. |
+irritant | [ˈɪrɪtənt] | 刺激物; 恼火的事 | n. |
+legible | [ˈlɛdʒəbəl] | 清晰易读的 | adj. |
+ultimately | [ˈʌltəmɪtli] | 最后最终 | adv. |
+purify | [ˈpjʊrɪfaɪ] | 净化; 使纯正 | v. |
+mute | [mjut] | 无声的；哑巴；减轻; 抑制; 缓和 | adj. n. v. |
+intrinsic | [ɪnˈtrɪnzɪk] | 内在的, 固有的 | adj. |
+instigate | [ˈɪnstɪˌɡet] | 教唆; 煽动 | v. |
+tone | [toʊn] | 声调; 色调; 氛围; 强健状；使健壮; 保持协调 | n. v. |
+comprehend | [ˌkɑmprɪˈhend] | 理解领悟 | v. |
+theme | [θim] | 主题; 主旋律; 话题 | n. |
+leap | [lip] | 跳跃; 猛跳; 激增 | n. v. |
