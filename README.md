@@ -1,100 +1,100 @@
-# vinext-starter
+# 简辞 Simple Dictionary
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+简辞是一款离线、按章节学习与复习的英语词汇应用。它把“今天学什么、复习什么”交给明确的章节计划，让每次学习都保持简单、可控，并把学习记录保存在本机。
 
-## Prerequisites
+## 功能亮点
 
-- Node.js `>=22.13.0`
+- 按章节制定学习计划：每天可选择多个新词章节和多个复习章节，也可以跳着安排章节。
+- 双模式学习：先处理今日到期复习，再进入今天安排的新词学习。
+- 词卡学习：先回忆单词，再查看音标、词性、中文释义和例句。
+- 学习记录持久化：今日进度、已掌握、待复习、词书切换和打卡记录均保存在本地。
+- 词书管理：支持导入、查看、切换、重命名和删除多套词书。
+- TXT / PDF 导入：支持音标；文本型 PDF 可直接识别章节、单词、音标、词性和释义。
+- 本地备份：可以导出和导入 JSON 学习备份，迁移或重装后恢复进度。
+- 快捷键：`←` 不认识，`→` 认识，`Space` 查看释义或进入下一个单词，`Z` 撤销上次选择。
+- 学习日历：提供月、周、日视图，日视图展示按小时统计的学习曲线。
 
-## Quick Start
+## 使用方式
+
+1. 在「我的词书」中导入自己的 TXT 或文本型 PDF。
+2. 在「今日学习」中查看打卡日历和当天章节计划。
+3. 先完成到期复习，再学习当天安排的新词。
+4. 对每个单词选择「认识」或「不认识」，系统会记录到当前章节的学习或复习列表。
+5. 完成今日计划后打卡；需要换设备或重装时，先导出本地备份。
+
+## TXT 导入格式
+
+每个章节使用一个标题，每行一个单词。字段顺序为：
+
+```text
+[List 01]
+summary | [ˈsʌməri] | 总结；概要 | n. | The summary is easy to understand.
+species | [ˈspiːʃiːz] | 物种；种类 | n. |
+
+[List 02]
+resilient | [rɪˈzɪliənt] | 有韧性的；能迅速恢复的 | adj. |
+```
+
+说明：
+
+- 格式为：`单词 | 音标 | 中文释义 | 词性 | 例句（可选）`。
+- 例句为空时，应用不会显示例句区域。
+- 词性可以写成 `n.`、`adj.`、`vt.`、`vi.` 等；一个单词有多个词性时，可在释义中按对应词性分行书写。
+- 章节标题建议使用 `[List 01]`、`[List 02]` 这样的形式。
+- PDF 导入适用于可复制文本的 PDF；扫描图片型 PDF 暂不支持。
+
+词书文件不会内置到应用或 DMG 中，首次使用时请从本地文件导入。
+
+## 下载 macOS App
+
+前往 [Releases](https://github.com/Lentin1/vocab-flow/releases) 下载 Apple Silicon 安装包：
+
+1. 下载名称类似 `简辞-0.1.0-arm64.dmg` 的文件。
+2. 打开 DMG，将「简辞」拖入 Applications。
+3. 当前版本未进行 Apple 开发者签名；首次打开时，如系统拦截，请在 Finder 中右键应用并选择「打开」。
+
+应用支持 M1、M2、M3、M4 等 Apple Silicon Mac，运行时不需要网络或账号。
+
+## 从源码运行 Web 版
+
+要求 Node.js `>=22.13.0`：
 
 ```bash
 npm install
 npm run dev
-npm run build
 ```
 
-This starter does not use `wrangler.jsonc`.
+然后打开终端输出的本地地址。
 
-## Included Shape
+## 构建 macOS DMG
 
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+仅构建 Apple Silicon 版本：
 
-## Workspace Auth Headers
-
-Signed-in visitors receive both `oai-authenticated-user-id` and `oai-authenticated-user-email`. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
-
-The user ID is stable for the same user on the same Site and different across Sites. Email and name are intended for display or contact purposes.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const userId = requestHeaders.get("oai-authenticated-user-id");
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```bash
+npm run desktop:dist
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+输出文件位于 `release/简辞-*-arm64.dmg`。桌面开发模式：
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+```bash
+npm run desktop:dev
+```
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+## 开发检查
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+```bash
+npm run lint
+npm test
+```
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+## 技术栈
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+- React 19 + TypeScript
+- Vinext / Vite
+- Electron + electron-builder
+- pdf.js
+- Browser localStorage
 
-## Useful Commands
+## 许可证
 
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
-
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+暂未指定开源许可证。

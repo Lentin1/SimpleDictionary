@@ -1,0 +1,22 @@
+appId: com.vocabflow.app
+productName: 简辞
+directories:
+  output: release
+files:
+  - desktop/**
+  - package.json
+extraResources:
+  - from: dist
+    to: vocab-flow-dist
+mac:
+  icon: desktop/icon.svg
+  target:
+    - target: dmg
+      arch:
+        - arm64
+  category: public.app-category.education
+  identity: null
+dmg:
+  title: 简辞
+  artifactName: 简辞-${version}-arm64.dmg
+asar: true

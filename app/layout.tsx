@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "词流 · 记忆曲线背词",
-  description: "用记忆曲线，把每一个单词记得更久。",
+  title: "简辞 · 按章节背单词",
+  description: "简辞，简单的辞典，按章节安排每天的学习与复习。",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
