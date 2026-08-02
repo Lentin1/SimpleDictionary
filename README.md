@@ -97,4 +97,4 @@ npm test
 
 ## 许可证
 
-暂未指定开源许可证。
+本项目采用 [MIT License](LICENSE) 开源。
