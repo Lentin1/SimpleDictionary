@@ -192,10 +192,10 @@ button:focus-visible { outline: 3px solid rgba(56, 184, 141, .3); outline-offset
 .word-meta { display: flex; align-items: center; justify-content: center; margin-top: 12px; color: #92a4a4; font-family: Georgia, serif; font-size: 14px; }
 .prompt { margin: 0; color: #9aacad; font-size: 12px; text-align: center; }
 .answer-reveal { position: relative; z-index: 1; min-height: 0; margin: 32px 0 0; }
-.meaning-line { display: flex; align-items: flex-start; gap: 13px; }
-.meaning-label, .example-label { color: #a0b0af; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.meaning-line { display: flex; align-items: baseline; justify-content: center; gap: 13px; width: 100%; text-align: center; }
+.example-label { color: #a0b0af; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .meaning-sense-list { display: grid; gap: 8px; min-width: 0; }
-.meaning-sense { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.meaning-sense { display: flex; align-items: baseline; justify-content: center; gap: 6px; min-width: 0; }
 .meaning-sense b { color: #4f987f; font-family: Arial, sans-serif; font-size: 12px; font-weight: 700; }
 .meaning-sense strong { min-width: 0; color: var(--ink); font-size: 20px; font-weight: 700; line-height: 1.4; }
 .definition { margin: 9px 0 0 58px; color: #6f8588; font-family: Georgia, serif; font-size: 13px; font-style: italic; }
@@ -445,7 +445,7 @@ kbd { margin: 0 2px; padding: 2px 6px; border: 1px solid #dfe8e6; border-radius:
   .word-display { margin-top: 54px; }
   .word-display h3 { font-size: 52px; }
   .answer-reveal { min-height: 0; }
-  .meaning-line { flex-direction: column; gap: 6px; }
+  .meaning-line { align-items: center; flex-direction: column; gap: 6px; }
   .meaning-sense-list { width: 100%; }
   .definition { margin-left: 0; }
   .card-divider { margin-top: 28px; }
