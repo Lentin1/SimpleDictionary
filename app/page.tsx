@@ -58,6 +58,9 @@ type StoredSessionState = {
   currentId: number;
   revealed: boolean;
   lastAnswer: "known" | "unknown" | null;
+  queue?: number[];
+  date?: string;
+  active?: boolean;
 };
 
 type StoredBookEntry = {
@@ -301,6 +304,23 @@ function normalizeProgress(value: unknown): StoredProgress {
   })) as StoredProgress;
 }
 
+function normalizeStoredSession(value: unknown): StoredSessionState | undefined {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const candidate = value as Partial<StoredSessionState>;
+  if ((candidate.mode !== "learn" && candidate.mode !== "review") || typeof candidate.currentId !== "number") return undefined;
+  return {
+    mode: candidate.mode,
+    currentId: candidate.currentId,
+    revealed: candidate.revealed === true,
+    lastAnswer: candidate.lastAnswer === "known" || candidate.lastAnswer === "unknown" ? candidate.lastAnswer : null,
+    queue: Array.isArray(candidate.queue)
+      ? candidate.queue.filter((id): id is number => typeof id === "number" && Number.isFinite(id))
+      : undefined,
+    date: typeof candidate.date === "string" ? candidate.date : undefined,
+    active: candidate.active !== false,
+  };
+}
+
 function buildStudyWeek(date = new Date()) {
   const start = dateFromKey(localDateKey(date));
   const mondayOffset = (start.getUTCDay() + 6) % 7;
@@ -466,9 +486,7 @@ function normalizeStoredBookEntry(value: unknown): StoredBookEntry | null {
     progress: normalizeProgress(candidate.progress),
     schedule,
     studyHistory: normalizeStudyHistory(candidate.studyHistory),
-    session: candidate.session && (candidate.session.mode === "learn" || candidate.session.mode === "review")
-      ? candidate.session
-      : undefined,
+    session: normalizeStoredSession(candidate.session),
   };
 }
 
@@ -724,6 +742,9 @@ export default function Home() {
   const [customWords, setCustomWords] = useState<Word[]>([]);
   const [currentId, setCurrentId] = useState<number>(1);
   const [sessionMode, setSessionMode] = useState<SessionMode>("choose");
+  const [sessionQueue, setSessionQueue] = useState<number[]>([]);
+  const [sessionDate, setSessionDate] = useState<string | null>(null);
+  const [pendingSessionMode, setPendingSessionMode] = useState<Exclude<SessionMode, "choose"> | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [lastAnswer, setLastAnswer] = useState<"known" | "unknown" | null>(null);
   const [activeTab, setActiveTab] = useState<"review" | "mastered">("review");
@@ -764,6 +785,31 @@ export default function Home() {
   const targetWordCount = planWords.length;
   const scheduleChapterNames = chapterNames(allWords);
   const bookChapterGroups = chapterNames(allWords).map((name) => ({ name, words: allWords.filter((word) => chapterName(word) === name) }));
+
+  const currentSessionState = useCallback((): StoredSessionState | undefined => {
+    if (sessionMode === "choose") {
+      return pendingSessionMode && sessionQueue.length
+        ? {
+          mode: pendingSessionMode,
+          currentId: sessionQueue[0] ?? currentId,
+          revealed: false,
+          lastAnswer: null,
+          queue: sessionQueue,
+          date: sessionDate ?? today,
+          active: false,
+        }
+        : undefined;
+    }
+    return {
+      mode: sessionMode,
+      currentId,
+      revealed,
+      lastAnswer,
+      queue: sessionQueue,
+      date: sessionDate ?? today,
+      active: true,
+    };
+  }, [currentId, lastAnswer, pendingSessionMode, revealed, sessionDate, sessionMode, sessionQueue, today]);
 
   const currentBookSnapshot = useCallback((session?: StoredSessionState): StoredBookEntry => ({
     id: activeBookId,
@@ -851,20 +897,49 @@ export default function Home() {
         setStudyHistory(parsedStudyHistory);
         setCustomWords(parsedCustomWords);
         setChapterSchedule(initialSchedule);
-        const initialPlan = getScheduledChapterPlan(availableWords, parsed, initialSchedule, localDateKey());
+        const sessionToday = localDateKey();
+        const initialPlan = getScheduledChapterPlan(availableWords, parsed, initialSchedule, sessionToday);
         const next = chooseNextWord(initialPlan.selectedWords, parsed);
         const storedSession = activeBook.session;
+        const reviewWordsForSession = availableWords.filter((word) => initialPlan.reviewNames.includes(chapterName(word)));
+        const learnResumeWords = availableWords.filter((word) => initialPlan.studyNames.includes(chapterName(word)) && parsed[word.id]?.status !== "mastered");
+        const storedModeWords = storedSession?.mode === "review"
+          ? reviewWordsForSession
+          : storedSession?.mode === "learn"
+            ? learnResumeWords
+            : [];
+        const storedQueue = storedSession && Array.isArray(storedSession.queue)
+          ? storedSession.queue.filter((id) => storedModeWords.some((word) => word.id === id))
+          : storedSession
+            ? (storedSession.lastAnswer === "known"
+              ? storedModeWords.filter((word) => word.id !== storedSession.currentId).map((word) => word.id)
+              : [storedSession.currentId, ...storedModeWords.filter((word) => word.id !== storedSession.currentId).map((word) => word.id)])
+            : [];
+        const sessionDateMatches = !storedSession?.date || storedSession.date === sessionToday;
         const hasStoredSession = storedSession
+          && sessionDateMatches
           && (storedSession.mode === "review" || storedSession.mode === "learn")
           && typeof storedSession.currentId === "number"
-          && initialPlan.selectedWords.some((word) => word.id === storedSession.currentId);
+          && (initialPlan.selectedWords.some((word) => word.id === storedSession.currentId) || storedQueue.length > 0);
         if (hasStoredSession) {
-          setCurrentId(storedSession.currentId);
-          setSessionMode(storedSession.mode);
-          setRevealed(storedSession.revealed === true);
-          setLastAnswer(storedSession.lastAnswer === "known" || storedSession.lastAnswer === "unknown" ? storedSession.lastAnswer : null);
+          setSessionQueue(storedQueue);
+          setSessionDate(storedSession.date ?? sessionToday);
+          if (storedSession.active === false) {
+            setPendingSessionMode(storedSession.mode);
+            setSessionMode("choose");
+            setRevealed(false);
+            setLastAnswer(null);
+          } else {
+            setCurrentId(storedSession.currentId);
+            setSessionMode(storedSession.mode);
+            setRevealed(storedSession.revealed === true);
+            setLastAnswer(storedSession.lastAnswer === "known" || storedSession.lastAnswer === "unknown" ? storedSession.lastAnswer : null);
+          }
         } else if (next) {
           setCurrentId(next.id);
+          setSessionQueue([]);
+          setSessionDate(null);
+          setPendingSessionMode(null);
         }
       } catch {
         // A clean in-memory session is still useful when storage is unavailable.
@@ -889,12 +964,7 @@ export default function Home() {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
       window.localStorage.setItem(CUSTOM_WORDS_KEY, JSON.stringify(customWords));
       window.localStorage.setItem(STUDY_HISTORY_KEY, JSON.stringify(studyHistory));
-      const session = sessionMode === "choose" ? undefined : {
-        mode: sessionMode,
-        currentId,
-        revealed,
-        lastAnswer,
-      } satisfies StoredSessionState;
+      const session = currentSessionState();
       const currentBook = currentBookSnapshot(session);
       window.localStorage.setItem(BOOK_STATE_KEY, JSON.stringify({
         ...currentBook,
@@ -907,14 +977,14 @@ export default function Home() {
     } catch {
       // The in-memory session remains usable when browser storage is unavailable.
     }
-  }, [activeBookId, bookLibrary, bookName, bookNote, chapterSchedule, currentBookSnapshot, currentId, lastAnswer, persistedBookEntries, progress, customWords, revealed, sessionMode, studyHistory, hydrated]);
+  }, [activeBookId, bookLibrary, bookName, bookNote, chapterSchedule, currentBookSnapshot, currentSessionState, persistedBookEntries, progress, customWords, studyHistory, hydrated]);
 
   useEffect(() => {
     const interval = window.setInterval(() => setNow(Date.now()), 60_000);
     return () => window.clearInterval(interval);
   }, []);
 
-  const studiedToday = planWords.filter((word) => progress[word.id]?.lastStudied === today).length;
+  const studiedToday = planWords.filter((word) => progress[word.id]?.status === "mastered" && progress[word.id]?.lastStudied === today).length;
   const learnedWords = allWords.filter((word) => Boolean(progress[word.id]));
   const masteredWords = allWords.filter((word) => progress[word.id]?.status === "mastered");
   const reviewWords = allWords.filter((word) => progress[word.id]?.status === "review");
@@ -937,17 +1007,23 @@ export default function Home() {
     [activePlan, allWords],
   );
   const reviewSessionWords = useMemo(
-    () => reviewChapterWords.filter((word) => Boolean(progress[word.id]) && progress[word.id]?.lastStudied !== today),
-    [progress, reviewChapterWords, today],
+    () => reviewChapterWords,
+    [reviewChapterWords],
   );
   const learnSessionWords = useMemo(
     () => learnChapterWords.filter((word) => !progress[word.id]),
     [learnChapterWords, progress],
   );
-  const sessionWords = useMemo(
-    () => sessionMode === "review" ? reviewSessionWords : sessionMode === "learn" ? learnSessionWords : [],
-    [learnSessionWords, reviewSessionWords, sessionMode],
+  const queuedSessionWords = useMemo(
+    () => sessionQueue.flatMap((id) => {
+      const word = allWords.find((candidate) => candidate.id === id);
+      return word ? [word] : [];
+    }),
+    [allWords, sessionQueue],
   );
+  const hasPendingSession = Boolean(pendingSessionMode && sessionDate === today && sessionQueue.length);
+  const reviewStartWords = hasPendingSession && pendingSessionMode === "review" ? queuedSessionWords : reviewSessionWords;
+  const learnStartWords = hasPendingSession && pendingSessionMode === "learn" ? queuedSessionWords : learnSessionWords;
   const todayRecord = studyHistory[today];
   const todayCompleted = targetWordCount > 0 && completed >= targetWordCount;
   const studyStreak = countStudyStreak(studyHistory, today);
@@ -963,7 +1039,7 @@ export default function Home() {
   const dayChartMax = Math.max(1, ...dayHourlyCounts);
   const dayChartPath = buildSmoothChartPath(dayHourlyCounts, dayChartMax);
   const dayChartTotal = dayHourlyCounts.reduce((total, count) => total + count, 0);
-  const reviewPreviewWords = reviewSessionWords.slice(0, 8);
+  const reviewPreviewWords = reviewStartWords.slice(0, 8);
 
   const activeList = activeTab === "review" ? reviewWords : masteredWords;
   const editingBook = bookLibrary.find((book) => book.id === editingBookId);
@@ -978,13 +1054,18 @@ export default function Home() {
   }];
 
   function startSession(mode: Exclude<SessionMode, "choose">) {
-    const words = mode === "review" ? reviewSessionWords : learnSessionWords;
+    const words = mode === "review" ? reviewStartWords : learnStartWords;
     if (!words.length) {
       setToast(mode === "review" ? "今日计划没有可复习的章节单词" : "今日计划的新词已经学完了");
       window.setTimeout(() => setToast(""), 2200);
       return;
     }
-    const next = chooseNextWord(words, progress);
+    const shouldResume = hasPendingSession && pendingSessionMode === mode && queuedSessionWords.length > 0;
+    const nextQueue = shouldResume ? sessionQueue : words.map((word) => word.id);
+    const next = allWords.find((word) => word.id === nextQueue[0]) ?? words[0];
+    setSessionQueue(nextQueue);
+    setSessionDate(today);
+    setPendingSessionMode(null);
     setCurrentId(next.id);
     setSessionMode(mode);
     setRevealed(false);
@@ -992,6 +1073,10 @@ export default function Home() {
   }
 
   function exitSession() {
+    if (sessionMode === "learn" || sessionMode === "review") {
+      setPendingSessionMode(sessionMode);
+      setSessionDate(today);
+    }
     setSessionMode("choose");
     setRevealed(false);
     setLastAnswer(null);
@@ -1001,8 +1086,13 @@ export default function Home() {
 
   const chooseNext = useCallback(() => {
     if (sessionMode === "choose") return;
-    const next = chooseNextWord(sessionWords, progress, currentWord.id);
+    const next = sessionQueue
+      .map((id) => allWords.find((word) => word.id === id))
+      .find((word): word is Word => Boolean(word));
     if (!next) {
+      setSessionQueue([]);
+      setSessionDate(null);
+      setPendingSessionMode(null);
       setSessionMode("choose");
       setRevealed(false);
       setLastAnswer(null);
@@ -1013,19 +1103,27 @@ export default function Home() {
     setCurrentId(next.id);
     setRevealed(false);
     setLastAnswer(null);
-  }, [currentWord.id, progress, sessionMode, sessionWords]);
+  }, [allWords, sessionMode, sessionQueue]);
 
   const answer = useCallback((type: "known" | "unknown") => {
     if (sessionMode === "choose") return;
     const answeredAt = new Date();
     const answeredDate = localDateKey(answeredAt);
     const answeredHour = localHour(answeredAt);
+    const previousRecord = progress[currentId];
+    const wasCompletedToday = previousRecord?.status === "mastered" && previousRecord.lastStudied === answeredDate;
     const nextRecord: ProgressRecord = type === "known"
       ? { status: "mastered", lastStudied: answeredDate, lastStudiedAt: answeredAt.toISOString() }
       : { status: "review", lastStudied: answeredDate, lastStudiedAt: answeredAt.toISOString() };
     const nextProgress = { ...progress, [currentId]: nextRecord };
-    const nextStudiedCount = planWords.filter((word) => nextProgress[word.id]?.lastStudied === answeredDate).length;
+    const nextStudiedCount = planWords.filter((word) => nextProgress[word.id]?.status === "mastered" && nextProgress[word.id]?.lastStudied === answeredDate).length;
+    const queue = sessionQueue.length ? sessionQueue : [currentId];
+    const queueWithoutCurrent = queue[0] === currentId ? queue.slice(1) : queue.filter((id) => id !== currentId);
+    const nextQueue = type === "unknown" ? [...queueWithoutCurrent, currentId] : queueWithoutCurrent;
     setProgress(nextProgress);
+    setSessionQueue(nextQueue);
+    setSessionDate(answeredDate);
+    setPendingSessionMode(null);
     setStudyHistory((current) => ({
       ...current,
       [answeredDate]: {
@@ -1035,14 +1133,20 @@ export default function Home() {
         checkedIn: current[answeredDate]?.checkedIn === true,
         hourlyCounts: (() => {
           const counts = [...(current[answeredDate]?.hourlyCounts ?? EMPTY_HOURLY_COUNTS)];
-          counts[answeredHour] += 1;
+          if (type === "known" && !wasCompletedToday) {
+            counts[answeredHour] += 1;
+          }
+          if (type === "unknown" && wasCompletedToday && previousRecord?.lastStudiedAt) {
+            const previousHour = localHour(new Date(previousRecord.lastStudiedAt));
+            counts[previousHour] = Math.max(0, counts[previousHour] - 1);
+          }
           return counts;
         })(),
       },
     }));
     setLastAnswer(type);
     setRevealed(true);
-  }, [currentId, planWords, progress, sessionMode, targetWordCount]);
+  }, [currentId, planWords, progress, sessionMode, sessionQueue, targetWordCount]);
 
   function resetProgress() {
     setProgress({});
@@ -1053,6 +1157,9 @@ export default function Home() {
     });
     setCurrentId(allWords[0]?.id ?? 1);
     setSessionMode("choose");
+    setSessionQueue([]);
+    setSessionDate(null);
+    setPendingSessionMode(null);
     setRevealed(false);
     setLastAnswer(null);
     setToast("学习进度已重置");
@@ -1076,7 +1183,7 @@ export default function Home() {
   }
 
   const removeProgressRecord = useCallback((wordId: number) => {
-    const wasStudiedToday = progress[wordId]?.lastStudied === today;
+    const wasStudiedToday = progress[wordId]?.status === "mastered" && progress[wordId]?.lastStudied === today;
     const studiedAt = progress[wordId]?.lastStudiedAt;
     setProgress((current) => {
       const next = { ...current };
@@ -1117,8 +1224,11 @@ export default function Home() {
 
   const undoLastAnswer = useCallback(() => {
     if (!lastAnswer) return;
+    setSessionQueue((current) => [currentId, ...current.filter((id) => id !== currentId)]);
+    setSessionDate(today);
+    setPendingSessionMode(null);
     removeProgressRecord(currentId);
-  }, [currentId, lastAnswer, removeProgressRecord]);
+  }, [currentId, lastAnswer, removeProgressRecord, today]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -1178,7 +1288,7 @@ export default function Home() {
     const nextSchedule = chapterSchedule?.bookSignature === nextSignature
       ? normalizeChapterSchedule(chapterSchedule, imported)
       : buildDefaultChapterSchedule(imported, today);
-    const previousBook = currentBookSnapshot();
+    const previousBook = currentBookSnapshot(currentSessionState());
     const importedName = (selectedFileName.replace(/\.(txt|pdf)$/i, "").trim() || `自定义词书 ${bookLibrary.length + 1}`).slice(0, 60);
     const importedBook: StoredBookEntry = {
       id: `book-${Date.now()}-${hashText(nextSignature)}`,
@@ -1204,6 +1314,9 @@ export default function Home() {
     setChapterSchedule(nextSchedule);
     setCurrentId(imported[0].id);
     setSessionMode("choose");
+    setSessionQueue([]);
+    setSessionDate(null);
+    setPendingSessionMode(null);
     setRevealed(false);
     setLastAnswer(null);
     setImportText("");
@@ -1242,12 +1355,7 @@ export default function Home() {
   }
 
   function exportBackup() {
-    const session = sessionMode === "choose" ? undefined : {
-      mode: sessionMode,
-      currentId,
-      revealed,
-      lastAnswer,
-    } satisfies StoredSessionState;
+    const session = currentSessionState();
     const payload: BackupPayload = {
       version: 1,
       exportedAt: new Date().toISOString(),
@@ -1301,6 +1409,9 @@ export default function Home() {
       setChapterSchedule(restoredSchedule);
       setCurrentId(next?.id ?? availableWords[0]?.id ?? 1);
       setSessionMode("choose");
+      setSessionQueue([]);
+      setSessionDate(null);
+      setPendingSessionMode(null);
       setRevealed(false);
       setLastAnswer(null);
       setToast(`已恢复 ${restoredBooks.length} 本词书和学习记录`);
@@ -1341,6 +1452,9 @@ export default function Home() {
     }]);
     setCurrentId(restoredWords[0].id);
     setSessionMode("choose");
+    setSessionQueue([]);
+    setSessionDate(null);
+    setPendingSessionMode(null);
     setRevealed(false);
     setLastAnswer(null);
     setToast(`已恢复 ${restoredWords.length} 个单词和学习记录`);
@@ -1366,12 +1480,7 @@ export default function Home() {
       if (target) setShowBookPanel(false);
       return;
     }
-    const currentSession = sessionMode === "choose" ? undefined : {
-      mode: sessionMode,
-      currentId,
-      revealed,
-      lastAnswer,
-    } satisfies StoredSessionState;
+    const currentSession = currentSessionState();
     const current = currentBookSnapshot(currentSession);
     setBookLibrary((books) => books.map((book) => book.id === activeBookId ? current : book));
     const targetWords = target.words.length ? target.words : WORDS;
@@ -1381,9 +1490,18 @@ export default function Home() {
     const targetPlan = getScheduledChapterPlan(targetWords, target.progress, targetSchedule, today);
     const storedSession = target.session;
     const canRestoreSession = storedSession
+      && storedSession.active !== false
       && (storedSession.mode === "learn" || storedSession.mode === "review")
       && targetPlan.selectedWords.some((word) => word.id === storedSession.currentId);
+    const canResumePending = storedSession
+      && storedSession.active === false
+      && (storedSession.mode === "learn" || storedSession.mode === "review")
+      && Array.isArray(storedSession.queue)
+      && storedSession.queue.some((id) => targetWords.some((word) => word.id === id));
     const next = chooseNextWord(targetPlan.selectedWords, target.progress);
+    const restoredQueue = canRestoreSession && Array.isArray(storedSession.queue)
+      ? storedSession.queue.filter((id) => targetWords.some((word) => word.id === id))
+      : [];
     setActiveBookId(target.id);
     setBookName(target.name);
     setBookNote(target.note);
@@ -1393,6 +1511,9 @@ export default function Home() {
     setChapterSchedule(targetSchedule);
     setCurrentId(canRestoreSession ? storedSession.currentId : next?.id ?? targetWords[0]?.id ?? 1);
     setSessionMode(canRestoreSession ? storedSession.mode : "choose");
+    setSessionQueue(restoredQueue);
+    setSessionDate(canRestoreSession || canResumePending ? storedSession.date ?? today : null);
+    setPendingSessionMode(canResumePending ? storedSession.mode : null);
     setRevealed(canRestoreSession ? storedSession.revealed === true : false);
     setLastAnswer(canRestoreSession && (storedSession.lastAnswer === "known" || storedSession.lastAnswer === "unknown") ? storedSession.lastAnswer : null);
     setShowBookPanel(false);
@@ -1422,7 +1543,7 @@ export default function Home() {
   }
 
   function deleteBook(bookId: string) {
-    const sourceBooks = bookLibrary.length ? bookLibrary : [currentBookSnapshot()];
+    const sourceBooks = bookLibrary.length ? bookLibrary : [currentBookSnapshot(currentSessionState())];
     const target = sourceBooks.find((book) => book.id === bookId);
     if (!target) return;
     if (sourceBooks.length <= 1) {
@@ -1432,12 +1553,7 @@ export default function Home() {
     }
     if (!window.confirm(`确定删除「${target.name}」吗？这本词书的学习进度、计划和打卡记录也会被删除。`)) return;
 
-    const currentSession = sessionMode === "choose" ? undefined : {
-      mode: sessionMode,
-      currentId,
-      revealed,
-      lastAnswer,
-    } satisfies StoredSessionState;
+    const currentSession = currentSessionState();
     const current = currentBookSnapshot(currentSession);
     const booksWithCurrent = sourceBooks.map((book) => book.id === activeBookId ? current : book);
     const remainingBooks = booksWithCurrent.filter((book) => book.id !== bookId);
@@ -1458,10 +1574,19 @@ export default function Home() {
     const nextPlan = getScheduledChapterPlan(nextWords, nextBook.progress, nextSchedule, today);
     const storedSession = nextBook.session;
     const canRestoreSession = storedSession
+      && storedSession.active !== false
       && (storedSession.mode === "learn" || storedSession.mode === "review")
       && nextPlan.selectedWords.some((word) => word.id === storedSession.currentId);
+    const canResumePending = storedSession
+      && storedSession.active === false
+      && (storedSession.mode === "learn" || storedSession.mode === "review")
+      && Array.isArray(storedSession.queue)
+      && storedSession.queue.some((id) => nextWords.some((word) => word.id === id));
     const next = chooseNextWord(nextPlan.selectedWords, nextBook.progress);
     const normalizedNextBook = { ...nextBook, schedule: nextSchedule };
+    const restoredQueue = canRestoreSession && Array.isArray(storedSession.queue)
+      ? storedSession.queue.filter((id) => nextWords.some((word) => word.id === id))
+      : [];
 
     setBookLibrary([normalizedNextBook, ...remainingBooks.slice(1)]);
     setActiveBookId(normalizedNextBook.id);
@@ -1473,6 +1598,9 @@ export default function Home() {
     setChapterSchedule(nextSchedule);
     setCurrentId(canRestoreSession ? storedSession.currentId : next?.id ?? nextWords[0]?.id ?? 1);
     setSessionMode(canRestoreSession ? storedSession.mode : "choose");
+    setSessionQueue(restoredQueue);
+    setSessionDate(canRestoreSession || canResumePending ? storedSession.date ?? today : null);
+    setPendingSessionMode(canResumePending ? storedSession.mode : null);
     setRevealed(canRestoreSession ? storedSession.revealed === true : false);
     setLastAnswer(canRestoreSession && (storedSession.lastAnswer === "known" || storedSession.lastAnswer === "unknown") ? storedSession.lastAnswer : null);
     setBookPanelMode("library");
@@ -1517,7 +1645,7 @@ export default function Home() {
         </div>
 
         <nav className="main-nav" aria-label="主导航">
-          <button className={`nav-item ${showBookPanel ? "" : "active"}`} type="button" aria-label="今日学习" title="今日学习" onClick={() => { setShowBookPanel(false); setSessionMode("choose"); }}><span className="nav-icon"><Icon name="clock" /></span><span className="nav-label">今日学习</span><span className="nav-badge">{completed} / {targetWordCount}</span></button>
+          <button className={`nav-item ${showBookPanel ? "" : "active"}`} type="button" aria-label="今日学习" title="今日学习" onClick={() => { setShowBookPanel(false); if (sessionMode === "learn" || sessionMode === "review") exitSession(); else setSessionMode("choose"); }}><span className="nav-icon"><Icon name="clock" /></span><span className="nav-label">今日学习</span><span className="nav-badge">{completed} / {targetWordCount}</span></button>
           <button className={`nav-item ${showBookPanel ? "active" : ""}`} type="button" aria-label="我的词书" title="我的词书" onClick={() => { setImportError(""); setBookPanelMode("library"); setShowBookPanel(true); }}><span className="nav-icon"><Icon name="stack" /></span><span className="nav-label">我的词书</span></button>
         </nav>
 
@@ -1541,20 +1669,20 @@ export default function Home() {
                 <div className="calendar-estimate"><div><span>预计完成</span><strong>{estimatedCompletion}</strong></div><small>按当前章节计划估算</small></div>
               </div>
               <div className="session-choice-grid">
-                <button className="session-choice review" type="button" disabled={!reviewSessionWords.length} onClick={() => startSession("review")}><span className="session-choice-icon">↻</span><span><strong>复习旧词</strong><small>{reviewSessionWords.length ? `${reviewSessionWords.length} 个章节单词` : "今日计划没有复习单词"}</small></span><Icon name="arrow" /></button>
-                <button className="session-choice learn" type="button" disabled={!learnSessionWords.length} onClick={() => startSession("learn")}><span className="session-choice-icon">＋</span><span><strong>学习新词</strong><small>{learnSessionWords.length ? `${learnSessionWords.length} 个新单词` : "今天的新词已经学完"}</small></span><Icon name="arrow" /></button>
+                <button className="session-choice review" type="button" disabled={!reviewStartWords.length} onClick={() => startSession("review")}><span className="session-choice-icon">↻</span><span><strong>复习旧词</strong><small>{reviewStartWords.length ? `${reviewStartWords.length} 个章节单词` : "今日计划没有复习单词"}</small></span><Icon name="arrow" /></button>
+                <button className="session-choice learn" type="button" disabled={!learnStartWords.length} onClick={() => startSession("learn")}><span className="session-choice-icon">＋</span><span><strong>学习新词</strong><small>{learnStartWords.length ? `${learnStartWords.length} 个新单词` : "今天的新词已经学完"}</small></span><Icon name="arrow" /></button>
               </div>
-              <section className="review-list-preview" data-testid="review-list-preview" aria-label="今日复习列表"><div className="review-list-heading"><div><span className="section-kicker">严格按章节</span><strong>今日复习列表</strong></div><span>{reviewSessionWords.length} 个词</span></div>{reviewPreviewWords.length ? <div className="review-list-items">{reviewPreviewWords.map((word) => <div className="review-list-item" key={word.id}><strong>{word.word}</strong><span>{chapterName(word)} · {word.meaning}</span></div>)}</div> : <p className="review-list-empty">{activePlan.reviewNames.length ? "这些章节还没有已学习的单词" : "今日计划没有安排复习章节"}</p>}{reviewSessionWords.length > reviewPreviewWords.length && <p className="review-list-more">还有 {reviewSessionWords.length - reviewPreviewWords.length} 个词，进入复习后继续</p>}</section>
+              <section className="review-list-preview" data-testid="review-list-preview" aria-label="今日复习列表"><div className="review-list-heading"><div><span className="section-kicker">严格按章节</span><strong>今日复习列表</strong></div><span>{reviewStartWords.length} 个词</span></div>{reviewPreviewWords.length ? <div className="review-list-items">{reviewPreviewWords.map((word) => <div className="review-list-item" key={word.id}><strong>{word.word}</strong><span>{chapterName(word)} · {word.meaning}</span></div>)}</div> : <p className="review-list-empty">{activePlan.reviewNames.length ? "所选章节暂无可复习单词" : "今日计划没有安排复习章节"}</p>}{reviewStartWords.length > reviewPreviewWords.length && <p className="review-list-more">还有 {reviewStartWords.length - reviewPreviewWords.length} 个词，进入复习后继续</p>}</section>
             </div> : <>
-            <div className="session-heading"><div><span className="section-kicker">今日计划 · 第 {activePlan.dayIndex + 1} 天 · {sessionMode === "review" ? (activePlan.reviewNames.length ? activePlan.reviewNames.join("、") : "章节复习") : (activePlan.studyNames.length ? activePlan.studyNames.join("、") : "新词")}</span><h2>{sessionMode === "review" ? "复习旧词" : "学习新词"}</h2></div><div className="session-heading-actions"><span className="queue-count">{sessionWords.length} 个待完成</span><button className="exit-session-button" type="button" onClick={exitSession}>退出学习</button></div></div>
+            <div className="session-heading"><div><span className="section-kicker">今日计划 · 第 {activePlan.dayIndex + 1} 天 · {sessionMode === "review" ? (activePlan.reviewNames.length ? activePlan.reviewNames.join("、") : "章节复习") : (activePlan.studyNames.length ? activePlan.studyNames.join("、") : "新词")}</span><h2>{sessionMode === "review" ? "复习旧词" : "学习新词"}</h2></div><div className="session-heading-actions"><span className="queue-count">{queuedSessionWords.length} 个待完成</span><button className="exit-session-button" type="button" onClick={exitSession}>退出学习</button></div></div>
 
             <article className={`word-card ${revealed ? "is-revealed" : ""}`}>
               <div className="word-card-top"><span className="word-tag">{currentWord.tag}</span></div>
               <div className="word-display"><h3>{currentWord.word}</h3><div className="word-meta"><span>{currentWord.phonetic}</span></div></div>
-              {!revealed ? <p className="prompt">先凭直觉回想它的意思，再选择你的答案</p> : <div className="answer-reveal"><div className="meaning-line"><span className="meaning-label">中文释义</span><div className="meaning-sense-list">{getWordSenses(currentWord).map((sense) => <div className="meaning-sense" key={`${sense.part}-${sense.meaning}`}><b>{sense.part}</b><strong>{sense.meaning}</strong></div>)}</div></div>{shouldShowDefinition(currentWord.definition) && <p className="definition">{currentWord.definition}</p>}{shouldShowExample(currentWord.example) && <div className="example-block"><span className="example-label">例句</span><p>{currentWord.example}</p>{currentWord.translation.trim() && <p className="translation">{currentWord.translation}</p>}</div>}</div>}
-              {revealed && lastAnswer && <div className={`answer-note answer-note-top ${lastAnswer}`}><span>{lastAnswer === "known" ? "✓" : "↻"}</span>{lastAnswer === "known" ? "已记录，本章复习时会再次出现" : "已加入本章复习列表"}</div>}
+              {!revealed ? <p className="prompt">先凭直觉回想它的意思，再选择你的答案</p> : <div className="answer-reveal"><div className="meaning-line"><div className="meaning-sense-list">{getWordSenses(currentWord).map((sense) => <div className="meaning-sense" key={`${sense.part}-${sense.meaning}`}><b>{sense.part}</b><strong>{sense.meaning}</strong></div>)}</div></div>{shouldShowDefinition(currentWord.definition) && <p className="definition">{currentWord.definition}</p>}{shouldShowExample(currentWord.example) && <div className="example-block"><span className="example-label">例句</span><p>{currentWord.example}</p>{currentWord.translation.trim() && <p className="translation">{currentWord.translation}</p>}</div>}</div>}
+              {revealed && lastAnswer && <div className={`answer-note answer-note-top ${lastAnswer}`}><span>{lastAnswer === "known" ? "✓" : "↻"}</span>{lastAnswer === "known" ? "已答对，移出当前队列" : "已排到队尾，稍后再次出现"}</div>}
               <div className={`card-divider ${revealed ? "revealed-divider" : ""}`} />
-              {!revealed ? progress[currentWord.id] && sessionMode === "learn" ? <div className="known-word-actions"><button className="undo-answer-button" type="button" onClick={() => removeProgressRecord(currentWord.id)}>撤销此词记录</button></div> : <div className="answer-buttons"><button className="answer-button unknown" type="button" onClick={() => answer("unknown")}><span className="answer-symbol">×</span><span><strong>不认识</strong><small>加入待复习</small></span><span className="key-hint">←</span></button><button className="answer-button known" type="button" onClick={() => answer("known")}><span className="answer-symbol">✓</span><span><strong>认识</strong><small>加入已掌握</small></span><span className="key-hint">→</span></button></div> : <div className="revealed-actions"><button className="undo-answer-button" type="button" onClick={undoLastAnswer} aria-label="撤销本次选择，快捷键 Z"><span>撤销本次选择</span><span className="action-key">Z</span></button><button className="next-button" type="button" onClick={chooseNext}><span>{sessionWords.length ? "下一个单词" : "返回今日任务"}</span><span className="action-key next-key">Space</span><Icon name="arrow" /></button></div>}
+              {!revealed ? <div className="answer-buttons"><button className="answer-button unknown" type="button" onClick={() => answer("unknown")}><span className="answer-symbol">×</span><span><strong>不认识</strong><small>排到队尾，稍后再刷</small></span><span className="key-hint">←</span></button><button className="answer-button known" type="button" onClick={() => answer("known")}><span className="answer-symbol">✓</span><span><strong>认识</strong><small>答对并移出本轮</small></span><span className="key-hint">→</span></button></div> : <div className="revealed-actions"><button className="undo-answer-button" type="button" onClick={undoLastAnswer} aria-label="撤销本次选择，快捷键 Z"><span>撤销本次选择</span><span className="action-key">Z</span></button><button className="next-button" type="button" onClick={chooseNext}><span>{queuedSessionWords.length ? "下一个单词" : "完成本轮"}</span><span className="action-key next-key">Space</span><Icon name="arrow" /></button></div>}
             </article>
             <p className="keyboard-note">使用键盘 <kbd>←</kbd> 不认识 · <kbd>→</kbd> 认识 · <kbd>Space</kbd> 下一个单词 · <kbd>Z</kbd> 撤销</p>
 
