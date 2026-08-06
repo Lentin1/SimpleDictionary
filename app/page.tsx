@@ -2,6 +2,16 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { parsePdfImport } from "@/lib/pdf-import";
+import { WordAiTutor } from "@/app/components/WordAiTutor";
+
+declare global {
+  interface Window {
+    simpleDictionaryDesktop?: {
+      loadState: () => Promise<string | null>;
+      saveState: (value: string) => Promise<void>;
+    };
+  }
+}
 
 type WordSense = {
   part: string;
@@ -47,6 +57,8 @@ type DailyStudyRecord = {
   completed: boolean;
   checkedIn: boolean;
   hourlyCounts: number[];
+  learnedWordIds?: number[];
+  reviewedWordIds?: number[];
 };
 
 type StudyHistory = Record<string, DailyStudyRecord>;
@@ -225,25 +237,25 @@ function formatCompletionDate(timestamp: number) {
 
 function getTimeGreeting(date = new Date(), completed = false, studiedCount = 0) {
   const hour = localHour(date);
-  if (hour < 5) return "夜深了，早点休息，明天再继续吧";
+  if (hour < 5) return "还没休息吗？先睡一会儿，单词明天再学也来得及";
   if (hour < 8) {
-    if (completed) return "早安，今天的任务已经完成了";
-    return studiedCount > 0 ? "早安，继续保持这个节奏" : "早安，今天也从几个单词开始吧";
+    if (completed) return "早安，任务已经完成，给自己一个轻松的早晨吧";
+    return studiedCount > 0 ? "早安，已经开了个好头，按自己的节奏来" : "早安，新的一天慢慢开始，学几个就很好";
   }
   if (hour < 12) {
-    if (completed) return "上午好，今天的任务完成得很漂亮";
-    return studiedCount > 0 ? "上午好，趁状态正好继续学几个" : "上午好，趁状态正好学几个单词吧";
+    if (completed) return "上午好，今天的任务完成了，记得起来活动一下";
+    return studiedCount > 0 ? "上午好，已经学了不少，累了就停下来歇一会儿" : "上午好，有空学几个就好，不必着急";
   }
   if (hour < 14) {
-    if (completed) return "中午好，今天的任务已经完成了，安心休息吧";
-    return studiedCount > 0 ? "中午好，学了一会儿，先休息一下吧" : "中午好，午休后再学也不迟";
+    if (completed) return "中午好，今天已经完成了，安心吃饭休息吧";
+    return studiedCount > 0 ? "中午好，先去吃饭休息，回来再继续也不迟" : "中午好，先照顾好自己，午休后再学也不迟";
   }
   if (hour < 18) {
-    if (completed) return "下午好，今天的任务已经完成了";
-    return studiedCount > 0 ? "下午好，继续保持这个节奏" : "下午好，抽几分钟巩固一下吧";
+    if (completed) return "下午好，任务已经完成，剩下的时间轻松一点吧";
+    return studiedCount > 0 ? "下午好，已经有进展了，慢慢来就好" : "下午好，状态合适时学几个，不必勉强自己";
   }
-  if (completed) return "晚上好，今天的任务完成了，安心休息吧";
-  return studiedCount > 0 ? "晚上好，再巩固几个就可以收工了" : "晚上好，今天想学几个单词呢？";
+  if (completed) return "晚上好，今天辛苦了，任务完成就早点休息吧";
+  return studiedCount > 0 ? "晚上好，今天已经有收获了，累了就早点收工" : "晚上好，如果还有精力就学几个，没有也没关系";
 }
 
 function localDateKey(date = new Date()) {
@@ -274,6 +286,11 @@ function normalizeHourlyCounts(value: unknown) {
   });
 }
 
+function normalizeWordIds(value: unknown) {
+  if (!Array.isArray(value)) return undefined;
+  return Array.from(new Set(value.filter((id): id is number => typeof id === "number" && Number.isFinite(id))));
+}
+
 function normalizeStudyHistory(value: unknown): StudyHistory {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
   return Object.fromEntries(Object.entries(value as Record<string, unknown>).flatMap(([date, record]) => {
@@ -285,6 +302,8 @@ function normalizeStudyHistory(value: unknown): StudyHistory {
       completed: candidate.completed === true,
       checkedIn: candidate.checkedIn === true,
       hourlyCounts: normalizeHourlyCounts(candidate.hourlyCounts),
+      learnedWordIds: normalizeWordIds(candidate.learnedWordIds),
+      reviewedWordIds: normalizeWordIds(candidate.reviewedWordIds),
     } satisfies DailyStudyRecord]];
   }));
 }
@@ -381,6 +400,10 @@ function dateFromKey(value: string) {
 
 function daysBetween(startDate: string, endDate: string) {
   return Math.floor((dateFromKey(endDate).getTime() - dateFromKey(startDate).getTime()) / DAY_MS);
+}
+
+function shiftDateKey(value: string, offset: number) {
+  return localDateKey(new Date(dateFromKey(value).getTime() + offset * DAY_MS));
 }
 
 function chapterLabelKey(value: string) {
@@ -582,7 +605,7 @@ function normalizePart(value: string) {
 }
 
 const PART_TOKEN_PATTERN = /^(?:(?:vt|vi)\.?\/(?:vt|vi)\.?|n|adj|adv|v|vt|vi|prep|pron|conj|num|det|aux|art|modal|noun|adjective|verb|名词|形容词|动词)\.?$/i;
-const PART_SEQUENCE_PATTERN = /(?:vt\.?\s*\/\s*vi\.?|vi\.?\s*\/\s*vt\.?|noun|adjective|verb|n|adj|adv|v|vt|vi|prep|pron|conj|num|det|aux|art|modal|名词|形容词|动词)\.?/gi;
+const PART_SEQUENCE_PATTERN = /(?:vt\.?\s*\/\s*vi\.?|vi\.?\s*\/\s*vt\.?|noun|adjective|verb|num|prep|pron|conj|det|aux|art|modal|adj|adv|vt|vi|n|v|名词|形容词|动词)\.?/gi;
 
 function normalizeStoredSenses(value: unknown): WordSense[] | undefined {
   if (!Array.isArray(value)) return undefined;
@@ -712,8 +735,11 @@ function chapterNames(words: Word[]) {
 
 function getScheduledChapterPlan(words: Word[], progress: StoredProgress, schedule: StoredChapterSchedule, today: string) {
   const names = chapterNames(words);
-  const dayIndex = Math.max(0, Math.min(schedule.days.length - 1, daysBetween(schedule.startDate, today)));
-  const day = schedule.days[dayIndex] ?? { study: [], review: [] };
+  const scheduleOffset = daysBetween(schedule.startDate, today);
+  const dayIndex = Math.max(0, Math.min(schedule.days.length - 1, scheduleOffset));
+  const day = scheduleOffset >= 0 && scheduleOffset < schedule.days.length
+    ? schedule.days[dayIndex] ?? { study: [], review: [] }
+    : { study: [], review: [] };
   const studyNames = day.study.filter((name) => names.includes(name));
   const reviewNames = day.review.filter((name) => names.includes(name));
   const selectedNames = Array.from(new Set([...studyNames, ...reviewNames]));
@@ -722,7 +748,71 @@ function getScheduledChapterPlan(words: Word[], progress: StoredProgress, schedu
   return { names, dayIndex, day, studyNames, reviewNames, selectedNames, selectedWords, studyWords };
 }
 
-function Icon({ name }: { name: "spark" | "book" | "clock" | "stack" | "check" | "arrow" | "sliders" | "help" }) {
+function getDailyTaskState(
+  words: Word[],
+  progress: StoredProgress,
+  schedule: StoredChapterSchedule,
+  history: StudyHistory,
+  date: string,
+) {
+  const plan = getScheduledChapterPlan(words, progress, schedule, date);
+  const record = history[date];
+  const studyChapterWords = words.filter((word) => plan.studyNames.includes(chapterName(word)));
+  const reviewWords = words.filter((word) => plan.reviewNames.includes(chapterName(word)));
+  const legacyCompletedIds = (source: Word[]) => source
+    .filter((word) => progress[word.id]?.status === "mastered" && progress[word.id]?.lastStudied === date)
+    .map((word) => word.id);
+  const learnedWordIds = new Set(record?.learnedWordIds ?? legacyCompletedIds(studyChapterWords));
+  const reviewedWordIds = new Set(record?.reviewedWordIds ?? legacyCompletedIds(reviewWords));
+  const learnWords = studyChapterWords.filter((word) => progress[word.id]?.status !== "mastered" || learnedWordIds.has(word.id));
+  const remainingLearnWords = learnWords.filter((word) => !learnedWordIds.has(word.id));
+  const remainingReviewWords = reviewWords.filter((word) => !reviewedWordIds.has(word.id));
+  const learnIds = new Set(learnWords.map((word) => word.id));
+  const reviewIds = new Set(reviewWords.map((word) => word.id));
+  const targetIds = new Set([...learnIds, ...reviewIds]);
+  const completedCount = [...learnedWordIds].filter((id) => learnIds.has(id)).length
+    + [...reviewedWordIds].filter((id) => reviewIds.has(id)).length;
+  const targetWords = words.filter((word) => targetIds.has(word.id));
+  const completed = targetWords.length > 0 && remainingLearnWords.length === 0 && remainingReviewWords.length === 0;
+  return {
+    plan,
+    record,
+    learnWords,
+    reviewWords,
+    remainingLearnWords,
+    remainingReviewWords,
+    targetWords,
+    targetCount: learnWords.length + reviewWords.length,
+    completedCount,
+    completed,
+    learnedWordIds: [...learnedWordIds],
+    reviewedWordIds: [...reviewedWordIds],
+  };
+}
+
+type DailyTaskState = ReturnType<typeof getDailyTaskState>;
+
+function restoreStoredSession(
+  words: Word[],
+  progress: StoredProgress,
+  schedule: StoredChapterSchedule,
+  history: StudyHistory,
+  session: StoredSessionState | undefined,
+  today: string,
+) {
+  if (!session) return null;
+  const taskDate = session.date ?? today;
+  if (Math.abs(daysBetween(today, taskDate)) > 1) return null;
+  const task = getDailyTaskState(words, progress, schedule, history, taskDate);
+  const modeWords = session.mode === "review" ? task.reviewWords : task.learnWords;
+  const queue = (session.queue ?? []).filter((id) => modeWords.some((word) => word.id === id));
+  const currentAllowed = modeWords.some((word) => word.id === session.currentId);
+  const active = session.active !== false && (currentAllowed || queue.length > 0);
+  const pending = session.active === false && queue.length > 0;
+  return active || pending ? { taskDate, task, queue, active, pending } : null;
+}
+
+function Icon({ name }: { name: "spark" | "book" | "clock" | "stack" | "check" | "arrow" | "volume" | "sliders" | "help" }) {
   const paths = {
     spark: <><path d="m12 2 1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9L12 2Z" /><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z" /></>,
     book: <><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z" /><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20" /></>,
@@ -730,6 +820,7 @@ function Icon({ name }: { name: "spark" | "book" | "clock" | "stack" | "check" |
     stack: <><path d="M5.5 5H19v14H5.5A2.5 2.5 0 0 0 3 21.5v-14A2.5 2.5 0 0 1 5.5 5Z" /><path d="M7 9h9M7 13h9M7 17h6" /></>,
     check: <path d="m5 12 4.2 4.2L19 6.5" />,
     arrow: <><path d="M5 12h13" /><path d="m13 6 6 6-6 6" /></>,
+    volume: <><path d="M4 10v4h3l4 3V7l-4 3H4Z" /><path d="M15 9.5a4 4 0 0 1 0 5" /><path d="M17.5 7a7.5 7.5 0 0 1 0 10" /></>,
     sliders: <><path d="M4 6h16M4 12h16M4 18h16" /><circle cx="9" cy="6" r="2" /><circle cx="15" cy="12" r="2" /><circle cx="11" cy="18" r="2" /></>,
     help: <><circle cx="12" cy="12" r="9" /><path d="M9.7 9a2.4 2.4 0 1 1 4.2 1.6c-1 .9-1.9 1.2-1.9 2.5" /><path d="M12 16.5h.01" /></>,
   };
@@ -767,24 +858,66 @@ export default function Home() {
   const [calendarView, setCalendarView] = useState<"month" | "week" | "day">("week");
   const [calendarCursor, setCalendarCursor] = useState(() => localDateKey());
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [speakingWordId, setSpeakingWordId] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const backupInputRef = useRef<HTMLInputElement>(null);
   const persistenceReadyRef = useRef(false);
   const allWords = customWords.length ? customWords : WORDS;
   const today = localDateKey();
+  const yesterday = shiftDateKey(today, -1);
+  const tomorrow = shiftDateKey(today, 1);
   const currentWord = allWords.find((word) => word.id === currentId) ?? allWords[0];
   const effectiveSchedule = useMemo(
     () => chapterSchedule ?? buildDefaultChapterSchedule(allWords, today),
     [allWords, chapterSchedule, today],
   );
-  const activePlan = useMemo(
-    () => getScheduledChapterPlan(allWords, progress, effectiveSchedule, today),
-    [allWords, effectiveSchedule, progress, today],
+  const todayTask = useMemo(
+    () => getDailyTaskState(allWords, progress, effectiveSchedule, studyHistory, today),
+    [allWords, effectiveSchedule, progress, studyHistory, today],
   );
-  const planWords = activePlan.selectedWords;
-  const targetWordCount = planWords.length;
+  const yesterdayTask = useMemo(
+    () => getDailyTaskState(allWords, progress, effectiveSchedule, studyHistory, yesterday),
+    [allWords, effectiveSchedule, progress, studyHistory, yesterday],
+  );
+  const tomorrowTask = useMemo(
+    () => getDailyTaskState(allWords, progress, effectiveSchedule, studyHistory, tomorrow),
+    [allWords, effectiveSchedule, progress, studyHistory, tomorrow],
+  );
+  const activePlan = todayTask.plan;
+  const targetWordCount = todayTask.targetCount;
   const scheduleChapterNames = chapterNames(allWords);
   const bookChapterGroups = chapterNames(allWords).map((name) => ({ name, words: allWords.filter((word) => chapterName(word) === name) }));
+
+  const speakWord = useCallback((word: Word) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") return;
+    const synthesis = window.speechSynthesis;
+    synthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(word.word);
+    const voices = synthesis.getVoices();
+    const englishVoice = voices.find((voice) => /^en-US/i.test(voice.lang)) ?? voices.find((voice) => /^en/i.test(voice.lang));
+    if (englishVoice) {
+      utterance.voice = englishVoice;
+      utterance.lang = englishVoice.lang;
+    } else {
+      utterance.lang = "en-US";
+    }
+    utterance.rate = 0.82;
+    utterance.pitch = 1;
+    utterance.onstart = () => setSpeakingWordId(word.id);
+    utterance.onend = () => setSpeakingWordId(null);
+    utterance.onerror = () => setSpeakingWordId(null);
+    setSpeakingWordId(word.id);
+    synthesis.speak(utterance);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+  }, [currentId]);
+
+  useEffect(() => () => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
+  }, []);
 
   const currentSessionState = useCallback((): StoredSessionState | undefined => {
     if (sessionMode === "choose") {
@@ -831,11 +964,15 @@ export default function Home() {
 
   useEffect(() => {
     let readyFrame = 0;
+    let cancelled = false;
     const frame = window.requestAnimationFrame(() => {
+      void (async () => {
       try {
+        const desktopBookState = await window.simpleDictionaryDesktop?.loadState().catch(() => null);
+        if (cancelled) return;
         const saved = window.localStorage.getItem(STORAGE_KEY);
         const savedCustomWords = window.localStorage.getItem(CUSTOM_WORDS_KEY);
-        const savedBookState = window.localStorage.getItem(BOOK_STATE_KEY);
+        const savedBookState = desktopBookState ?? window.localStorage.getItem(BOOK_STATE_KEY);
         const savedStudyHistory = window.localStorage.getItem(STUDY_HISTORY_KEY);
         const parsedBookState = savedBookState ? JSON.parse(savedBookState) as Partial<StoredBookState> : {};
         const bookStateWords = Array.isArray(parsedBookState.words) ? parsedBookState.words : [];
@@ -898,33 +1035,20 @@ export default function Home() {
         setCustomWords(parsedCustomWords);
         setChapterSchedule(initialSchedule);
         const sessionToday = localDateKey();
-        const initialPlan = getScheduledChapterPlan(availableWords, parsed, initialSchedule, sessionToday);
-        const next = chooseNextWord(initialPlan.selectedWords, parsed);
         const storedSession = activeBook.session;
-        const reviewWordsForSession = availableWords.filter((word) => initialPlan.reviewNames.includes(chapterName(word)));
-        const learnResumeWords = availableWords.filter((word) => initialPlan.studyNames.includes(chapterName(word)) && parsed[word.id]?.status !== "mastered");
-        const storedModeWords = storedSession?.mode === "review"
-          ? reviewWordsForSession
-          : storedSession?.mode === "learn"
-            ? learnResumeWords
-            : [];
-        const storedQueue = storedSession && Array.isArray(storedSession.queue)
-          ? storedSession.queue.filter((id) => storedModeWords.some((word) => word.id === id))
-          : storedSession
-            ? (storedSession.lastAnswer === "known"
+        const restoredSession = restoreStoredSession(availableWords, parsed, initialSchedule, parsedStudyHistory, storedSession, sessionToday);
+        const initialTodayTask = getDailyTaskState(availableWords, parsed, initialSchedule, parsedStudyHistory, sessionToday);
+        const next = chooseNextWord(initialTodayTask.targetWords, parsed);
+        if (storedSession && restoredSession) {
+          const storedModeWords = storedSession.mode === "review" ? restoredSession.task.reviewWords : restoredSession.task.learnWords;
+          const storedQueue = restoredSession.queue.length
+            ? restoredSession.queue
+            : storedSession.lastAnswer === "known"
               ? storedModeWords.filter((word) => word.id !== storedSession.currentId).map((word) => word.id)
-              : [storedSession.currentId, ...storedModeWords.filter((word) => word.id !== storedSession.currentId).map((word) => word.id)])
-            : [];
-        const sessionDateMatches = !storedSession?.date || storedSession.date === sessionToday;
-        const hasStoredSession = storedSession
-          && sessionDateMatches
-          && (storedSession.mode === "review" || storedSession.mode === "learn")
-          && typeof storedSession.currentId === "number"
-          && (initialPlan.selectedWords.some((word) => word.id === storedSession.currentId) || storedQueue.length > 0);
-        if (hasStoredSession) {
+              : [storedSession.currentId, ...storedModeWords.filter((word) => word.id !== storedSession.currentId).map((word) => word.id)];
           setSessionQueue(storedQueue);
-          setSessionDate(storedSession.date ?? sessionToday);
-          if (storedSession.active === false) {
+          setSessionDate(restoredSession.taskDate);
+          if (restoredSession.pending) {
             setPendingSessionMode(storedSession.mode);
             setSessionMode("choose");
             setRevealed(false);
@@ -948,11 +1072,14 @@ export default function Home() {
       // Wait for the loaded state to commit before enabling persistence. Otherwise
       // the initial default state can overwrite the user's saved book on refresh.
       readyFrame = window.requestAnimationFrame(() => {
+        if (cancelled) return;
         persistenceReadyRef.current = true;
         setHydrated(true);
       });
+      })();
     });
     return () => {
+      cancelled = true;
       window.cancelAnimationFrame(frame);
       if (readyFrame) window.cancelAnimationFrame(readyFrame);
     };
@@ -966,14 +1093,18 @@ export default function Home() {
       window.localStorage.setItem(STUDY_HISTORY_KEY, JSON.stringify(studyHistory));
       const session = currentSessionState();
       const currentBook = currentBookSnapshot(session);
-      window.localStorage.setItem(BOOK_STATE_KEY, JSON.stringify({
+      const serializedBookState = JSON.stringify({
         ...currentBook,
         activeBookId,
         bookId: activeBookId,
         bookName,
         bookNote,
         books: persistedBookEntries(session),
-      } satisfies StoredBookState));
+      } satisfies StoredBookState);
+      window.localStorage.setItem(BOOK_STATE_KEY, serializedBookState);
+      void window.simpleDictionaryDesktop?.saveState(serializedBookState).catch(() => {
+        // localStorage remains a browser fallback if the desktop bridge is unavailable.
+      });
     } catch {
       // The in-memory session remains usable when browser storage is unavailable.
     }
@@ -984,36 +1115,15 @@ export default function Home() {
     return () => window.clearInterval(interval);
   }, []);
 
-  const studiedToday = planWords.filter((word) => progress[word.id]?.status === "mastered" && progress[word.id]?.lastStudied === today).length;
   const learnedWords = allWords.filter((word) => Boolean(progress[word.id]));
   const masteredWords = allWords.filter((word) => progress[word.id]?.status === "mastered");
   const reviewWords = allWords.filter((word) => progress[word.id]?.status === "review");
-  const completed = studiedToday;
+  const completed = todayTask.completedCount;
   const progressPercent = Math.min(100, Math.round((completed / Math.max(1, targetWordCount)) * 100));
   const remainingCount = Math.max(0, allWords.length - masteredWords.length);
   const estimatedDays = Math.ceil(remainingCount / Math.max(1, targetWordCount));
   const estimatedCompletion = now ? formatCompletionDate(now + estimatedDays * DAY_MS) : "计算中";
 
-  const reviewChapterWords = useMemo(
-    () => activePlan.reviewNames.length
-      ? allWords.filter((word) => activePlan.reviewNames.includes(chapterName(word)))
-      : [],
-    [activePlan, allWords],
-  );
-  const learnChapterWords = useMemo(
-    () => activePlan.studyNames.length
-      ? allWords.filter((word) => activePlan.studyNames.includes(chapterName(word)))
-      : [],
-    [activePlan, allWords],
-  );
-  const reviewSessionWords = useMemo(
-    () => reviewChapterWords,
-    [reviewChapterWords],
-  );
-  const learnSessionWords = useMemo(
-    () => learnChapterWords.filter((word) => !progress[word.id]),
-    [learnChapterWords, progress],
-  );
   const queuedSessionWords = useMemo(
     () => sessionQueue.flatMap((id) => {
       const word = allWords.find((candidate) => candidate.id === id);
@@ -1021,11 +1131,27 @@ export default function Home() {
     }),
     [allWords, sessionQueue],
   );
-  const hasPendingSession = Boolean(pendingSessionMode && sessionDate === today && sessionQueue.length);
-  const reviewStartWords = hasPendingSession && pendingSessionMode === "review" ? queuedSessionWords : reviewSessionWords;
-  const learnStartWords = hasPendingSession && pendingSessionMode === "learn" ? queuedSessionWords : learnSessionWords;
-  const todayRecord = studyHistory[today];
-  const todayCompleted = targetWordCount > 0 && completed >= targetWordCount;
+  const hasPendingSession = Boolean(pendingSessionMode && sessionDate && sessionQueue.length);
+  const startWordsFor = (task: DailyTaskState, mode: Exclude<SessionMode, "choose">, taskDate: string) => (
+    hasPendingSession && pendingSessionMode === mode && sessionDate === taskDate
+      ? queuedSessionWords
+      : mode === "review" ? task.remainingReviewWords : task.remainingLearnWords
+  );
+  const reviewStartWords = startWordsFor(todayTask, "review", today);
+  const learnStartWords = startWordsFor(todayTask, "learn", today);
+  const yesterdayReviewStartWords = startWordsFor(yesterdayTask, "review", yesterday);
+  const yesterdayLearnStartWords = startWordsFor(yesterdayTask, "learn", yesterday);
+  const tomorrowReviewStartWords = startWordsFor(tomorrowTask, "review", tomorrow);
+  const tomorrowLearnStartWords = startWordsFor(tomorrowTask, "learn", tomorrow);
+  const sessionTaskDate = sessionDate ?? today;
+  const sessionTask = useMemo(
+    () => getDailyTaskState(allWords, progress, effectiveSchedule, studyHistory, sessionTaskDate),
+    [allWords, effectiveSchedule, progress, sessionTaskDate, studyHistory],
+  );
+  const todayRecord = todayTask.record;
+  const todayCompleted = todayTask.completed;
+  const yesterdayNeedsMakeup = yesterdayTask.targetCount > 0 && yesterdayTask.record?.checkedIn !== true;
+  const tomorrowHasTasks = tomorrowTask.targetCount > 0;
   const studyStreak = countStudyStreak(studyHistory, today);
   const calendarDates = useMemo(() => {
     const date = dateFromKey(calendarCursor);
@@ -1053,18 +1179,20 @@ export default function Home() {
     studyHistory,
   }];
 
-  function startSession(mode: Exclude<SessionMode, "choose">) {
-    const words = mode === "review" ? reviewStartWords : learnStartWords;
+  function startSession(mode: Exclude<SessionMode, "choose">, taskDate = today) {
+    const task = taskDate === yesterday ? yesterdayTask : taskDate === tomorrow ? tomorrowTask : todayTask;
+    const words = startWordsFor(task, mode, taskDate);
+    const dateLabel = taskDate === yesterday ? "昨天" : taskDate === tomorrow ? "明天" : "今天";
     if (!words.length) {
-      setToast(mode === "review" ? "今日计划没有可复习的章节单词" : "今日计划的新词已经学完了");
+      setToast(mode === "review" ? `${dateLabel}没有待完成的复习单词` : `${dateLabel}的新词已经学完了`);
       window.setTimeout(() => setToast(""), 2200);
       return;
     }
-    const shouldResume = hasPendingSession && pendingSessionMode === mode && queuedSessionWords.length > 0;
+    const shouldResume = hasPendingSession && pendingSessionMode === mode && sessionDate === taskDate && queuedSessionWords.length > 0;
     const nextQueue = shouldResume ? sessionQueue : words.map((word) => word.id);
     const next = allWords.find((word) => word.id === nextQueue[0]) ?? words[0];
     setSessionQueue(nextQueue);
-    setSessionDate(today);
+    setSessionDate(taskDate);
     setPendingSessionMode(null);
     setCurrentId(next.id);
     setSessionMode(mode);
@@ -1075,7 +1203,7 @@ export default function Home() {
   function exitSession() {
     if (sessionMode === "learn" || sessionMode === "review") {
       setPendingSessionMode(sessionMode);
-      setSessionDate(today);
+      setSessionDate((current) => current ?? today);
     }
     setSessionMode("choose");
     setRevealed(false);
@@ -1110,43 +1238,57 @@ export default function Home() {
     const answeredAt = new Date();
     const answeredDate = localDateKey(answeredAt);
     const answeredHour = localHour(answeredAt);
+    const taskDate = sessionDate ?? today;
     const previousRecord = progress[currentId];
-    const wasCompletedToday = previousRecord?.status === "mastered" && previousRecord.lastStudied === answeredDate;
     const nextRecord: ProgressRecord = type === "known"
       ? { status: "mastered", lastStudied: answeredDate, lastStudiedAt: answeredAt.toISOString() }
       : { status: "review", lastStudied: answeredDate, lastStudiedAt: answeredAt.toISOString() };
     const nextProgress = { ...progress, [currentId]: nextRecord };
-    const nextStudiedCount = planWords.filter((word) => nextProgress[word.id]?.status === "mastered" && nextProgress[word.id]?.lastStudied === answeredDate).length;
     const queue = sessionQueue.length ? sessionQueue : [currentId];
     const queueWithoutCurrent = queue[0] === currentId ? queue.slice(1) : queue.filter((id) => id !== currentId);
     const nextQueue = type === "unknown" ? [...queueWithoutCurrent, currentId] : queueWithoutCurrent;
     setProgress(nextProgress);
     setSessionQueue(nextQueue);
-    setSessionDate(answeredDate);
+    setSessionDate(taskDate);
     setPendingSessionMode(null);
-    setStudyHistory((current) => ({
-      ...current,
-      [answeredDate]: {
-        studiedCount: nextStudiedCount,
-        targetCount: targetWordCount,
-        completed: nextStudiedCount >= targetWordCount,
-        checkedIn: current[answeredDate]?.checkedIn === true,
-        hourlyCounts: (() => {
-          const counts = [...(current[answeredDate]?.hourlyCounts ?? EMPTY_HOURLY_COUNTS)];
-          if (type === "known" && !wasCompletedToday) {
-            counts[answeredHour] += 1;
-          }
-          if (type === "unknown" && wasCompletedToday && previousRecord?.lastStudiedAt) {
-            const previousHour = localHour(new Date(previousRecord.lastStudiedAt));
-            counts[previousHour] = Math.max(0, counts[previousHour] - 1);
-          }
-          return counts;
-        })(),
-      },
-    }));
+    setStudyHistory((current) => {
+      const task = getDailyTaskState(allWords, progress, effectiveSchedule, current, taskDate);
+      const learnedWordIds = new Set(task.learnedWordIds);
+      const reviewedWordIds = new Set(task.reviewedWordIds);
+      const completedIds = sessionMode === "review" ? reviewedWordIds : learnedWordIds;
+      const wasCompletedForTask = completedIds.has(currentId);
+      if (type === "known") completedIds.add(currentId);
+      else completedIds.delete(currentId);
+      const hourlyCounts = [...(current[taskDate]?.hourlyCounts ?? EMPTY_HOURLY_COUNTS)];
+      if (type === "known" && !wasCompletedForTask) hourlyCounts[answeredHour] += 1;
+      if (type === "unknown" && wasCompletedForTask && previousRecord?.lastStudiedAt) {
+        const previousHour = localHour(new Date(previousRecord.lastStudiedAt));
+        hourlyCounts[previousHour] = Math.max(0, hourlyCounts[previousHour] - 1);
+      }
+      const draftRecord: DailyStudyRecord = {
+        studiedCount: current[taskDate]?.studiedCount ?? 0,
+        targetCount: current[taskDate]?.targetCount ?? task.targetCount,
+        completed: false,
+        checkedIn: current[taskDate]?.checkedIn === true,
+        hourlyCounts,
+        learnedWordIds: [...learnedWordIds],
+        reviewedWordIds: [...reviewedWordIds],
+      };
+      const nextHistory = { ...current, [taskDate]: draftRecord };
+      const nextTask = getDailyTaskState(allWords, nextProgress, effectiveSchedule, nextHistory, taskDate);
+      return {
+        ...nextHistory,
+        [taskDate]: {
+          ...draftRecord,
+          studiedCount: nextTask.completedCount,
+          targetCount: nextTask.targetCount,
+          completed: nextTask.completed,
+        },
+      };
+    });
     setLastAnswer(type);
     setRevealed(true);
-  }, [currentId, planWords, progress, sessionMode, sessionQueue, targetWordCount]);
+  }, [allWords, currentId, effectiveSchedule, progress, sessionDate, sessionMode, sessionQueue, today]);
 
   function resetProgress() {
     setProgress({});
@@ -1166,66 +1308,88 @@ export default function Home() {
     window.setTimeout(() => setToast(""), 2200);
   }
 
-  function checkInToday() {
-    if (!todayCompleted) return;
+  function checkInTask(taskDate: string, task: DailyTaskState, message: string) {
+    if (!task.completed) return;
     setStudyHistory((current) => ({
       ...current,
-      [today]: {
-        studiedCount: completed,
-        targetCount: targetWordCount,
+      [taskDate]: {
+        studiedCount: task.completedCount,
+        targetCount: task.targetCount,
         completed: true,
         checkedIn: true,
-        hourlyCounts: todayRecord?.hourlyCounts ?? [...EMPTY_HOURLY_COUNTS],
+        hourlyCounts: current[taskDate]?.hourlyCounts ?? [...EMPTY_HOURLY_COUNTS],
+        learnedWordIds: task.learnedWordIds,
+        reviewedWordIds: task.reviewedWordIds,
       },
     }));
-    setToast("今日学习已打卡");
+    setToast(message);
     window.setTimeout(() => setToast(""), 2200);
   }
 
+  function checkInToday() {
+    checkInTask(today, todayTask, "今日学习已打卡");
+  }
+
+  function checkInYesterday() {
+    checkInTask(yesterday, yesterdayTask, "昨天的任务已补打卡");
+  }
+
   const removeProgressRecord = useCallback((wordId: number) => {
-    const wasStudiedToday = progress[wordId]?.status === "mastered" && progress[wordId]?.lastStudied === today;
     const studiedAt = progress[wordId]?.lastStudiedAt;
+    const taskDate = sessionDate ?? today;
+    const nextProgress = { ...progress };
+    delete nextProgress[wordId];
     setProgress((current) => {
       const next = { ...current };
       delete next[wordId];
       return next;
     });
-    if (wasStudiedToday) {
-      setStudyHistory((current) => {
-        const record = current[today];
-        if (!record) return current;
-        const studiedCount = Math.max(0, record.studiedCount - 1);
-        const next = { ...current };
-        const hourlyCounts = [...(record.hourlyCounts ?? EMPTY_HOURLY_COUNTS)];
-        if (studiedAt) {
-          const hour = localHour(new Date(studiedAt));
-          hourlyCounts[hour] = Math.max(0, hourlyCounts[hour] - 1);
-        }
-        if (studiedCount === 0 && !record.checkedIn) {
-          delete next[today];
-        } else {
-          next[today] = {
-            ...record,
-            studiedCount,
-            completed: studiedCount >= record.targetCount,
-            hourlyCounts,
-          };
-        }
+    setStudyHistory((current) => {
+      const record = current[taskDate];
+      if (!record) return current;
+      const task = getDailyTaskState(allWords, progress, effectiveSchedule, current, taskDate);
+      const learnedWordIds = new Set(task.learnedWordIds);
+      const reviewedWordIds = new Set(task.reviewedWordIds);
+      const completedIds = sessionMode === "review" ? reviewedWordIds : learnedWordIds;
+      const wasCompletedForTask = completedIds.delete(wordId);
+      const hourlyCounts = [...(record.hourlyCounts ?? EMPTY_HOURLY_COUNTS)];
+      if (wasCompletedForTask && studiedAt) {
+        const hour = localHour(new Date(studiedAt));
+        hourlyCounts[hour] = Math.max(0, hourlyCounts[hour] - 1);
+      }
+      const draftRecord: DailyStudyRecord = {
+        ...record,
+        completed: false,
+        hourlyCounts,
+        learnedWordIds: [...learnedWordIds],
+        reviewedWordIds: [...reviewedWordIds],
+      };
+      const next = { ...current, [taskDate]: draftRecord };
+      const nextTask = getDailyTaskState(allWords, nextProgress, effectiveSchedule, next, taskDate);
+      if (nextTask.completedCount === 0 && !record.checkedIn) {
+        delete next[taskDate];
         return next;
-      });
-    }
+      }
+      next[taskDate] = {
+        ...draftRecord,
+        studiedCount: nextTask.completedCount,
+        targetCount: nextTask.targetCount,
+        completed: nextTask.completed,
+      };
+      return next;
+    });
     if (wordId === currentId) {
       setLastAnswer(null);
       setRevealed(false);
     }
     setToast("已撤销本次选择");
     window.setTimeout(() => setToast(""), 2200);
-  }, [currentId, progress, today]);
+  }, [allWords, currentId, effectiveSchedule, progress, sessionDate, sessionMode, today]);
 
   const undoLastAnswer = useCallback(() => {
     if (!lastAnswer) return;
     setSessionQueue((current) => [currentId, ...current.filter((id) => id !== currentId)]);
-    setSessionDate(today);
+    setSessionDate((current) => current ?? today);
     setPendingSessionMode(null);
     removeProgressRecord(currentId);
   }, [currentId, lastAnswer, removeProgressRecord, today]);
@@ -1487,21 +1651,13 @@ export default function Home() {
     const targetSchedule = target.schedule && target.schedule.bookSignature === bookSignature(targetWords)
       ? normalizeChapterSchedule(target.schedule, targetWords)
       : buildDefaultChapterSchedule(targetWords, today);
-    const targetPlan = getScheduledChapterPlan(targetWords, target.progress, targetSchedule, today);
     const storedSession = target.session;
-    const canRestoreSession = storedSession
-      && storedSession.active !== false
-      && (storedSession.mode === "learn" || storedSession.mode === "review")
-      && targetPlan.selectedWords.some((word) => word.id === storedSession.currentId);
-    const canResumePending = storedSession
-      && storedSession.active === false
-      && (storedSession.mode === "learn" || storedSession.mode === "review")
-      && Array.isArray(storedSession.queue)
-      && storedSession.queue.some((id) => targetWords.some((word) => word.id === id));
-    const next = chooseNextWord(targetPlan.selectedWords, target.progress);
-    const restoredQueue = canRestoreSession && Array.isArray(storedSession.queue)
-      ? storedSession.queue.filter((id) => targetWords.some((word) => word.id === id))
-      : [];
+    const restoredSession = restoreStoredSession(targetWords, target.progress, targetSchedule, target.studyHistory, storedSession, today);
+    const canRestoreSession = Boolean(restoredSession?.active);
+    const canResumePending = Boolean(restoredSession?.pending);
+    const targetTodayTask = getDailyTaskState(targetWords, target.progress, targetSchedule, target.studyHistory, today);
+    const next = chooseNextWord(targetTodayTask.targetWords, target.progress);
+    const restoredQueue = restoredSession?.queue ?? [];
     setActiveBookId(target.id);
     setBookName(target.name);
     setBookNote(target.note);
@@ -1509,13 +1665,13 @@ export default function Home() {
     setProgress(target.progress);
     setStudyHistory(target.studyHistory);
     setChapterSchedule(targetSchedule);
-    setCurrentId(canRestoreSession ? storedSession.currentId : next?.id ?? targetWords[0]?.id ?? 1);
-    setSessionMode(canRestoreSession ? storedSession.mode : "choose");
+    setCurrentId(canRestoreSession && storedSession ? storedSession.currentId : next?.id ?? targetWords[0]?.id ?? 1);
+    setSessionMode(canRestoreSession && storedSession ? storedSession.mode : "choose");
     setSessionQueue(restoredQueue);
-    setSessionDate(canRestoreSession || canResumePending ? storedSession.date ?? today : null);
-    setPendingSessionMode(canResumePending ? storedSession.mode : null);
-    setRevealed(canRestoreSession ? storedSession.revealed === true : false);
-    setLastAnswer(canRestoreSession && (storedSession.lastAnswer === "known" || storedSession.lastAnswer === "unknown") ? storedSession.lastAnswer : null);
+    setSessionDate(restoredSession?.taskDate ?? null);
+    setPendingSessionMode(canResumePending && storedSession ? storedSession.mode : null);
+    setRevealed(canRestoreSession && storedSession ? storedSession.revealed === true : false);
+    setLastAnswer(canRestoreSession && storedSession && (storedSession.lastAnswer === "known" || storedSession.lastAnswer === "unknown") ? storedSession.lastAnswer : null);
     setShowBookPanel(false);
     setToast(`已切换到「${target.name}」`);
     window.setTimeout(() => setToast(""), 2200);
@@ -1571,22 +1727,14 @@ export default function Home() {
     const nextSchedule = nextBook.schedule && nextBook.schedule.bookSignature === bookSignature(nextWords)
       ? normalizeChapterSchedule(nextBook.schedule, nextWords)
       : buildDefaultChapterSchedule(nextWords, today);
-    const nextPlan = getScheduledChapterPlan(nextWords, nextBook.progress, nextSchedule, today);
     const storedSession = nextBook.session;
-    const canRestoreSession = storedSession
-      && storedSession.active !== false
-      && (storedSession.mode === "learn" || storedSession.mode === "review")
-      && nextPlan.selectedWords.some((word) => word.id === storedSession.currentId);
-    const canResumePending = storedSession
-      && storedSession.active === false
-      && (storedSession.mode === "learn" || storedSession.mode === "review")
-      && Array.isArray(storedSession.queue)
-      && storedSession.queue.some((id) => nextWords.some((word) => word.id === id));
-    const next = chooseNextWord(nextPlan.selectedWords, nextBook.progress);
+    const restoredSession = restoreStoredSession(nextWords, nextBook.progress, nextSchedule, nextBook.studyHistory, storedSession, today);
+    const canRestoreSession = Boolean(restoredSession?.active);
+    const canResumePending = Boolean(restoredSession?.pending);
+    const nextTodayTask = getDailyTaskState(nextWords, nextBook.progress, nextSchedule, nextBook.studyHistory, today);
+    const next = chooseNextWord(nextTodayTask.targetWords, nextBook.progress);
     const normalizedNextBook = { ...nextBook, schedule: nextSchedule };
-    const restoredQueue = canRestoreSession && Array.isArray(storedSession.queue)
-      ? storedSession.queue.filter((id) => nextWords.some((word) => word.id === id))
-      : [];
+    const restoredQueue = restoredSession?.queue ?? [];
 
     setBookLibrary([normalizedNextBook, ...remainingBooks.slice(1)]);
     setActiveBookId(normalizedNextBook.id);
@@ -1596,13 +1744,13 @@ export default function Home() {
     setProgress(normalizedNextBook.progress);
     setStudyHistory(normalizedNextBook.studyHistory);
     setChapterSchedule(nextSchedule);
-    setCurrentId(canRestoreSession ? storedSession.currentId : next?.id ?? nextWords[0]?.id ?? 1);
-    setSessionMode(canRestoreSession ? storedSession.mode : "choose");
+    setCurrentId(canRestoreSession && storedSession ? storedSession.currentId : next?.id ?? nextWords[0]?.id ?? 1);
+    setSessionMode(canRestoreSession && storedSession ? storedSession.mode : "choose");
     setSessionQueue(restoredQueue);
-    setSessionDate(canRestoreSession || canResumePending ? storedSession.date ?? today : null);
-    setPendingSessionMode(canResumePending ? storedSession.mode : null);
-    setRevealed(canRestoreSession ? storedSession.revealed === true : false);
-    setLastAnswer(canRestoreSession && (storedSession.lastAnswer === "known" || storedSession.lastAnswer === "unknown") ? storedSession.lastAnswer : null);
+    setSessionDate(restoredSession?.taskDate ?? null);
+    setPendingSessionMode(canResumePending && storedSession ? storedSession.mode : null);
+    setRevealed(canRestoreSession && storedSession ? storedSession.revealed === true : false);
+    setLastAnswer(canRestoreSession && storedSession && (storedSession.lastAnswer === "known" || storedSession.lastAnswer === "unknown") ? storedSession.lastAnswer : null);
     setBookPanelMode("library");
     setToast(`已删除「${target.name}」，已切换到「${normalizedNextBook.name}」`);
     window.setTimeout(() => setToast(""), 2400);
@@ -1633,7 +1781,9 @@ export default function Home() {
     updateScheduleDay(dayIndex, { [field]: nextNames });
   }
 
-  const greeting = getTimeGreeting(now ? new Date(now) : new Date(), todayCompleted, studiedToday);
+  const greeting = getTimeGreeting(now ? new Date(now) : new Date(), todayCompleted, completed);
+  const sessionDateLabel = sessionTaskDate === yesterday ? "昨日补做" : sessionTaskDate === tomorrow ? "明日提前" : "今日计划";
+  const sessionChapterNames = sessionMode === "review" ? sessionTask.plan.reviewNames : sessionTask.plan.studyNames;
 
   return (
     <main className={`app-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
@@ -1656,15 +1806,15 @@ export default function Home() {
           <div><p className="eyebrow">{formatDate()}</p><h1>{greeting}</h1></div>
         </header>
 
-        <div className="dashboard-grid">
+        <div className={`dashboard-grid ${sessionMode !== "choose" ? "with-ai-sidebar" : ""}`}>
           <section className="study-column" aria-label={sessionMode === "choose" ? "今日任务选择" : "单词学习区"}>
             {sessionMode === "choose" ? <div className="session-chooser">
               <div className="session-calendar-panel">
                 <div className="session-calendar-header"><div><span className="section-kicker">学习日历 · 第 {activePlan.dayIndex + 1} 天</span><h2>{calendarTitle}</h2></div><div className="session-calendar-streak"><strong>{studyStreak} 天</strong><span>连续学习</span></div></div>
                 <div className="calendar-toolbar"><div className="calendar-view-switcher" role="tablist" aria-label="日历范围">{(["month", "week", "day"] as const).map((view) => <button key={view} type="button" role="tab" aria-selected={calendarView === view} className={`calendar-view-button ${calendarView === view ? "selected" : ""}`} onClick={() => setCalendarView(view)}>{view === "month" ? "月" : view === "week" ? "周" : "日"}</button>)}</div><div className="calendar-nav"><button type="button" aria-label={`上一个${calendarView === "month" ? "月" : calendarView === "week" ? "周" : "日"}`} onClick={() => setCalendarCursor(shiftCalendarCursor(calendarCursor, calendarView, -1))}>‹</button><button type="button" onClick={() => setCalendarCursor(today)}>今天</button><button type="button" aria-label={`下一个${calendarView === "month" ? "月" : calendarView === "week" ? "周" : "日"}`} onClick={() => setCalendarCursor(shiftCalendarCursor(calendarCursor, calendarView, 1))}>›</button></div></div>
-                {calendarView === "month" && <div className="calendar-month-grid" aria-label="月打卡日历">{WEEKDAY_LABELS.map((label) => <span className="calendar-month-weekday" key={`month-weekday-${label}`}>{label}</span>)}{calendarDates.map((date) => { const dateKey = localDateKey(date); const record = studyHistory[dateKey]; const status = record?.checkedIn ? "done" : dateKey > today ? "future" : "missed"; const isCurrentMonth = date.getUTCMonth() === dateFromKey(calendarCursor).getUTCMonth(); return <button type="button" className={`calendar-month-cell ${status} ${dateKey === today ? "today" : ""} ${isCurrentMonth ? "" : "outside"}`} key={`month-${dateKey}`} onClick={() => { setCalendarView("day"); setCalendarCursor(dateKey); }}><strong>{Number(dateKey.slice(-2))}</strong><span>{record?.studiedCount ?? 0} 词</span><i className={`calendar-dot ${status}`} /></button>; })}</div>}
-                {calendarView === "week" && <div className="session-calendar-week" aria-label="周打卡日历">{calendarDates.map((date) => { const dateKey = localDateKey(date); const record = studyHistory[dateKey]; const status = record?.checkedIn ? "done" : dateKey > today ? "future" : "missed"; const weekdayIndex = (date.getUTCDay() + 6) % 7; return <button type="button" className={`session-calendar-day ${status} ${dateKey === today ? "today" : ""}`} key={`session-calendar-${dateKey}`} onClick={() => { setCalendarView("day"); setCalendarCursor(dateKey); }}><span>{WEEKDAY_LABELS[weekdayIndex]}</span><strong>{Number(dateKey.slice(-2))}</strong><small>{record?.studiedCount ?? 0} 词</small><i className={`calendar-dot ${status} ${dateKey === today ? "current" : ""}`} /></button>; })}</div>}
-                {calendarView === "day" && <div className="calendar-day-view" aria-label="日学习曲线"><div className="day-chart-heading"><div><strong>{calendarCursor === today ? "今日学习曲线" : `${calendarCursor} 学习曲线`}</strong><span>{dayChartTotal} 个单词 · 按完成时间统计</span></div><span className={`calendar-status-pill ${selectedCalendarRecord?.checkedIn ? "done" : ""}`}>{selectedCalendarRecord?.checkedIn ? "已打卡" : calendarCursor > today ? "未开始" : "未打卡"}</span></div><div className="day-chart"><svg className="day-chart-svg" viewBox="0 0 100 100" role="img" aria-label="按小时统计的学习单词数量"><line x1="0" y1="88" x2="100" y2="88" /><line x1="0" y1="53" x2="100" y2="53" /><line x1="0" y1="18" x2="100" y2="18" /><path className="day-chart-line" d={dayChartPath} /></svg><div className="day-chart-labels"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div></div></div>}
+                {calendarView === "month" && <div className="calendar-month-grid" aria-label="月打卡日历">{WEEKDAY_LABELS.map((label) => <span className="calendar-month-weekday" key={`month-weekday-${label}`}>{label}</span>)}{calendarDates.map((date) => { const dateKey = localDateKey(date); const record = studyHistory[dateKey]; const status = record?.checkedIn ? "done" : dateKey > today && record?.completed ? "prepared" : dateKey > today ? "future" : "missed"; const isCurrentMonth = date.getUTCMonth() === dateFromKey(calendarCursor).getUTCMonth(); return <button type="button" className={`calendar-month-cell ${status} ${dateKey === today ? "today" : ""} ${isCurrentMonth ? "" : "outside"}`} key={`month-${dateKey}`} onClick={() => { setCalendarView("day"); setCalendarCursor(dateKey); }}><strong>{Number(dateKey.slice(-2))}</strong><span>{record?.studiedCount ?? 0} 词</span><i className={`calendar-dot ${status}`} /></button>; })}</div>}
+                {calendarView === "week" && <div className="session-calendar-week" aria-label="周打卡日历">{calendarDates.map((date) => { const dateKey = localDateKey(date); const record = studyHistory[dateKey]; const status = record?.checkedIn ? "done" : dateKey > today && record?.completed ? "prepared" : dateKey > today ? "future" : "missed"; const weekdayIndex = (date.getUTCDay() + 6) % 7; return <button type="button" className={`session-calendar-day ${status} ${dateKey === today ? "today" : ""}`} key={`session-calendar-${dateKey}`} onClick={() => { setCalendarView("day"); setCalendarCursor(dateKey); }}><span>{WEEKDAY_LABELS[weekdayIndex]}</span><strong>{Number(dateKey.slice(-2))}</strong><small>{record?.studiedCount ?? 0} 词</small><i className={`calendar-dot ${status} ${dateKey === today ? "current" : ""}`} /></button>; })}</div>}
+                {calendarView === "day" && <div className="calendar-day-view" aria-label="日学习曲线"><div className="day-chart-heading"><div><strong>{calendarCursor === today ? "今日学习曲线" : `${calendarCursor} 学习曲线`}</strong><span>{dayChartTotal} 个单词 · 按完成时间统计</span></div><span className={`calendar-status-pill ${selectedCalendarRecord?.checkedIn ? "done" : selectedCalendarRecord?.completed && calendarCursor > today ? "prepared" : ""}`}>{selectedCalendarRecord?.checkedIn ? "已打卡" : selectedCalendarRecord?.completed && calendarCursor > today ? "已提前完成" : calendarCursor > today ? "未开始" : "未打卡"}</span></div><div className="day-chart"><svg className="day-chart-svg" viewBox="0 0 100 100" role="img" aria-label="按小时统计的学习单词数量"><line x1="0" y1="88" x2="100" y2="88" /><line x1="0" y1="53" x2="100" y2="53" /><line x1="0" y1="18" x2="100" y2="18" /><path className="day-chart-line" d={dayChartPath} /></svg><div className="day-chart-labels"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div></div></div>}
                 <div className={`session-calendar-footer ${todayCompleted ? "ready" : ""} ${todayRecord?.checkedIn ? "done" : ""}`}><div><strong>{todayRecord?.checkedIn ? "今日已打卡" : todayCompleted ? "今日任务已完成" : "今日学习进度"}</strong><span>{completed} / {targetWordCount} 个单词 · {todayRecord?.checkedIn ? "记录已保存到日历" : `还差 ${Math.max(0, targetWordCount - completed)} 个单词`}</span></div>{todayCompleted && !todayRecord?.checkedIn && <button type="button" onClick={checkInToday}>今日打卡</button>}</div>
                 <div className="calendar-estimate"><div><span>预计完成</span><strong>{estimatedCompletion}</strong></div><small>按当前章节计划估算</small></div>
               </div>
@@ -1672,13 +1822,17 @@ export default function Home() {
                 <button className="session-choice review" type="button" disabled={!reviewStartWords.length} onClick={() => startSession("review")}><span className="session-choice-icon">↻</span><span><strong>复习旧词</strong><small>{reviewStartWords.length ? `${reviewStartWords.length} 个章节单词` : "今日计划没有复习单词"}</small></span><Icon name="arrow" /></button>
                 <button className="session-choice learn" type="button" disabled={!learnStartWords.length} onClick={() => startSession("learn")}><span className="session-choice-icon">＋</span><span><strong>学习新词</strong><small>{learnStartWords.length ? `${learnStartWords.length} 个新单词` : "今天的新词已经学完"}</small></span><Icon name="arrow" /></button>
               </div>
+              <div className="date-task-tools">
+                {yesterdayNeedsMakeup && <section className="date-task-card makeup" aria-label="补做昨天的学习任务"><div className="date-task-card-header"><div><span className="section-kicker">补打卡</span><strong>补做昨天</strong><p>{yesterdayTask.completed ? "昨天的任务已完成，现在可以补上打卡。" : `还差 ${Math.max(0, yesterdayTask.targetCount - yesterdayTask.completedCount)} / ${yesterdayTask.targetCount} 个单词，完成后补打卡。`}</p></div><span className="date-task-date">{yesterday}</span></div>{yesterdayTask.completed ? <button className="makeup-checkin-button" type="button" onClick={checkInYesterday}><Icon name="check" />补上昨天打卡</button> : <div className="date-task-actions"><button type="button" disabled={!yesterdayReviewStartWords.length} onClick={() => startSession("review", yesterday)}><span>↻</span><strong>补昨日复习</strong><small>{yesterdayReviewStartWords.length} 个词</small></button><button type="button" disabled={!yesterdayLearnStartWords.length} onClick={() => startSession("learn", yesterday)}><span>＋</span><strong>补昨日新词</strong><small>{yesterdayLearnStartWords.length} 个词</small></button></div>}</section>}
+                {tomorrowHasTasks && <section className="date-task-card advance" aria-label="提前学习明天的任务"><div className="date-task-card-header"><div><span className="section-kicker">提前学习</span><strong>提前学习明天</strong><p>{tomorrowTask.completed ? "明天的任务已经提前完成，记录将在明天保留。" : `可提前完成明天安排的 ${tomorrowTask.targetCount} 个单词。`}</p></div><span className="date-task-date">{tomorrow}</span></div><div className="date-task-actions"><button type="button" disabled={!tomorrowReviewStartWords.length} onClick={() => startSession("review", tomorrow)}><span>↻</span><strong>提前复习</strong><small>{tomorrowReviewStartWords.length} 个词</small></button><button type="button" disabled={!tomorrowLearnStartWords.length} onClick={() => startSession("learn", tomorrow)}><span>＋</span><strong>提前学新词</strong><small>{tomorrowLearnStartWords.length} 个词</small></button></div></section>}
+              </div>
               <section className="review-list-preview" data-testid="review-list-preview" aria-label="今日复习列表"><div className="review-list-heading"><div><span className="section-kicker">严格按章节</span><strong>今日复习列表</strong></div><span>{reviewStartWords.length} 个词</span></div>{reviewPreviewWords.length ? <div className="review-list-items">{reviewPreviewWords.map((word) => <div className="review-list-item" key={word.id}><strong>{word.word}</strong><span>{chapterName(word)} · {word.meaning}</span></div>)}</div> : <p className="review-list-empty">{activePlan.reviewNames.length ? "所选章节暂无可复习单词" : "今日计划没有安排复习章节"}</p>}{reviewStartWords.length > reviewPreviewWords.length && <p className="review-list-more">还有 {reviewStartWords.length - reviewPreviewWords.length} 个词，进入复习后继续</p>}</section>
             </div> : <>
-            <div className="session-heading"><div><span className="section-kicker">今日计划 · 第 {activePlan.dayIndex + 1} 天 · {sessionMode === "review" ? (activePlan.reviewNames.length ? activePlan.reviewNames.join("、") : "章节复习") : (activePlan.studyNames.length ? activePlan.studyNames.join("、") : "新词")}</span><h2>{sessionMode === "review" ? "复习旧词" : "学习新词"}</h2></div><div className="session-heading-actions"><span className="queue-count">{queuedSessionWords.length} 个待完成</span><button className="exit-session-button" type="button" onClick={exitSession}>退出学习</button></div></div>
+            <div className="session-heading"><div><span className="section-kicker">{sessionDateLabel} · 第 {sessionTask.plan.dayIndex + 1} 天 · {sessionChapterNames.length ? sessionChapterNames.join("、") : sessionMode === "review" ? "章节复习" : "新词"}</span><h2>{sessionMode === "review" ? "复习旧词" : "学习新词"}</h2></div><div className="session-heading-actions"><span className="queue-count">{queuedSessionWords.length} 个待完成</span><button className="exit-session-button" type="button" onClick={exitSession}>退出学习</button></div></div>
 
             <article className={`word-card ${revealed ? "is-revealed" : ""}`}>
               <div className="word-card-top"><span className="word-tag">{currentWord.tag}</span></div>
-              <div className="word-display"><h3>{currentWord.word}</h3><div className="word-meta"><span>{currentWord.phonetic}</span></div></div>
+              <div className="word-display"><h3>{currentWord.word}</h3><div className="word-meta"><span>{currentWord.phonetic}</span><button type="button" className={`pronounce-button ${speakingWordId === currentWord.id ? "is-speaking" : ""}`} aria-label={`播放 ${currentWord.word} 的发音`} title="使用系统语音播放" onClick={() => speakWord(currentWord)}><Icon name="volume" /></button></div></div>
               {!revealed ? <p className="prompt">先凭直觉回想它的意思，再选择你的答案</p> : <div className="answer-reveal"><div className="meaning-line"><div className="meaning-sense-list">{getWordSenses(currentWord).map((sense) => <div className="meaning-sense" key={`${sense.part}-${sense.meaning}`}><b>{sense.part}</b><strong>{sense.meaning}</strong></div>)}</div></div>{shouldShowDefinition(currentWord.definition) && <p className="definition">{currentWord.definition}</p>}{shouldShowExample(currentWord.example) && <div className="example-block"><span className="example-label">例句</span><p>{currentWord.example}</p>{currentWord.translation.trim() && <p className="translation">{currentWord.translation}</p>}</div>}</div>}
               {revealed && lastAnswer && <div className={`answer-note answer-note-top ${lastAnswer}`}><span>{lastAnswer === "known" ? "✓" : "↻"}</span>{lastAnswer === "known" ? "已答对，移出当前队列" : "已排到队尾，稍后再次出现"}</div>}
               <div className={`card-divider ${revealed ? "revealed-divider" : ""}`} />
@@ -1688,6 +1842,8 @@ export default function Home() {
 
             </>}
           </section>
+
+          {sessionMode !== "choose" && <WordAiTutor key={currentWord.id} word={{ id: currentWord.id, word: currentWord.word, phonetic: currentWord.phonetic, senses: getWordSenses(currentWord), example: currentWord.example, translation: currentWord.translation }} unlocked={revealed && lastAnswer !== null} answer={lastAnswer} />}
 
           <aside className="stats-column" aria-label="学习进度">
             <section className="progress-panel panel"><div className="panel-heading"><div><span className="section-kicker">今日进度</span><h3>{bookName}</h3></div><button type="button" className="more-button" onClick={resetProgress} aria-label="重置学习进度">重置</button></div><div className="ring-row"><div className="progress-ring" style={{ "--progress": `${progressPercent * 3.6}deg` } as React.CSSProperties}><div><strong>{progressPercent}%</strong><span>完成</span></div></div><div className="progress-copy"><strong>{completed} <em>/ {targetWordCount}</em></strong><span>今日计划已学单词</span><p>{progressPercent >= 100 ? "今日计划已完成" : `还差 ${Math.max(0, targetWordCount - completed)} 个单词`}</p></div></div><div className="progress-bar"><span style={{ width: `${progressPercent}%` }} /></div><div className="goal-row"><span>今日计划</span><div className="goal-actions"><strong>{targetWordCount} 个单词</strong><button type="button" className="goal-edit-button" aria-expanded={showScheduleEditor} aria-controls="chapter-schedule-editor" onClick={() => setShowScheduleEditor((open) => !open)}><Icon name="sliders" /><span>{showScheduleEditor ? "收起计划" : "编辑学习计划"}</span></button></div></div>{showScheduleEditor && <div id="chapter-schedule-editor" className="chapter-schedule-editor"><div className="schedule-editor-heading"><div><strong>每日章节计划</strong><p>每天可直接点击多个学习章节和多个复习章节；学习与复习都严格按这里的章节执行。</p></div><label htmlFor="schedule-start-date">开始日期<input id="schedule-start-date" type="date" value={effectiveSchedule.startDate} onChange={(event) => updateScheduleStartDate(event.target.value)} /></label></div><div className="schedule-table" role="table" aria-label="每日章节计划"><div className="schedule-row schedule-header" role="row"><span>日期</span><span>学习章节（可多选）</span><span>复习章节（可多选）</span></div>{effectiveSchedule.days.map((day, index) => { const dayDate = localDateKey(new Date(dateFromKey(effectiveSchedule.startDate).getTime() + index * DAY_MS)); return <div className={`schedule-row ${index === activePlan.dayIndex ? "is-today" : ""}`} role="row" key={`schedule-${index}`}><span className="schedule-day">第 {index + 1} 天<small>{dayDate}</small></span><div className="chapter-picker" aria-label={`第 ${index + 1} 天学习章节`}><button type="button" className={`chapter-choice empty-choice ${day.study.length === 0 ? "selected" : ""}`} aria-pressed={day.study.length === 0} onClick={() => updateScheduleDay(index, { study: [] })}>不安排</button>{scheduleChapterNames.map((name) => <button type="button" className={`chapter-choice ${day.study.includes(name) ? "selected" : ""}`} aria-pressed={day.study.includes(name)} key={`study-${index}-${name}`} onClick={() => toggleScheduleChapter(index, "study", name)}>{name}</button>)}</div><div className="chapter-picker" aria-label={`第 ${index + 1} 天复习章节`}><button type="button" className={`chapter-choice empty-choice ${day.review.length === 0 ? "selected" : ""}`} aria-pressed={day.review.length === 0} onClick={() => updateScheduleDay(index, { review: [] })}>不安排</button>{scheduleChapterNames.map((name) => <button type="button" className={`chapter-choice ${day.review.includes(name) ? "selected" : ""}`} aria-pressed={day.review.includes(name)} key={`review-${index}-${name}`} onClick={() => toggleScheduleChapter(index, "review", name)}>{name}</button>)}</div></div>; })}</div><p className="schedule-help">直接点击章节即可跳着多选，再次点击取消；绿色行是今天，修改会自动保存。</p><div className="backup-row"><span>本地学习数据</span><div><button type="button" className="backup-button" onClick={exportBackup}>导出备份</button><input ref={backupInputRef} id="backup-upload" className="sr-only" type="file" accept=".json,application/json" onChange={handleBackupFileChange} /><label className="backup-button" htmlFor="backup-upload">导入备份</label></div></div></div>}<div className="completion-estimate">今天是第 {activePlan.dayIndex + 1} 天 · 按当前计划预计 <strong>{estimatedCompletion}</strong> 完成</div></section>

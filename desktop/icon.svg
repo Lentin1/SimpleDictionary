@@ -1,7 +1,10 @@
 <svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="1024" height="1024" rx="224" fill="#38B88D"/>
-  <path d="M176 250H444C523.529 250 588 314.471 588 394V786H320C240.471 786 176 721.529 176 642V250Z" fill="white"/>
-  <path d="M848 250H580C500.471 250 436 314.471 436 394V786H704C783.529 786 848 721.529 848 642V250Z" fill="white"/>
-  <path d="M512 382V786" stroke="#38B88D" stroke-width="28" stroke-linecap="round"/>
-  <path d="M258 404H460M258 508H460M564 404H766M564 508H766" stroke="#A8E7CF" stroke-width="24" stroke-linecap="round"/>
+  <!-- Keep a transparent macOS safe-area so the icon matches the visual size of system apps. -->
+  <g transform="translate(102 102) scale(0.8)">
+    <rect width="1024" height="1024" rx="224" fill="#38B88D"/>
+    <path d="M176 250H444C523.529 250 588 314.471 588 394V786H320C240.471 786 176 721.529 176 642V250Z" fill="white"/>
+    <path d="M848 250H580C500.471 250 436 314.471 436 394V786H704C783.529 786 848 721.529 848 642V250Z" fill="white"/>
+    <path d="M512 382V786" stroke="#38B88D" stroke-width="28" stroke-linecap="round"/>
+    <path d="M258 404H460M258 508H460M564 404H766M564 508H766" stroke="#A8E7CF" stroke-width="24" stroke-linecap="round"/>
+  </g>
 </svg>

@@ -10,22 +10,21 @@
   },
   "scripts": {
     "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext dev",
+    "v2:dev": "vite --config v2/vite.config.ts",
+    "v2:build": "vite build --config v2/vite.config.ts",
+    "v2:typecheck": "tsc --noEmit -p tsconfig.v2.json",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "npm run v2:build && tauri build",
     "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "desktop:dev": "npm run build && electron .",
     "desktop:dist": "npm run build && electron-builder --mac dmg --arm64",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern release",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern 'v2/dist/**' --ignore-pattern 'src-tauri/target/**' --ignore-pattern .next --ignore-pattern release",
     "db:generate": "drizzle-kit generate"
   },
-  "dependencies": {
-    "drizzle-orm": "0.45.2",
-    "next": "16.2.6",
-    "pdfjs-dist": "^6.2.108",
-    "react": "19.2.6",
-    "react-dom": "19.2.6"
-  },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.8.4",
     "@cloudflare/vite-plugin": "1.37.1",
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
@@ -44,6 +43,14 @@
     "vinext": "0.0.50",
     "vite": "8.0.13",
     "wrangler": "4.92.0"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.8.0",
+    "drizzle-orm": "0.45.2",
+    "next": "16.2.6",
+    "pdfjs-dist": "^6.2.108",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
   },
   "type": "module"
 }

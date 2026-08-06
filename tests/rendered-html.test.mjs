@@ -23,6 +23,21 @@ async function render() {
   );
 }
 
+async function requestLlm(body) {
+  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
+  workerUrl.searchParams.set("llm-test", `${process.pid}-${Date.now()}-${Math.random()}`);
+  const { default: worker } = await import(workerUrl.href);
+  return worker.fetch(
+    new Request("http://localhost/api/llm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }),
+    { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
+    { waitUntil() {}, passThroughOnException() {} },
+  );
+}
+
 test("server-renders the vocab learning experience", async () => {
   const response = await render();
   assert.equal(response.status, 200);
@@ -33,18 +48,78 @@ test("server-renders the vocab learning experience", async () => {
   assert.match(html, /本周打卡/);
   assert.match(html, /复习旧词/);
   assert.match(html, /学习新词/);
+  assert.match(html, /提前学习明天/);
   assert.match(html, /学习日历/);
   assert.match(html, /今日学习进度/);
   assert.doesNotMatch(html, /Your site is taking shape|codex-preview|SkeletonPreview/);
 });
 
+test("validates LLM requests before contacting a provider", async () => {
+  const missing = await requestLlm({});
+  assert.equal(missing.status, 400);
+  assert.match((await missing.json()).error, /缺少接口/);
+
+  const unsafe = await requestLlm({
+    endpoint: "http://example.com/v1/chat/completions",
+    model: "test-model",
+    word: { word: "resilient" },
+    messages: [{ role: "user", content: "怎么记？" }],
+  });
+  assert.equal(unsafe.status, 400);
+  assert.match((await unsafe.json()).error, /HTTPS/);
+});
+
+test("proxies a contextual word question to a local compatible LLM", async () => {
+  let authorization = "";
+  let providerBody = null;
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (_input, init) => {
+    const headers = new Headers(init?.headers);
+    authorization = headers.get("authorization") ?? "";
+    providerBody = JSON.parse(String(init?.body ?? "{}"));
+    return Response.json({ choices: [{ message: { content: "resilient 可以联想为受压后又弹回原状。" } }] });
+  };
+  try {
+    const response = await requestLlm({
+      endpoint: "https://llm.example/v1",
+      model: "local-test-model",
+      apiKey: "local-secret",
+      answer: "unknown",
+      word: { word: "resilient", phonetic: "/rɪˈzɪliənt/", senses: [{ part: "adj.", meaning: "有韧性的" }] },
+      messages: [{ role: "user", content: "怎么记？" }],
+    });
+    assert.equal(response.status, 200);
+    assert.match((await response.json()).content, /弹回原状/);
+    assert.equal(authorization, "Bearer local-secret");
+    assert.equal(providerBody.model, "local-test-model");
+    assert.match(providerBody.messages[0].content, /用户刚才选择：不认识/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("keeps progress logic local and removes starter-only assets", async () => {
-  const [page, packageJson] = await Promise.all([
+  const [page, tutor, llmRoute, packageJson] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/components/WordAiTutor.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/llm/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
 
   assert.match(page, /localStorage/);
+  assert.match(page, /simpleDictionaryDesktop/);
+  assert.match(page, /WordAiTutor/);
+  assert.match(page, /with-ai-sidebar/);
+  assert.match(tutor, /答题后可以继续追问/);
+  assert.match(tutor, /simple-dictionary-llm-settings-v1/);
+  assert.match(tutor, /\/api\/llm/);
+  assert.match(tutor, /正在思考/);
+  assert.doesNotMatch(tutor, /正在想一想/);
+  assert.match(tutor, /renderInlineMarkdown/);
+  assert.match(llmRoute, /chat\/completions/);
+  assert.match(llmRoute, /只围绕当前单词回答/);
+  assert.match(llmRoute, /Authorization: `Bearer \$\{apiKey\}`/);
+  assert.match(page, /serializedBookState/);
   assert.match(page, /vocab-flow-book-state-v1/);
   assert.match(page, /vocab-flow-study-history-v1/);
   assert.match(page, /satisfies StoredBookState/);
@@ -52,8 +127,10 @@ test("keeps progress logic local and removes starter-only assets", async () => {
   assert.match(page, /status: "review"/);
   assert.match(page, /normalizeProgress/);
   assert.match(page, /StoredBookEntry/);
+  assert.match(page, /PART_SEQUENCE_PATTERN/);
+  assert.doesNotMatch(page, /PART_SEQUENCE_PATTERN = [^\n]*\|v\|vt\|vi/);
   assert.match(page, /getTimeGreeting/);
-  assert.match(page, /夜深了，早点休息，明天再继续吧/);
+  assert.match(page, /还没休息吗？先睡一会儿，单词明天再学也来得及/);
   assert.match(page, /buildSmoothChartPath/);
   assert.match(page, /dayChartPath/);
   assert.match(page, /switchBook/);
@@ -104,6 +181,15 @@ test("keeps progress logic local and removes starter-only assets", async () => {
   assert.match(page, /学习新词/);
   assert.match(page, /学习日历/);
   assert.match(page, /今日打卡/);
+  assert.match(page, /补做昨天/);
+  assert.match(page, /补上昨天打卡/);
+  assert.match(page, /提前学习明天/);
+  assert.match(page, /startSession\("review", tomorrow\)/);
+  assert.match(page, /startSession\("learn", yesterday\)/);
+  assert.match(page, /learnedWordIds/);
+  assert.match(page, /reviewedWordIds/);
+  assert.match(page, /restoreStoredSession/);
+  assert.match(page, /targetCount: learnWords\.length \+ reviewWords\.length/);
   assert.match(page, /每天可直接点击多个学习章节/);
   assert.match(page, /chapter-picker/);
   assert.match(page, /aria-pressed/);
@@ -121,4 +207,21 @@ test("keeps progress logic local and removes starter-only assets", async () => {
   assert.match(packageJson, /desktop:dist/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   await assert.rejects(access(new URL("../app/_sites-preview/SkeletonPreview.tsx", import.meta.url)));
+});
+
+test("keeps the Electron storage origin stable across launches", async () => {
+  const [desktopMain, preload] = await Promise.all([
+    readFile(new URL("../desktop/main.mjs", import.meta.url), "utf8"),
+    readFile(new URL("../desktop/preload.cjs", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(desktopMain, /const LOCAL_SERVER_PORT = \d+;/);
+  assert.match(desktopMain, /localServer\.listen\(LOCAL_SERVER_PORT, "127\.0\.0\.1"/);
+  assert.doesNotMatch(desktopMain, /localServer\.listen\(0,/);
+  assert.match(desktopMain, /simple-dictionary-state\.json/);
+  assert.doesNotMatch(desktopMain, /webContents\.debugger|DOMStorage\./);
+  assert.match(desktopMain, /preload\.cjs/);
+  assert.match(preload, /contextBridge\.exposeInMainWorld\("simpleDictionaryDesktop"/);
+  assert.match(preload, /simple-dictionary:load-state/);
+  assert.match(preload, /simple-dictionary:save-state/);
 });

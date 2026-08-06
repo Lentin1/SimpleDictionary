@@ -100,6 +100,8 @@ export async function parsePdfImport(file: Blob, startId: number) {
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
   const document = await pdfjs.getDocument({
     data: new Uint8Array(await file.arrayBuffer()),
+    // pdfjs accepts this runtime option although the current type definition omits it.
+    // @ts-expect-error -- keep PDF import worker-free inside the offline desktop shell.
     disableWorker: true,
     useSystemFonts: true,
   }).promise;
