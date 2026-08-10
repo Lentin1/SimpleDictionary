@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { answerWord, askLlm, checkIn, deleteBook, getBackupJson, getBookWords, importBook, leaveStudy, loadLlmSettings, loadSnapshot, nextWord, renameBook, saveLlmSettings, saveSchedule, setActiveBook, startStudy, undoAnswer } from "./backend";
-import type { AppSnapshot, BookWord, ImportWordInput, LlmMessage, LlmSettings, ScheduleDayInput, StudySessionSnapshot, StudyWord, View } from "./types";
+import type { AppSnapshot, BookWord, ImportWordInput, LlmMessage, LlmSettings, ScheduleDayInput, StudySessionSnapshot, View } from "./types";
 import { parsePdfImport } from "../../lib/pdf-import";
+import { shouldSubmitAiQuestion } from "./ai-input";
+import { studySenses } from "./word-meaning";
 
 type ThemeMode = "system" | "light" | "dark";
 
@@ -291,7 +293,7 @@ export function App() {
         </header>
 
         {view === "today" && (
-          <TodayPage snapshot={snapshot} percent={percent} onStart={(mode) => void openStudy(mode)} onSaveSchedule={savePlan} onCheckIn={handleCheckIn} />
+          <TodayPage snapshot={snapshot} percent={percent} onStart={(mode, date) => void openStudy(mode, date)} onSaveSchedule={savePlan} onCheckIn={handleCheckIn} />
         )}
         {view === "books" && (
           <BooksPage snapshot={snapshot} onChoose={chooseBook} onRename={editBook} onDelete={removeBook} onImport={addBook} onView={openBookPreview} onExport={exportBackup} />
@@ -631,18 +633,6 @@ function parseTxtBook(raw: string): ImportWordInput[] {
   return words;
 }
 
-function splitPartLabels(value: string) {
-  return value.match(/(?:vt\.?\/?vi\.?|vi\.?\/?vt\.?|adj\.?|adv\.?|prep\.?|pron\.?|conj\.?|num\.?|det\.?|aux\.?|art\.?|modal\.?|n\.?|v\.?)/gi)?.map((part) => part.endsWith(".") ? part : `${part}.`) ?? [];
-}
-
-function studySenses(word: StudyWord) {
-  if (word.senses?.length) return word.senses;
-  const parts = splitPartLabels(word.part);
-  const meanings = word.meaning.split(/[；;]/).map((meaning) => meaning.trim()).filter(Boolean);
-  if (parts.length > 1 && parts.length === meanings.length) return parts.map((part, index) => ({ part, meaning: meanings[index] ?? "" }));
-  return [{ part: word.part.trim() || "—", meaning: word.meaning.trim() || word.definition?.trim() || "—" }];
-}
-
 function BookPreview({ book, words, onClose }: { book: AppSnapshot["books"][number]; words: BookWord[]; onClose: () => void }) {
   const [chapter, setChapter] = useState("全部章节");
   const visibleWords = chapter === "全部章节" ? words : words.filter((word) => word.chapter === chapter);
@@ -727,6 +717,16 @@ function AiDrawer({ word, answer, settings, messages, onMessagesChange, onSaveSe
   const [question, setQuestion] = useState("");
   const [thinking, setThinking] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(!settings.configured);
+  const conversationEndRef = useRef<HTMLDivElement | null>(null);
+  const composingRef = useRef(false);
+
+  useEffect(() => {
+    if (settingsOpen) return;
+    const frame = window.requestAnimationFrame(() => {
+      conversationEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [messages, settingsOpen, thinking]);
 
   async function saveSettings() {
     try {
@@ -775,13 +775,27 @@ function AiDrawer({ word, answer, settings, messages, onMessagesChange, onSaveSe
         </div>
       ) : (
         <>
-          <div className="ai-message assistant"><AiMessageContent content="你可以问我这个词的用法、近义词，或让它出一道小测验。" /></div>
-          <div className="ai-thread" aria-live="polite">
-            {messages.map((message, index) => <div className={message.role === "user" ? "ai-message user" : "ai-message assistant"} key={message.role + "-" + index}><AiMessageContent content={message.content} /></div>)}
-            {thinking && <div className="ai-message assistant ai-thinking" role="status"><AiMessageContent content="思考中…" /></div>}
+          <div className="ai-conversation">
+            <div className="ai-message assistant"><AiMessageContent content="你可以问我这个词的用法、近义词，或让它出一道小测验。" /></div>
+            <div className="ai-thread" aria-live="polite">
+              {messages.map((message, index) => <div className={message.role === "user" ? "ai-message user" : "ai-message assistant"} key={message.role + "-" + index}><AiMessageContent content={message.content} /></div>)}
+              {thinking && <div className="ai-message assistant ai-thinking" role="status"><AiMessageContent content="思考中…" /></div>}
+            </div>
+            <div className="ai-conversation-end" ref={conversationEndRef} aria-hidden="true" />
           </div>
           <div className="ai-input-row">
-            <input value={question} onChange={(event) => setQuestion(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") void send(question); }} placeholder="问问这个词……" />
+            <input
+              value={question}
+              onChange={(event) => setQuestion(event.target.value)}
+              onCompositionStart={() => { composingRef.current = true; }}
+              onCompositionEnd={() => { composingRef.current = false; }}
+              onKeyDown={(event) => {
+                if (!shouldSubmitAiQuestion(event.nativeEvent, composingRef.current)) return;
+                event.preventDefault();
+                void send(question);
+              }}
+              placeholder="问问这个词……"
+            />
             <button onClick={() => void send(question)} disabled={thinking}>发送</button>
           </div>
           <div className="ai-drawer-footer"><small>API 密钥由 macOS 钥匙串保护。</small><button className="link-button" onClick={() => setSettingsOpen(true)}>修改配置</button></div>

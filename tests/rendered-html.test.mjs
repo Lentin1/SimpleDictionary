@@ -1,6 +1,87 @@
 import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
+import { shouldSubmitAiQuestion } from "../v2/src/ai-input.ts";
+import { studySenses } from "../v2/src/word-meaning.ts";
+
+test("does not submit an AI question while an input method is composing", () => {
+  assert.equal(shouldSubmitAiQuestion({ key: "Enter", isComposing: true, keyCode: 13 }, false), false);
+  assert.equal(shouldSubmitAiQuestion({ key: "Enter", isComposing: false, keyCode: 229 }, false), false);
+  assert.equal(shouldSubmitAiQuestion({ key: "Enter", isComposing: false, keyCode: 13 }, true), false);
+  assert.equal(shouldSubmitAiQuestion({ key: "Enter", isComposing: false, keyCode: 13 }, false), true);
+  assert.equal(shouldSubmitAiQuestion({ key: "a", isComposing: false, keyCode: 65 }, false), false);
+});
+
+test("keeps every imported meaning when formatting study senses", () => {
+  assert.deepEqual(
+    studySenses({
+      word: "rate",
+      phonetic: "[reɪt]",
+      part: "n. v.",
+      meaning: "n. 比率；v. 速度；估价；定级",
+      chapter: "List 01",
+      senses: [{ part: "n.", meaning: "比率" }, { part: "v.", meaning: "速度" }],
+    }),
+    [{ part: "n.", meaning: "比率" }, { part: "v.", meaning: "速度；估价；定级" }],
+  );
+
+  assert.deepEqual(
+    studySenses({
+      word: "light",
+      phonetic: "[laɪt]",
+      part: "n. adj.",
+      meaning: "光；轻的",
+      chapter: "List 01",
+      senses: [{ part: "n.", meaning: "光" }, { part: "adj.", meaning: "轻的" }],
+    }),
+    [{ part: "n.", meaning: "光" }, { part: "adj.", meaning: "轻的" }],
+  );
+
+  assert.deepEqual(
+    studySenses({
+      word: "charge",
+      phonetic: "[tʃɑːrdʒ]",
+      part: "n. v.",
+      meaning: "费用；掌管；电荷；装满；充电",
+      chapter: "List 01",
+      senses: [{ part: "n.", meaning: "费用" }, { part: "v.", meaning: "掌管" }],
+    }),
+    [{ part: "n. v.", meaning: "费用；掌管；电荷；装满；充电" }],
+  );
+
+  assert.deepEqual(
+    studySenses({
+      word: "light",
+      phonetic: "[laɪt]",
+      part: "n. adj.",
+      meaning: "光；adj. 轻的",
+      chapter: "List 01",
+    }),
+    [{ part: "n.", meaning: "光" }, { part: "adj.", meaning: "轻的" }],
+  );
+
+  assert.deepEqual(
+    studySenses({
+      word: "test",
+      phonetic: "",
+      part: "n.",
+      meaning: "nonsense",
+      chapter: "List 01",
+    }),
+    [{ part: "n.", meaning: "nonsense" }],
+  );
+
+  assert.deepEqual(
+    studySenses({
+      word: "test",
+      phonetic: "",
+      part: "n.",
+      meaning: "n.onsense",
+      chapter: "List 01",
+    }),
+    [{ part: "n.", meaning: "n.onsense" }],
+  );
+});
 
 async function render() {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
@@ -99,11 +180,13 @@ test("proxies a contextual word question to a local compatible LLM", async () =>
 });
 
 test("keeps progress logic local and removes starter-only assets", async () => {
-  const [page, tutor, llmRoute, packageJson] = await Promise.all([
+  const [page, tutor, llmRoute, packageJson, v2App, v2Styles] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/components/WordAiTutor.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/api/llm/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
+    readFile(new URL("../v2/src/app.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../v2/src/styles.css", import.meta.url), "utf8"),
   ]);
 
   assert.match(page, /localStorage/);
@@ -195,6 +278,12 @@ test("keeps progress logic local and removes starter-only assets", async () => {
   assert.match(page, /aria-pressed/);
   assert.match(page, /review-list-preview/);
   assert.match(page, /今日复习列表/);
+  assert.match(v2App, /onStart=\{\(mode, date\) => void openStudy\(mode, date\)\}/);
+  assert.match(v2App, /onStart: \(mode: "learn" \| "review", date\?: string\) =>/);
+  assert.match(v2App, /scrollIntoView\(\{ behavior: "smooth", block: "end" \}\)/);
+  assert.match(v2App, /onCompositionStart/);
+  assert.match(v2Styles, /\.sidebar \{ position: sticky; top: 0;/);
+  assert.match(v2Styles, /\.ai-conversation \{[^}]*overflow-y: auto;/);
   assert.doesNotMatch(page, /multiple size=\{3\}/);
   assert.doesNotMatch(page, /按住 Command 可多选/);
   assert.doesNotMatch(page, /<span className="nav-badge muted">\{customWords\.length\}<\/span>/);

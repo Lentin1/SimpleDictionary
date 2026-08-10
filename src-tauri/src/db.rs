@@ -629,7 +629,7 @@ pub fn start_study_for_date(
     }
 
     let chapters = scheduled_chapters(&connection, &book_id, &date, normalized_mode)?;
-    let queue = pending_word_keys(&connection, &book_id, &chapters, normalized_mode)?;
+    let queue = pending_word_keys(&connection, &book_id, &date, &chapters, normalized_mode)?;
     let completed = queue.is_empty();
     let payload = json!({
         "mode": normalized_mode,
@@ -1198,13 +1198,10 @@ fn load_today(
         studied_count: value_i64(&history, "studiedCount").unwrap_or(0),
         review_count: value_i64(&history, "reviewedCount").unwrap_or(0),
         target_count: {
-            let scheduled_target =
-                scheduled_target_count(connection, &book.id, &study_chapters, &review_chapters);
-            if scheduled_target > 0 {
-                scheduled_target
-            } else {
-                value_i64(&history, "targetCount").unwrap_or(0)
-            }
+            let recorded_target = value_i64(&history, "targetCount").filter(|count| *count > 0);
+            recorded_target.unwrap_or_else(|| {
+                scheduled_target_count(connection, &book.id, &study_chapters, &review_chapters)
+            })
         },
         checked_in: history
             .get("checkedIn")
@@ -1665,9 +1662,27 @@ fn scheduled_chapters(
 fn pending_word_keys(
     connection: &Connection,
     book_id: &str,
+    date: &str,
     chapters: &[String],
     mode: &str,
 ) -> Result<Vec<String>, DbError> {
+    let history: Option<String> = connection
+        .query_row(
+            "SELECT payload_json FROM study_history WHERE book_id = ?1 AND date = ?2",
+            params![book_id, date],
+            |row| row.get(0),
+        )
+        .optional()?;
+    let completed_keys = history
+        .and_then(|payload| serde_json::from_str::<Value>(&payload).ok())
+        .map(|payload| {
+            if mode == "review" {
+                history_keys(&payload, &["reviewedWordKeys", "reviewedWordIds"])
+            } else {
+                history_keys(&payload, &["learnedWordKeys", "learnedWordIds"])
+            }
+        })
+        .unwrap_or_default();
     let mut statement = connection
         .prepare("SELECT legacy_id, chapter FROM words WHERE book_id = ?1 ORDER BY order_index")?;
     let rows = statement.query_map(params![book_id], |row| {
@@ -1677,6 +1692,9 @@ fn pending_word_keys(
     for row in rows {
         let (key, chapter) = row?;
         if !chapters.iter().any(|candidate| candidate == &chapter) {
+            continue;
+        }
+        if completed_keys.iter().any(|completed| completed == &key) {
             continue;
         }
         if mode == "learn" {
@@ -2523,6 +2541,50 @@ mod tests {
         assert_eq!(snapshot.today.target_count, 1);
         let session = start_study(&state, "learn").unwrap();
         assert_eq!(session.current.as_ref().unwrap().key, "2");
+
+        remove_test_db(&path);
+    }
+
+    #[test]
+    fn today_target_count_does_not_shrink_after_learning_words() {
+        let (path, state) = new_test_state("jian-ci-stable-target-count-test");
+        let connection = Connection::open(&state.path).unwrap();
+        connection.execute("INSERT INTO words(book_id, legacy_id, chapter, word, order_index) VALUES('empty-book', '1', 'List 01', 'one', 0), ('empty-book', '2', 'List 01', 'two', 1)", []).unwrap();
+        connection.execute("INSERT INTO schedule_days(book_id, day_index, date, study_chapters_json) VALUES('empty-book', 0, ?1, '[\"List 01\"]')", params![today()]).unwrap();
+        drop(connection);
+
+        assert_eq!(load_snapshot(&state).unwrap().today.target_count, 2);
+        start_study(&state, "learn").unwrap();
+        answer_word(&state, "1", true).unwrap();
+        let snapshot = load_snapshot(&state).unwrap();
+        assert_eq!(snapshot.today.studied_count, 1);
+        assert_eq!(snapshot.today.target_count, 2);
+
+        remove_test_db(&path);
+    }
+
+    #[test]
+    fn completed_review_history_survives_switching_dates() {
+        let (path, state) = new_test_state("jian-ci-review-history-resume-test");
+        let current_date = today();
+        let next_date = add_days(&current_date, 1).unwrap();
+        let connection = Connection::open(&state.path).unwrap();
+        connection.execute("INSERT INTO words(book_id, legacy_id, chapter, word, order_index) VALUES('empty-book', '1', 'List 01', 'one', 0), ('empty-book', '2', 'List 01', 'two', 1)", []).unwrap();
+        connection.execute("INSERT INTO schedule_days(book_id, day_index, date, review_chapters_json) VALUES('empty-book', 0, ?1, '[\"List 01\"]'), ('empty-book', 1, ?2, '[\"List 01\"]')", params![current_date, next_date]).unwrap();
+        drop(connection);
+
+        start_study_for_date(&state, "review", Some(&current_date)).unwrap();
+        answer_word(&state, "1", true).unwrap();
+        next_word(&state).unwrap();
+        answer_word(&state, "2", true).unwrap();
+        assert!(next_word(&state).unwrap().completed);
+
+        let next_session = start_study_for_date(&state, "review", Some(&next_date)).unwrap();
+        assert_eq!(next_session.remaining_count, 2);
+        let restored = start_study_for_date(&state, "review", Some(&current_date)).unwrap();
+        assert!(restored.completed);
+        assert_eq!(restored.remaining_count, 0);
+        assert!(restored.current.is_none());
 
         remove_test_db(&path);
     }
