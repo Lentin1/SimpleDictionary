@@ -3,6 +3,7 @@ import { answerWord, askLlm, checkIn, deleteBook, getBackupJson, getBookWords, i
 import type { AppSnapshot, BookWord, ImportWordInput, LlmMessage, LlmSettings, ScheduleDayInput, StudySessionSnapshot, View } from "./types";
 import { parsePdfImport } from "../../lib/pdf-import";
 import { shouldSubmitAiQuestion } from "./ai-input";
+import { selectPronunciationVoice } from "./speech-voice";
 import { studySenses } from "./word-meaning";
 
 type ThemeMode = "system" | "light" | "dark";
@@ -669,10 +670,10 @@ function StudyPage({ session, snapshot, percent, revealed, onAnswer, onNext, onU
     synthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(word.word);
     const voices = synthesis.getVoices();
-    const englishVoice = voices.find((voice) => /^en-US/i.test(voice.lang)) ?? voices.find((voice) => /^en/i.test(voice.lang));
-    if (englishVoice) {
-      utterance.voice = englishVoice;
-      utterance.lang = englishVoice.lang;
+    const pronunciationVoice = selectPronunciationVoice(voices);
+    if (pronunciationVoice) {
+      utterance.voice = pronunciationVoice;
+      utterance.lang = pronunciationVoice.lang;
     } else {
       utterance.lang = "en-US";
     }
@@ -690,7 +691,7 @@ function StudyPage({ session, snapshot, percent, revealed, onAnswer, onNext, onU
       <div className="study-heading"><div><p className="eyebrow">{sessionDate} · {session?.mode === "review" ? "复习" : "学习"} · {word?.chapter ?? "按章节"}</p><h2>{session?.mode === "review" ? "复习旧词" : "学习新词"}</h2></div><div className="study-heading-actions"><span>{session?.remainingCount ?? 0} 个待完成</span><button className="secondary-button" onClick={onBack}>退出学习</button></div></div>
       <article className={revealed ? "study-card revealed" : "study-card"}>
         <div className="study-card-top"><span className="tag">TOEFL</span><button className="ai-trigger" onClick={onAi}>问问 AI</button></div>
-        {word ? <div className="word-center"><h2>{word.word}</h2><div className="phonetic-row"><p className="phonetic">{word.phonetic}</p><button type="button" className={`pronounce-button ${speakingWordKey === word.key ? "is-speaking" : ""}`} aria-label={`播放 ${word.word} 的发音`} title="使用系统语音播放" onClick={speakWord}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l4 3V7l-4 3H4Z" /><path d="M15 9.5a4 4 0 0 1 0 5M17.5 7a7.5 7.5 0 0 1 0 10" /></svg></button></div>{revealed ? <div className="meaning-list" aria-label="词性和释义">{studySenses(word).map((sense, index) => <div className="meaning-line" key={`${sense.part}-${index}`}><b>{sense.part}</b><strong>{sense.meaning}</strong></div>)}</div> : <p className="hint">先回想它的意思，再选择你的答案</p>}</div> : <div className="word-center empty-state"><h2>今天完成了</h2><p className="meaning">这一章节的任务已完成</p></div>}
+        {word ? <div className="word-center"><h2>{word.word}</h2><div className="phonetic-row"><p className="phonetic">{word.phonetic}</p><button type="button" className={`pronounce-button ${speakingWordKey === word.key ? "is-speaking" : ""}`} aria-label={`播放 ${word.word} 的发音`} title="使用 Samantha 播放（不可用时回退到系统英语音色）" onClick={speakWord}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l4 3V7l-4 3H4Z" /><path d="M15 9.5a4 4 0 0 1 0 5M17.5 7a7.5 7.5 0 0 1 0 10" /></svg></button></div>{revealed ? <div className="meaning-list" aria-label="词性和释义">{studySenses(word).map((sense, index) => <div className="meaning-line" key={`${sense.part}-${index}`}><b>{sense.part}</b><strong>{sense.meaning}</strong></div>)}</div> : <p className="hint">先回想它的意思，再选择你的答案</p>}</div> : <div className="word-center empty-state"><h2>今天完成了</h2><p className="meaning">这一章节的任务已完成</p></div>}
         {word && (!revealed ? <div className="answer-grid"><button className="answer unknown" onClick={() => onAnswer(false)}><strong>不认识</strong><small>查看释义，并放到队尾复习</small></button><button className="answer known" onClick={() => onAnswer(true)}><strong>认识</strong><small>查看释义，并继续下一个</small></button></div> : <div className="revealed-actions"><span className="answer-status">{session?.answer === "unknown" ? "✓ 已加入本章队尾" : "✓ 已记录本章学习进度"}</span><div className="revealed-action-buttons"><button className="secondary-button undo-button" onClick={onUndo}>撤销选择 <kbd>Z</kbd></button><button className="primary-button next-button" onClick={onNext}>下一个单词 <kbd>Space</kbd> <span>→</span></button></div></div>)}
       </article>
       <p className="keyboard-hint">使用键盘 <kbd>←</kbd> 不认识 · <kbd>→</kbd> 认识 · <kbd>Space</kbd> 查看 / 下一个 · <kbd>Z</kbd> 撤销</p>

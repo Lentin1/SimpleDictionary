@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 import { shouldSubmitAiQuestion } from "../v2/src/ai-input.ts";
+import { selectPronunciationVoice } from "../v2/src/speech-voice.ts";
 import { studySenses } from "../v2/src/word-meaning.ts";
 
 test("does not submit an AI question while an input method is composing", () => {
@@ -10,6 +11,17 @@ test("does not submit an AI question while an input method is composing", () => 
   assert.equal(shouldSubmitAiQuestion({ key: "Enter", isComposing: false, keyCode: 13 }, true), false);
   assert.equal(shouldSubmitAiQuestion({ key: "Enter", isComposing: false, keyCode: 13 }, false), true);
   assert.equal(shouldSubmitAiQuestion({ key: "a", isComposing: false, keyCode: 65 }, false), false);
+});
+
+test("prefers Samantha for word pronunciation and falls back to English", () => {
+  const voices = [
+    { name: "Alex", lang: "en-US" },
+    { name: "Samantha (Enhanced)", lang: "en-US" },
+    { name: "Daniel", lang: "en-GB" },
+  ];
+  assert.equal(selectPronunciationVoice(voices)?.name, "Samantha (Enhanced)");
+  assert.equal(selectPronunciationVoice(voices.filter((voice) => !voice.name.includes("Samantha")))?.name, "Alex");
+  assert.equal(selectPronunciationVoice([{ name: "Daniel", lang: "en-GB" }])?.name, "Daniel");
 });
 
 test("keeps every imported meaning when formatting study senses", () => {
