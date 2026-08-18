@@ -3,6 +3,7 @@ import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 import { shouldSubmitAiQuestion } from "../v2/src/ai-input.ts";
 import { selectPronunciationVoice } from "../v2/src/speech-voice.ts";
+import { DEFAULT_SHORTCUTS, findMatchingShortcut, findShortcutConflict, formatShortcut, normalizeShortcut, parseShortcutBindings, shouldIgnoreShortcutEvent } from "../v2/src/shortcuts.ts";
 import { studySenses } from "../v2/src/word-meaning.ts";
 
 test("does not submit an AI question while an input method is composing", () => {
@@ -22,6 +23,28 @@ test("prefers Samantha for word pronunciation and falls back to English", () => 
   assert.equal(selectPronunciationVoice(voices)?.name, "Samantha (Enhanced)");
   assert.equal(selectPronunciationVoice(voices.filter((voice) => !voice.name.includes("Samantha")))?.name, "Alex");
   assert.equal(selectPronunciationVoice([{ name: "Daniel", lang: "en-GB" }])?.name, "Daniel");
+});
+
+test("normalizes and displays single-key and macOS shortcut combinations", () => {
+  const shortcut = normalizeShortcut({ key: "a", code: "KeyA", metaKey: true, shiftKey: true });
+  assert.deepEqual(shortcut, { key: "A", code: "KeyA", meta: true, ctrl: false, alt: false, shift: true });
+  assert.equal(formatShortcut(shortcut), "⌘ ⇧ A");
+  assert.equal(findMatchingShortcut({ key: "A", code: "KeyA", metaKey: true, shiftKey: true }, { ...DEFAULT_SHORTCUTS, openAi: shortcut }), "openAi");
+});
+
+test("rejects duplicate shortcuts and falls back from invalid persisted data", () => {
+  const duplicate = { ...DEFAULT_SHORTCUTS, openAi: { ...DEFAULT_SHORTCUTS.undo } };
+  assert.equal(findShortcutConflict(duplicate, "openAi", duplicate.openAi), "undo");
+  assert.deepEqual(parseShortcutBindings("not-json"), DEFAULT_SHORTCUTS);
+  assert.deepEqual(parseShortcutBindings(JSON.stringify({ version: 0, shortcuts: DEFAULT_SHORTCUTS })), DEFAULT_SHORTCUTS);
+  assert.deepEqual(parseShortcutBindings(JSON.stringify({ version: 1, shortcuts: duplicate })), DEFAULT_SHORTCUTS);
+  assert.deepEqual(parseShortcutBindings(JSON.stringify({ version: 1, shortcuts: { ...DEFAULT_SHORTCUTS, openAi: { key: "Meta", code: "MetaLeft", meta: false, ctrl: false, alt: false, shift: false } } })), DEFAULT_SHORTCUTS);
+});
+
+test("ignores IME composition and editable shortcut targets", () => {
+  assert.equal(shouldIgnoreShortcutEvent({ key: "A", isComposing: true }), true);
+  assert.equal(shouldIgnoreShortcutEvent({ key: "A", keyCode: 229 }), true);
+  assert.equal(shouldIgnoreShortcutEvent({ key: "A" }), false);
 });
 
 test("keeps every imported meaning when formatting study senses", () => {
@@ -192,13 +215,14 @@ test("proxies a contextual word question to a local compatible LLM", async () =>
 });
 
 test("keeps progress logic local and removes starter-only assets", async () => {
-  const [page, tutor, llmRoute, packageJson, v2App, v2Styles] = await Promise.all([
+  const [page, tutor, llmRoute, packageJson, v2App, v2Styles, v2Shortcuts] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/components/WordAiTutor.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/api/llm/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
     readFile(new URL("../v2/src/app.tsx", import.meta.url), "utf8"),
     readFile(new URL("../v2/src/styles.css", import.meta.url), "utf8"),
+    readFile(new URL("../v2/src/shortcuts.ts", import.meta.url), "utf8"),
   ]);
 
   assert.match(page, /localStorage/);
@@ -293,9 +317,65 @@ test("keeps progress logic local and removes starter-only assets", async () => {
   assert.match(v2App, /onStart=\{\(mode, date\) => void openStudy\(mode, date\)\}/);
   assert.match(v2App, /onStart: \(mode: "learn" \| "review", date\?: string\) =>/);
   assert.match(v2App, /scrollIntoView\(\{ behavior: "smooth", block: "end" \}\)/);
+  assert.match(v2App, /questionInputRef\.current\?\.focus\(\)/);
+  assert.match(v2App, /voiceschanged/);
+  assert.match(v2App, /synthesis\.resume\(\)/);
+  assert.match(v2App, /speechWatchdogRef/);
+  assert.match(v2App, /maxAttempts = 4/);
   assert.match(v2App, /onCompositionStart/);
+  assert.match(v2App, /jian-ci-auto-pronounce-after-answer/);
+  assert.match(v2App, /if \(autoPronounceAfterAnswer\) speakWord\(answeredWord\);/);
+  assert.match(v2App, />答题后发音</);
+  assert.match(v2App, /view === "settings"/);
+  assert.match(v2App, /value: "system", label: "跟随系统"/);
+  assert.match(v2App, /value: "light", label: "浅色"/);
+  assert.match(v2App, /value: "dark", label: "深色"/);
+  assert.match(v2App, /document\.documentElement\.dataset\.theme = theme/);
+  assert.match(v2App, /media\.addEventListener\("change", onChange\)/);
+  assert.match(v2App, /留空则保留钥匙串中的原密钥/);
+  assert.match(v2App, /label: "怎么记忆"/);
+  assert.match(v2App, /label: "怎么用"/);
+  assert.match(v2App, /label: "派生词"/);
+  assert.match(v2App, /label: "词根"/);
+  assert.match(v2App, /onClick=\{\(\) => void send\(suggestion\.prompt\)\}/);
+  assert.match(v2App, /disabled=\{thinking \|\| !word\}/);
+  assert.match(v2App, /view === "vocabulary"/);
+  assert.match(v2App, />生词本</);
+  assert.match(v2App, /vocabularyWords\.length/);
+  assert.match(v2App, /setVocabularyWord\(wordKey, saved\)/);
+  assert.match(v2App, /startVocabularyStudy\(\)/);
+  assert.match(v2App, /studySession\.mode === "vocabulary"/);
+  assert.match(v2App, /还没有收藏生词/);
+  assert.match(v2App, /单词、词性或释义/);
+  assert.match(v2App, /全部章节/);
+  assert.match(v2App, /<BookmarkIcon filled=\{saved\} \/>/);
+  assert.match(v2App, /book\.active && <button[^>]+bookmark-button/);
+  assert.match(v2App, /不认识的单词会移到队尾/);
+  assert.match(v2Shortcuts, /jian-ci-shortcuts-v1/);
+  assert.match(v2App, /恢复默认/);
+  assert.match(v2App, /请按键…/);
+  assert.match(v2App, /findMatchingShortcut\(event, shortcuts\)/);
+  assert.match(v2App, /shouldIgnoreShortcutEvent\(event\)/);
+  assert.match(v2App, /action === "answerUnknown" && !revealed/);
+  assert.match(v2App, /action === "answerKnown" && !revealed/);
+  assert.match(v2App, /action === "advance" && revealed/);
+  assert.match(v2App, /action === "undo" && revealed/);
+  assert.match(v2App, /action === "pronounce"/);
+  assert.match(v2App, /action === "openAi"/);
+  assert.match(v2App, /shortcutActionLabel\(conflict\)/);
+  assert.match(v2App, /formatShortcut\(shortcuts\.openAi\)/);
+  assert.match(v2Shortcuts, /version !== 1/);
+  assert.match(v2Shortcuts, /findShortcutConflict/);
   assert.match(v2Styles, /\.sidebar \{ position: sticky; top: 0;/);
   assert.match(v2Styles, /\.ai-conversation \{[^}]*overflow-y: auto;/);
+  assert.match(v2Styles, /\.auto-pronounce-toggle input:checked \+ \.toggle-track/);
+  assert.match(v2Styles, /\.theme-option-grid/);
+  assert.match(v2Styles, /\.ai-suggestion-list \{[^}]*grid-template-columns: repeat\(4,/);
+  assert.match(v2Styles, /\.shortcut-list \{/);
+  assert.match(v2Styles, /\.shortcut-capture\.recording/);
+  assert.match(v2Styles, /\.vocabulary-card \{/);
+  assert.match(v2Styles, /\.bookmark-button\.saved/);
+  assert.match(v2Styles, /\.sidebar-collapsed \.nav-item b/);
   assert.doesNotMatch(page, /multiple size=\{3\}/);
   assert.doesNotMatch(page, /按住 Command 可多选/);
   assert.doesNotMatch(page, /<span className="nav-badge muted">\{customWords\.length\}<\/span>/);

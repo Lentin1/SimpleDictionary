@@ -1,4 +1,4 @@
-export type View = "today" | "learn" | "books";
+export type View = "today" | "learn" | "books" | "vocabulary" | "settings";
 
 export type BookSummary = {
   id: string;
@@ -81,8 +81,10 @@ export type StudyWord = {
 
 export type BookWord = StudyWord & { key: string };
 
+export type VocabularyWord = BookWord & { addedAt: string };
+
 export type StudySessionSnapshot = {
-  mode: "learn" | "review";
+  mode: "learn" | "review" | "vocabulary";
   date: string;
   active: boolean;
   completed: boolean;

@@ -126,6 +126,14 @@ pub struct StudyWord {
     pub senses: Vec<StudySense>,
 }
 
+#[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct VocabularyWord {
+    #[serde(flatten)]
+    pub word: StudyWord,
+    pub added_at: String,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct StudySense {
@@ -273,6 +281,19 @@ pub fn initialize(state: &DbState) -> Result<(), DbError> {
           payload_json TEXT NOT NULL DEFAULT '{}',
           updated_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS vocabulary_words (
+          book_id TEXT NOT NULL,
+          word_key TEXT NOT NULL,
+          added_at TEXT NOT NULL,
+          PRIMARY KEY(book_id, word_key)
+        );
+        CREATE INDEX IF NOT EXISTS vocabulary_words_recent
+          ON vocabulary_words(book_id, added_at DESC);
+        CREATE TABLE IF NOT EXISTS vocabulary_sessions (
+          book_id TEXT PRIMARY KEY,
+          payload_json TEXT NOT NULL DEFAULT '{}',
+          updated_at TEXT NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS snapshots (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           created_at TEXT NOT NULL,
@@ -380,6 +401,335 @@ pub fn get_book_words(state: &DbState, book_id: &str) -> Result<Vec<StudyWord>, 
         })
     })?;
     rows.collect::<Result<Vec<_>, _>>().map_err(DbError::from)
+}
+
+pub fn get_vocabulary_words(state: &DbState) -> Result<Vec<VocabularyWord>, DbError> {
+    let connection = Connection::open(&state.path)?;
+    let book_id = active_book_id(&connection)?;
+    load_vocabulary_words(&connection, &book_id)
+}
+
+pub fn set_vocabulary_word(
+    state: &DbState,
+    word_key: &str,
+    saved: bool,
+) -> Result<Vec<VocabularyWord>, DbError> {
+    let connection = Connection::open(&state.path)?;
+    let book_id = active_book_id(&connection)?;
+    let exists = connection
+        .query_row(
+            "SELECT 1 FROM words WHERE book_id = ?1 AND legacy_id = ?2",
+            params![book_id, word_key],
+            |_| Ok(true),
+        )
+        .optional()?
+        .unwrap_or(false);
+    if !exists {
+        return Err(DbError::Message("当前词书中不存在该单词".to_string()));
+    }
+    if saved {
+        connection.execute(
+            "INSERT OR IGNORE INTO vocabulary_words(book_id, word_key, added_at) VALUES(?1, ?2, ?3)",
+            params![book_id, word_key, now()],
+        )?;
+    } else {
+        connection.execute(
+            "DELETE FROM vocabulary_words WHERE book_id = ?1 AND word_key = ?2",
+            params![book_id, word_key],
+        )?;
+        remove_word_from_vocabulary_session(&connection, &book_id, word_key)?;
+    }
+    create_snapshot(
+        state,
+        if saved {
+            "收藏生词"
+        } else {
+            "移除生词"
+        },
+    )?;
+    load_vocabulary_words(&connection, &book_id)
+}
+
+pub fn start_vocabulary_study(state: &DbState) -> Result<StudySessionSnapshot, DbError> {
+    let connection = Connection::open(&state.path)?;
+    let book_id = active_book_id(&connection)?;
+    let existing: Option<String> = connection
+        .query_row(
+            "SELECT payload_json FROM vocabulary_sessions WHERE book_id = ?1",
+            params![book_id],
+            |row| row.get(0),
+        )
+        .optional()?;
+    if let Some(raw) = existing {
+        let mut payload: Value = serde_json::from_str(&raw)?;
+        filter_vocabulary_queue(&connection, &book_id, &mut payload)?;
+        let completed = payload
+            .get("completed")
+            .and_then(Value::as_bool)
+            .unwrap_or(false);
+        let has_queue = payload
+            .get("queue")
+            .and_then(Value::as_array)
+            .is_some_and(|queue| !queue.is_empty());
+        if !completed && has_queue {
+            save_vocabulary_session(&connection, &book_id, &payload)?;
+            return session_snapshot(&connection, &book_id, payload);
+        }
+    }
+    let mut statement = connection
+        .prepare("SELECT word_key FROM vocabulary_words WHERE book_id = ?1 ORDER BY RANDOM()")?;
+    let queue = statement
+        .query_map(params![book_id], |row| row.get::<_, String>(0))?
+        .collect::<Result<Vec<_>, _>>()?;
+    let completed = queue.is_empty();
+    let payload = json!({
+        "mode": "vocabulary",
+        "date": today(),
+        "queue": queue,
+        "active": !completed,
+        "completed": completed,
+        "revealed": false,
+        "answer": null,
+        "knownCount": 0,
+        "unknownCount": 0,
+    });
+    save_vocabulary_session(&connection, &book_id, &payload)?;
+    session_snapshot(&connection, &book_id, payload)
+}
+
+pub fn answer_vocabulary_word(
+    state: &DbState,
+    word_key: &str,
+    known: bool,
+) -> Result<StudySessionSnapshot, DbError> {
+    let connection = Connection::open(&state.path)?;
+    let book_id = active_book_id(&connection)?;
+    let raw: String = connection
+        .query_row(
+            "SELECT payload_json FROM vocabulary_sessions WHERE book_id = ?1",
+            params![book_id],
+            |row| row.get(0),
+        )
+        .optional()?
+        .ok_or_else(|| DbError::Message("当前没有生词复习会话".to_string()))?;
+    let mut payload: Value = serde_json::from_str(&raw)?;
+    filter_vocabulary_queue(&connection, &book_id, &mut payload)?;
+    let current_key = payload
+        .get("queue")
+        .and_then(Value::as_array)
+        .and_then(|queue| queue.first())
+        .and_then(Value::as_str)
+        .ok_or_else(|| DbError::Message("当前没有待复习生词".to_string()))?;
+    if current_key != word_key {
+        return Err(DbError::Message(
+            "当前单词已变化，请重新打开复习".to_string(),
+        ));
+    }
+    if payload.get("answer").and_then(Value::as_str).is_some() {
+        return Err(DbError::Message("请先进入下一个单词".to_string()));
+    }
+    let previous_progress: Option<(String, Option<String>, Option<String>, i64, i64, i64, String)> = connection.query_row(
+        "SELECT status, last_studied_at, due_at, times_seen, correct_count, incorrect_count, extra_json FROM progress WHERE book_id = ?1 AND word_key = ?2",
+        params![book_id, word_key],
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?, row.get(5)?, row.get(6)?)),
+    ).optional()?;
+    let status = if known { "mastered" } else { "review" };
+    connection.execute(
+        "INSERT INTO progress(book_id, word_key, status, last_studied_at, times_seen, correct_count, incorrect_count) VALUES(?1, ?2, ?3, ?4, 1, ?5, ?6) ON CONFLICT(book_id, word_key) DO UPDATE SET status = excluded.status, last_studied_at = excluded.last_studied_at, times_seen = progress.times_seen + 1, correct_count = progress.correct_count + excluded.correct_count, incorrect_count = progress.incorrect_count + excluded.incorrect_count",
+        params![book_id, word_key, status, now(), if known { 1 } else { 0 }, if known { 0 } else { 1 }],
+    )?;
+    let known_count = payload
+        .get("knownCount")
+        .and_then(Value::as_i64)
+        .unwrap_or(0)
+        + i64::from(known);
+    let unknown_count = payload
+        .get("unknownCount")
+        .and_then(Value::as_i64)
+        .unwrap_or(0)
+        + i64::from(!known);
+    if let Some(object) = payload.as_object_mut() {
+        object.insert("knownCount".to_string(), json!(known_count));
+        object.insert("unknownCount".to_string(), json!(unknown_count));
+        object.insert(
+            "answer".to_string(),
+            json!(if known { "known" } else { "unknown" }),
+        );
+        object.insert("revealed".to_string(), json!(true));
+        object.insert("active".to_string(), json!(true));
+        object.insert("completed".to_string(), json!(false));
+        object.insert(
+            "previousProgress".to_string(),
+            previous_progress
+                .map(
+                    |(
+                        status,
+                        last_studied_at,
+                        due_at,
+                        times_seen,
+                        correct_count,
+                        incorrect_count,
+                        extra_json,
+                    )| {
+                        json!({
+                            "status": status,
+                            "lastStudiedAt": last_studied_at,
+                            "dueAt": due_at,
+                            "timesSeen": times_seen,
+                            "correctCount": correct_count,
+                            "incorrectCount": incorrect_count,
+                            "extraJson": extra_json,
+                        })
+                    },
+                )
+                .unwrap_or(Value::Null),
+        );
+    }
+    save_vocabulary_session(&connection, &book_id, &payload)?;
+    create_snapshot(
+        state,
+        if known {
+            "生词复习回答认识"
+        } else {
+            "生词复习回答不认识"
+        },
+    )?;
+    session_snapshot(&connection, &book_id, payload)
+}
+
+pub fn undo_vocabulary_answer(state: &DbState) -> Result<StudySessionSnapshot, DbError> {
+    let connection = Connection::open(&state.path)?;
+    let book_id = active_book_id(&connection)?;
+    let raw: String = connection
+        .query_row(
+            "SELECT payload_json FROM vocabulary_sessions WHERE book_id = ?1",
+            params![book_id],
+            |row| row.get(0),
+        )
+        .optional()?
+        .ok_or_else(|| DbError::Message("当前没有生词复习会话".to_string()))?;
+    let mut payload: Value = serde_json::from_str(&raw)?;
+    let answer = payload
+        .get("answer")
+        .and_then(Value::as_str)
+        .ok_or_else(|| DbError::Message("当前没有可撤销的选择".to_string()))?
+        .to_string();
+    let word_key = payload
+        .get("queue")
+        .and_then(Value::as_array)
+        .and_then(|queue| queue.first())
+        .and_then(Value::as_str)
+        .ok_or_else(|| DbError::Message("当前没有待复习生词".to_string()))?
+        .to_string();
+    let transaction = connection.unchecked_transaction()?;
+    restore_previous_progress(
+        &transaction,
+        &book_id,
+        &word_key,
+        payload.get("previousProgress"),
+    )?;
+    if let Some(object) = payload.as_object_mut() {
+        let known_count = object
+            .get("knownCount")
+            .and_then(Value::as_i64)
+            .unwrap_or(0);
+        let unknown_count = object
+            .get("unknownCount")
+            .and_then(Value::as_i64)
+            .unwrap_or(0);
+        object.insert(
+            "knownCount".to_string(),
+            json!(if answer == "known" {
+                (known_count - 1).max(0)
+            } else {
+                known_count
+            }),
+        );
+        object.insert(
+            "unknownCount".to_string(),
+            json!(if answer == "unknown" {
+                (unknown_count - 1).max(0)
+            } else {
+                unknown_count
+            }),
+        );
+        object.insert("answer".to_string(), Value::Null);
+        object.insert("revealed".to_string(), json!(false));
+        object.insert("active".to_string(), json!(true));
+        object.insert("completed".to_string(), json!(false));
+        object.insert("previousProgress".to_string(), Value::Null);
+    }
+    save_vocabulary_session(&transaction, &book_id, &payload)?;
+    transaction.commit()?;
+    create_snapshot(state, "撤销生词复习选择")?;
+    let connection = Connection::open(&state.path)?;
+    session_snapshot(&connection, &book_id, payload)
+}
+
+pub fn next_vocabulary_word(state: &DbState) -> Result<StudySessionSnapshot, DbError> {
+    let connection = Connection::open(&state.path)?;
+    let book_id = active_book_id(&connection)?;
+    let raw: String = connection
+        .query_row(
+            "SELECT payload_json FROM vocabulary_sessions WHERE book_id = ?1",
+            params![book_id],
+            |row| row.get(0),
+        )
+        .optional()?
+        .ok_or_else(|| DbError::Message("当前没有生词复习会话".to_string()))?;
+    let mut payload: Value = serde_json::from_str(&raw)?;
+    filter_vocabulary_queue(&connection, &book_id, &mut payload)?;
+    let answer = payload
+        .get("answer")
+        .and_then(Value::as_str)
+        .ok_or_else(|| DbError::Message("请先选择认识或不认识".to_string()))?
+        .to_string();
+    let remaining_count = {
+        let queue = payload
+            .get_mut("queue")
+            .and_then(Value::as_array_mut)
+            .ok_or_else(|| DbError::Message("生词复习队列损坏".to_string()))?;
+        let current = queue
+            .first()
+            .and_then(Value::as_str)
+            .map(ToString::to_string)
+            .ok_or_else(|| DbError::Message("当前没有待复习生词".to_string()))?;
+        queue.remove(0);
+        if answer == "unknown" && vocabulary_contains(&connection, &book_id, &current)? {
+            queue.push(Value::String(current));
+        }
+        queue.len()
+    };
+    if let Some(object) = payload.as_object_mut() {
+        object.insert("answer".to_string(), Value::Null);
+        object.insert("revealed".to_string(), json!(false));
+        object.insert("active".to_string(), json!(remaining_count > 0));
+        object.insert("completed".to_string(), json!(remaining_count == 0));
+        object.insert("previousProgress".to_string(), Value::Null);
+    }
+    save_vocabulary_session(&connection, &book_id, &payload)?;
+    session_snapshot(&connection, &book_id, payload)
+}
+
+pub fn leave_vocabulary_study(state: &DbState) -> Result<StudySessionSnapshot, DbError> {
+    let connection = Connection::open(&state.path)?;
+    let book_id = active_book_id(&connection)?;
+    let raw: String = connection
+        .query_row(
+            "SELECT payload_json FROM vocabulary_sessions WHERE book_id = ?1",
+            params![book_id],
+            |row| row.get(0),
+        )
+        .optional()?
+        .ok_or_else(|| DbError::Message("当前没有生词复习会话".to_string()))?;
+    let mut payload: Value = serde_json::from_str(&raw)?;
+    let has_answer = payload.get("answer").and_then(Value::as_str).is_some();
+    if let Some(object) = payload.as_object_mut() {
+        object.insert("active".to_string(), json!(false));
+        object.insert("revealed".to_string(), json!(has_answer));
+    }
+    save_vocabulary_session(&connection, &book_id, &payload)?;
+    session_snapshot(&connection, &book_id, payload)
 }
 
 pub fn check_in(state: &DbState, date: &str) -> Result<AppSnapshot, DbError> {
@@ -989,6 +1339,14 @@ pub fn delete_book(state: &DbState, book_id: &str) -> Result<AppSnapshot, DbErro
         )
         .optional()?
         .ok_or_else(|| DbError::Message("词书不存在".to_string()))?;
+    transaction.execute(
+        "DELETE FROM vocabulary_sessions WHERE book_id = ?1",
+        params![book_id],
+    )?;
+    transaction.execute(
+        "DELETE FROM vocabulary_words WHERE book_id = ?1",
+        params![book_id],
+    )?;
     let deleted = transaction.execute("DELETE FROM books WHERE id = ?1", params![book_id])?;
     if deleted == 0 {
         return Err(DbError::Message("词书不存在".to_string()));
@@ -1719,6 +2077,168 @@ fn save_session(connection: &Connection, book_id: &str, payload: &Value) -> Resu
     Ok(())
 }
 
+fn save_vocabulary_session(
+    connection: &Connection,
+    book_id: &str,
+    payload: &Value,
+) -> Result<(), DbError> {
+    connection.execute("INSERT INTO vocabulary_sessions(book_id, payload_json, updated_at) VALUES(?1, ?2, ?3) ON CONFLICT(book_id) DO UPDATE SET payload_json = excluded.payload_json, updated_at = excluded.updated_at", params![book_id, payload.to_string(), now()])?;
+    Ok(())
+}
+
+fn load_vocabulary_words(
+    connection: &Connection,
+    book_id: &str,
+) -> Result<Vec<VocabularyWord>, DbError> {
+    let mut statement = connection.prepare(
+        "SELECT w.legacy_id, w.word, w.chapter, w.phonetic, w.part, w.meaning, w.definition, w.example, w.translation, w.tag, w.senses_json, v.added_at FROM vocabulary_words v JOIN words w ON w.book_id = v.book_id AND w.legacy_id = v.word_key WHERE v.book_id = ?1 ORDER BY v.added_at DESC, w.order_index",
+    )?;
+    let rows = statement.query_map(params![book_id], |row| {
+        Ok(VocabularyWord {
+            word: StudyWord {
+                key: row.get(0)?,
+                word: row.get(1)?,
+                chapter: row.get(2)?,
+                phonetic: row.get(3)?,
+                part: row.get(4)?,
+                meaning: row.get(5)?,
+                definition: row.get(6)?,
+                example: row.get(7)?,
+                translation: row.get(8)?,
+                tag: row.get(9)?,
+                senses: parse_senses(&row.get::<_, String>(10)?),
+            },
+            added_at: row.get(11)?,
+        })
+    })?;
+    rows.collect::<Result<Vec<_>, _>>().map_err(DbError::from)
+}
+
+fn vocabulary_contains(
+    connection: &Connection,
+    book_id: &str,
+    word_key: &str,
+) -> Result<bool, DbError> {
+    Ok(connection
+        .query_row(
+            "SELECT 1 FROM vocabulary_words WHERE book_id = ?1 AND word_key = ?2",
+            params![book_id, word_key],
+            |_| Ok(true),
+        )
+        .optional()?
+        .unwrap_or(false))
+}
+
+fn filter_vocabulary_queue(
+    connection: &Connection,
+    book_id: &str,
+    payload: &mut Value,
+) -> Result<(), DbError> {
+    let original_current = payload
+        .get("queue")
+        .and_then(Value::as_array)
+        .and_then(|queue| queue.first())
+        .and_then(Value::as_str)
+        .map(ToString::to_string);
+    if let Some(queue) = payload.get_mut("queue").and_then(Value::as_array_mut) {
+        let mut retained = Vec::with_capacity(queue.len());
+        for item in queue.drain(..) {
+            if let Some(key) = item.as_str() {
+                if vocabulary_contains(connection, book_id, key)? {
+                    retained.push(item);
+                }
+            }
+        }
+        *queue = retained;
+    }
+    let current = payload
+        .get("queue")
+        .and_then(Value::as_array)
+        .and_then(|queue| queue.first())
+        .and_then(Value::as_str);
+    if original_current.as_deref() != current {
+        if let Some(object) = payload.as_object_mut() {
+            object.insert("answer".to_string(), Value::Null);
+            object.insert("revealed".to_string(), json!(false));
+            object.insert("previousProgress".to_string(), Value::Null);
+        }
+    }
+    Ok(())
+}
+
+fn remove_word_from_vocabulary_session(
+    connection: &Connection,
+    book_id: &str,
+    word_key: &str,
+) -> Result<(), DbError> {
+    let raw: Option<String> = connection
+        .query_row(
+            "SELECT payload_json FROM vocabulary_sessions WHERE book_id = ?1",
+            params![book_id],
+            |row| row.get(0),
+        )
+        .optional()?;
+    let Some(raw) = raw else {
+        return Ok(());
+    };
+    let mut payload: Value = serde_json::from_str(&raw)?;
+    let was_current = payload
+        .get("queue")
+        .and_then(Value::as_array)
+        .and_then(|queue| queue.first())
+        .and_then(Value::as_str)
+        == Some(word_key);
+    let empty = if let Some(queue) = payload.get_mut("queue").and_then(Value::as_array_mut) {
+        queue.retain(|item| item.as_str() != Some(word_key));
+        queue.is_empty()
+    } else {
+        true
+    };
+    if let Some(object) = payload.as_object_mut() {
+        object.insert("active".to_string(), json!(!empty));
+        object.insert("completed".to_string(), json!(empty));
+        if was_current {
+            object.insert("answer".to_string(), Value::Null);
+            object.insert("revealed".to_string(), json!(false));
+            object.insert("previousProgress".to_string(), Value::Null);
+        }
+    }
+    save_vocabulary_session(connection, book_id, &payload)
+}
+
+fn restore_previous_progress(
+    connection: &Connection,
+    book_id: &str,
+    word_key: &str,
+    previous_progress: Option<&Value>,
+) -> Result<(), DbError> {
+    match previous_progress {
+        Some(Value::Object(previous)) => {
+            connection.execute(
+                "INSERT INTO progress(book_id, word_key, status, last_studied_at, due_at, times_seen, correct_count, incorrect_count, extra_json) VALUES(?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9) ON CONFLICT(book_id, word_key) DO UPDATE SET status = excluded.status, last_studied_at = excluded.last_studied_at, due_at = excluded.due_at, times_seen = excluded.times_seen, correct_count = excluded.correct_count, incorrect_count = excluded.incorrect_count, extra_json = excluded.extra_json",
+                params![
+                    book_id,
+                    word_key,
+                    previous.get("status").and_then(Value::as_str).unwrap_or("new"),
+                    previous.get("lastStudiedAt").and_then(Value::as_str),
+                    previous.get("dueAt").and_then(Value::as_str),
+                    previous.get("timesSeen").and_then(Value::as_i64).unwrap_or(0),
+                    previous.get("correctCount").and_then(Value::as_i64).unwrap_or(0),
+                    previous.get("incorrectCount").and_then(Value::as_i64).unwrap_or(0),
+                    previous.get("extraJson").and_then(Value::as_str).unwrap_or("{}"),
+                ],
+            )?;
+        }
+        _ => {
+            connection.execute(
+                "DELETE FROM progress WHERE book_id = ?1 AND word_key = ?2",
+                params![book_id, word_key],
+            )?;
+        }
+    }
+    Ok(())
+}
+
 fn session_snapshot(
     connection: &Connection,
     book_id: &str,
@@ -2012,6 +2532,8 @@ fn backup_payload(connection: &Connection) -> Result<Value, DbError> {
         "scheduleDays": query_rows(connection, "SELECT book_id, day_index, date, study_chapters_json, review_chapters_json, payload_json FROM schedule_days ORDER BY book_id, day_index", &["bookId", "dayIndex", "date", "studyChaptersJson", "reviewChaptersJson", "payloadJson"] )?,
         "studyHistory": query_rows(connection, "SELECT book_id, date, payload_json FROM study_history ORDER BY book_id, date", &["bookId", "date", "payloadJson"] )?,
         "studySessions": query_rows(connection, "SELECT book_id, payload_json, updated_at FROM study_sessions ORDER BY book_id", &["bookId", "payloadJson", "updatedAt"] )?,
+        "vocabularyWords": query_rows(connection, "SELECT book_id, word_key, added_at FROM vocabulary_words ORDER BY book_id, added_at DESC", &["bookId", "wordKey", "addedAt"] )?,
+        "vocabularySessions": query_rows(connection, "SELECT book_id, payload_json, updated_at FROM vocabulary_sessions ORDER BY book_id", &["bookId", "payloadJson", "updatedAt"] )?,
     }))
 }
 
@@ -2651,6 +3173,194 @@ mod tests {
         assert_eq!(value_i64(&payload, "studiedCount"), Some(2));
 
         drop(connection);
+        remove_test_db(&path);
+    }
+
+    #[test]
+    fn vocabulary_membership_is_idempotent_recent_first_and_book_scoped() {
+        let (path, state) = new_test_state("jian-ci-vocabulary-membership-test");
+        let connection = Connection::open(&state.path).unwrap();
+        connection.execute("INSERT INTO words(book_id, legacy_id, chapter, word, order_index) VALUES('empty-book', '1', 'List 01', 'one', 0), ('empty-book', '2', 'List 02', 'two', 1)", []).unwrap();
+        connection.execute("INSERT INTO books(id, name, note, created_at, updated_at, active) VALUES('other-book', 'Other', '', ?1, ?1, 0)", params![now()]).unwrap();
+        connection.execute("INSERT INTO words(book_id, legacy_id, chapter, word, order_index) VALUES('other-book', '1', 'Other', 'another', 0)", []).unwrap();
+        drop(connection);
+
+        set_vocabulary_word(&state, "1", true).unwrap();
+        set_vocabulary_word(&state, "1", true).unwrap();
+        set_vocabulary_word(&state, "2", true).unwrap();
+        let connection = Connection::open(&state.path).unwrap();
+        connection.execute("UPDATE vocabulary_words SET added_at = CASE word_key WHEN '1' THEN '2026-01-01T00:00:00Z' ELSE '2026-01-02T00:00:00Z' END WHERE book_id = 'empty-book'", []).unwrap();
+        drop(connection);
+        let words = get_vocabulary_words(&state).unwrap();
+        assert_eq!(words.len(), 2);
+        assert_eq!(words[0].word.key, "2");
+
+        set_active_book(&state, "other-book").unwrap();
+        assert!(get_vocabulary_words(&state).unwrap().is_empty());
+        set_vocabulary_word(&state, "1", true).unwrap();
+        assert_eq!(
+            get_vocabulary_words(&state).unwrap()[0].word.word,
+            "another"
+        );
+        set_active_book(&state, "empty-book").unwrap();
+        assert_eq!(get_vocabulary_words(&state).unwrap().len(), 2);
+
+        remove_test_db(&path);
+    }
+
+    #[test]
+    fn vocabulary_review_retries_resumes_undoes_and_skips_daily_history() {
+        let (path, state) = new_test_state("jian-ci-vocabulary-review-test");
+        let connection = Connection::open(&state.path).unwrap();
+        connection.execute("INSERT INTO words(book_id, legacy_id, chapter, word, order_index) VALUES('empty-book', '1', 'List 01', 'one', 0), ('empty-book', '2', 'List 01', 'two', 1), ('empty-book', '3', 'List 02', 'three', 2)", []).unwrap();
+        drop(connection);
+        for key in ["1", "2", "3"] {
+            set_vocabulary_word(&state, key, true).unwrap();
+        }
+        let daily_before = load_snapshot(&state).unwrap().today;
+
+        let started = start_vocabulary_study(&state).unwrap();
+        assert_eq!(started.mode, "vocabulary");
+        assert_eq!(started.remaining_count, 3);
+        let first_key = started.current.unwrap().key;
+        let connection = Connection::open(&state.path).unwrap();
+        let raw: String = connection
+            .query_row(
+                "SELECT payload_json FROM vocabulary_sessions WHERE book_id = 'empty-book'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        let payload: Value = serde_json::from_str(&raw).unwrap();
+        let mut queued = payload
+            .get("queue")
+            .and_then(Value::as_array)
+            .unwrap()
+            .iter()
+            .filter_map(Value::as_str)
+            .collect::<Vec<_>>();
+        queued.sort_unstable();
+        assert_eq!(queued, vec!["1", "2", "3"]);
+        drop(connection);
+
+        let answered = answer_vocabulary_word(&state, &first_key, false).unwrap();
+        assert_eq!(answered.answer.as_deref(), Some("unknown"));
+        assert_eq!(load_snapshot(&state).unwrap().today.studied_count, 0);
+        let undone = undo_vocabulary_answer(&state).unwrap();
+        assert!(undone.answer.is_none());
+        let connection = Connection::open(&state.path).unwrap();
+        let progress_count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM progress WHERE book_id = 'empty-book' AND word_key = ?1",
+                params![first_key],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(progress_count, 0);
+        drop(connection);
+
+        answer_vocabulary_word(&state, &first_key, false).unwrap();
+        let after_unknown = next_vocabulary_word(&state).unwrap();
+        assert_eq!(after_unknown.remaining_count, 3);
+        assert_ne!(after_unknown.current.as_ref().unwrap().key, first_key);
+        leave_vocabulary_study(&state).unwrap();
+        let resumed = start_vocabulary_study(&state).unwrap();
+        assert_eq!(
+            resumed.current.unwrap().key,
+            after_unknown.current.unwrap().key
+        );
+        assert_eq!(get_vocabulary_words(&state).unwrap().len(), 3);
+        let daily_after = load_snapshot(&state).unwrap().today;
+        assert_eq!(daily_after.studied_count, daily_before.studied_count);
+        assert_eq!(daily_after.review_count, daily_before.review_count);
+        assert_eq!(daily_after.target_count, daily_before.target_count);
+        assert_eq!(daily_after.checked_in, daily_before.checked_in);
+        let connection = Connection::open(&state.path).unwrap();
+        let status: String = connection
+            .query_row(
+                "SELECT status FROM progress WHERE book_id = 'empty-book' AND word_key = ?1",
+                params![first_key],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(status, "review");
+        drop(connection);
+
+        remove_test_db(&path);
+    }
+
+    #[test]
+    fn vocabulary_session_removal_is_immediate_and_new_words_wait_for_next_round() {
+        let (path, state) = new_test_state("jian-ci-vocabulary-session-membership-test");
+        let connection = Connection::open(&state.path).unwrap();
+        connection.execute("INSERT INTO words(book_id, legacy_id, chapter, word, order_index) VALUES('empty-book', '1', 'List 01', 'one', 0), ('empty-book', '2', 'List 01', 'two', 1), ('empty-book', '3', 'List 01', 'three', 2)", []).unwrap();
+        drop(connection);
+        set_vocabulary_word(&state, "1", true).unwrap();
+        set_vocabulary_word(&state, "2", true).unwrap();
+        let started = start_vocabulary_study(&state).unwrap();
+        let removed_key = started.current.unwrap().key;
+        set_vocabulary_word(&state, &removed_key, false).unwrap();
+        set_vocabulary_word(&state, "3", true).unwrap();
+        let resumed = start_vocabulary_study(&state).unwrap();
+        assert_eq!(resumed.remaining_count, 1);
+        assert_ne!(resumed.current.as_ref().unwrap().key, removed_key);
+        assert_ne!(resumed.current.as_ref().unwrap().key, "3");
+
+        let remaining_key = resumed.current.unwrap().key;
+        answer_vocabulary_word(&state, &remaining_key, true).unwrap();
+        assert!(next_vocabulary_word(&state).unwrap().completed);
+        let next_round = start_vocabulary_study(&state).unwrap();
+        let connection = Connection::open(&state.path).unwrap();
+        let raw: String = connection
+            .query_row(
+                "SELECT payload_json FROM vocabulary_sessions WHERE book_id = 'empty-book'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        let payload: Value = serde_json::from_str(&raw).unwrap();
+        let mut queued = payload
+            .get("queue")
+            .and_then(Value::as_array)
+            .unwrap()
+            .iter()
+            .filter_map(Value::as_str)
+            .collect::<Vec<_>>();
+        queued.sort_unstable();
+        assert_eq!(queued, vec![remaining_key.as_str(), "3"]);
+        assert_eq!(next_round.remaining_count, 2);
+        drop(connection);
+
+        remove_test_db(&path);
+    }
+
+    #[test]
+    fn deleting_book_explicitly_cleans_vocabulary_data() {
+        let (path, state) = new_test_state("jian-ci-vocabulary-delete-test");
+        let connection = Connection::open(&state.path).unwrap();
+        connection.execute("INSERT INTO words(book_id, legacy_id, chapter, word, order_index) VALUES('empty-book', '1', 'List 01', 'one', 0)", []).unwrap();
+        drop(connection);
+        set_vocabulary_word(&state, "1", true).unwrap();
+        start_vocabulary_study(&state).unwrap();
+        delete_book(&state, "empty-book").unwrap();
+        let connection = Connection::open(&state.path).unwrap();
+        let words: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM vocabulary_words WHERE book_id = 'empty-book'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        let sessions: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM vocabulary_sessions WHERE book_id = 'empty-book'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!((words, sessions), (0, 0));
+        drop(connection);
+
         remove_test_db(&path);
     }
 }

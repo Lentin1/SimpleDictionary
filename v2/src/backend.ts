@@ -8,6 +8,7 @@ import type {
   ScheduleDayInput,
   StudySessionSnapshot,
   StudyWord,
+  VocabularyWord,
 } from "./types";
 
 export function loadSnapshot() {
@@ -20,6 +21,14 @@ export function setActiveBook(bookId: string) {
 
 export function getBookWords(bookId: string) {
   return invoke<BookWord[]>("get_book_words", { bookId });
+}
+
+export function getVocabularyWords() {
+  return invoke<VocabularyWord[]>("get_vocabulary_words");
+}
+
+export function setVocabularyWord(wordKey: string, saved: boolean) {
+  return invoke<VocabularyWord[]>("set_vocabulary_word", { wordKey, saved });
 }
 
 export function getBackupJson() {
@@ -80,4 +89,24 @@ export function undoAnswer() {
 
 export function leaveStudy() {
   return invoke<StudySessionSnapshot>("leave_study");
+}
+
+export function startVocabularyStudy() {
+  return invoke<StudySessionSnapshot>("start_vocabulary_study");
+}
+
+export function answerVocabularyWord(wordKey: string, known: boolean) {
+  return invoke<StudySessionSnapshot>("answer_vocabulary_word", { wordKey, known });
+}
+
+export function nextVocabularyWord() {
+  return invoke<StudySessionSnapshot>("next_vocabulary_word");
+}
+
+export function undoVocabularyAnswer() {
+  return invoke<StudySessionSnapshot>("undo_vocabulary_answer");
+}
+
+export function leaveVocabularyStudy() {
+  return invoke<StudySessionSnapshot>("leave_vocabulary_study");
 }

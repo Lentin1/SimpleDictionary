@@ -2,7 +2,7 @@ mod db;
 
 use db::{
     AppSnapshot, DbState, ImportWordInput, LlmAskInput, LlmSettings, ScheduleDayInput,
-    ScheduleDaySnapshot, StudySessionSnapshot,
+    ScheduleDaySnapshot, StudySessionSnapshot, VocabularyWord,
 };
 use tauri::Manager;
 
@@ -30,6 +30,20 @@ fn get_book_words(
     state: tauri::State<'_, DbState>,
 ) -> Result<Vec<db::StudyWord>, String> {
     db::get_book_words(&state, &book_id).map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+fn get_vocabulary_words(state: tauri::State<'_, DbState>) -> Result<Vec<VocabularyWord>, String> {
+    db::get_vocabulary_words(&state).map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+fn set_vocabulary_word(
+    word_key: String,
+    saved: bool,
+    state: tauri::State<'_, DbState>,
+) -> Result<Vec<VocabularyWord>, String> {
+    db::set_vocabulary_word(&state, &word_key, saved).map_err(|error| error.to_string())
 }
 
 #[tauri::command]
@@ -107,6 +121,41 @@ fn leave_study(state: tauri::State<'_, DbState>) -> Result<StudySessionSnapshot,
 }
 
 #[tauri::command]
+fn start_vocabulary_study(
+    state: tauri::State<'_, DbState>,
+) -> Result<StudySessionSnapshot, String> {
+    db::start_vocabulary_study(&state).map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+fn answer_vocabulary_word(
+    word_key: String,
+    known: bool,
+    state: tauri::State<'_, DbState>,
+) -> Result<StudySessionSnapshot, String> {
+    db::answer_vocabulary_word(&state, &word_key, known).map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+fn undo_vocabulary_answer(
+    state: tauri::State<'_, DbState>,
+) -> Result<StudySessionSnapshot, String> {
+    db::undo_vocabulary_answer(&state).map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+fn next_vocabulary_word(state: tauri::State<'_, DbState>) -> Result<StudySessionSnapshot, String> {
+    db::next_vocabulary_word(&state).map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+fn leave_vocabulary_study(
+    state: tauri::State<'_, DbState>,
+) -> Result<StudySessionSnapshot, String> {
+    db::leave_vocabulary_study(&state).map_err(|error| error.to_string())
+}
+
+#[tauri::command]
 fn rename_book(
     book_id: String,
     name: String,
@@ -161,6 +210,8 @@ pub fn run() {
             set_active_book,
             get_backup_json,
             get_book_words,
+            get_vocabulary_words,
+            set_vocabulary_word,
             check_in,
             create_snapshot,
             get_llm_settings,
@@ -171,6 +222,11 @@ pub fn run() {
             undo_answer,
             next_word,
             leave_study,
+            start_vocabulary_study,
+            answer_vocabulary_word,
+            undo_vocabulary_answer,
+            next_vocabulary_word,
+            leave_vocabulary_study,
             rename_book,
             delete_book,
             import_book,
