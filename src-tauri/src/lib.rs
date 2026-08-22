@@ -1,10 +1,11 @@
 mod db;
 
 use db::{
-    AppSnapshot, DbState, ImportWordInput, LlmAskInput, LlmSettings, ScheduleDayInput,
-    ScheduleDaySnapshot, StudySessionSnapshot, VocabularyWord,
+    AppSnapshot, DbState, ImportWordInput, LlmAskInput, LlmSettings, PronunciationAudio,
+    PronunciationSettings, ProofreadIssue, ScheduleDayInput, ScheduleDaySnapshot,
+    StudySessionSnapshot, VocabularyWord,
 };
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 
 #[tauri::command]
 fn get_app_snapshot(state: tauri::State<'_, DbState>) -> Result<AppSnapshot, String> {
@@ -72,6 +73,38 @@ fn save_llm_settings(
 }
 
 #[tauri::command]
+fn get_pronunciation_settings(
+    state: tauri::State<'_, DbState>,
+) -> Result<PronunciationSettings, String> {
+    db::get_pronunciation_settings(&state).map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+fn save_pronunciation_settings(
+    enabled: bool,
+    model: String,
+    voice_id: String,
+    priority: String,
+    state: tauri::State<'_, DbState>,
+) -> Result<PronunciationSettings, String> {
+    db::save_pronunciation_settings(&state, enabled, &model, &voice_id, &priority)
+        .map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+async fn synthesize_pronunciation(
+    text: String,
+    state: tauri::State<'_, DbState>,
+) -> Result<PronunciationAudio, String> {
+    let state = state.inner().clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        db::synthesize_pronunciation(&state, &text).map_err(|error| error.to_string())
+    })
+    .await
+    .map_err(|error| format!("AI 发音线程异常：{error}"))?
+}
+
+#[tauri::command]
 async fn ask_llm(input: LlmAskInput, state: tauri::State<'_, DbState>) -> Result<String, String> {
     // curl and Keychain access are blocking operations. Keep them off Tauri's
     // main thread so macOS does not show the beachball while the model replies.
@@ -81,6 +114,41 @@ async fn ask_llm(input: LlmAskInput, state: tauri::State<'_, DbState>) -> Result
     })
     .await
     .map_err(|error| format!("AI 请求线程异常：{error}"))?
+}
+
+#[tauri::command]
+async fn proofread_book(
+    book_id: String,
+    state: tauri::State<'_, DbState>,
+    app: tauri::AppHandle,
+) -> Result<Vec<ProofreadIssue>, String> {
+    let state = state.inner().clone();
+    let event_book_id = book_id.clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        db::proofread_book(&state, &book_id, |completed, total, issues_found| {
+            let _ = app.emit(
+                "proofread-progress",
+                serde_json::json!({
+                    "bookId": event_book_id,
+                    "completed": completed,
+                    "total": total,
+                    "issuesFound": issues_found,
+                }),
+            );
+        })
+        .map_err(|error| error.to_string())
+    })
+    .await
+    .map_err(|error| format!("AI 校对线程异常：{error}"))?
+}
+
+#[tauri::command]
+fn apply_book_proofread(
+    book_id: String,
+    changes: Vec<ProofreadIssue>,
+    state: tauri::State<'_, DbState>,
+) -> Result<AppSnapshot, String> {
+    db::apply_book_proofread(&state, &book_id, changes).map_err(|error| error.to_string())
 }
 
 #[tauri::command]
@@ -216,7 +284,12 @@ pub fn run() {
             create_snapshot,
             get_llm_settings,
             save_llm_settings,
+            get_pronunciation_settings,
+            save_pronunciation_settings,
+            synthesize_pronunciation,
             ask_llm,
+            proofread_book,
+            apply_book_proofread,
             start_study,
             answer_word,
             undo_answer,

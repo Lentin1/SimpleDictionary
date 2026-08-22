@@ -56,9 +56,42 @@ export type LlmSettings = {
   configured: boolean;
 };
 
+export type PronunciationPriority = "ai-first" | "system-first";
+
+export type PronunciationSettings = {
+  enabled: boolean;
+  model: string;
+  voiceId: string;
+  priority: PronunciationPriority;
+};
+
+export type PronunciationAudio = {
+  audioHex: string;
+  mimeType: string;
+};
+
 export type LlmMessage = {
   role: "user" | "assistant";
   content: string;
+};
+
+export type ProofreadIssue = {
+  key: string;
+  originalWord: string;
+  correctedWord: string;
+  originalPart: string;
+  correctedPart: string;
+  originalMeaning: string;
+  correctedMeaning: string;
+  category: string;
+  reason: string;
+};
+
+export type ProofreadProgress = {
+  bookId: string;
+  completed: number;
+  total: number;
+  issuesFound: number;
 };
 
 export type StudySense = {

@@ -154,6 +154,21 @@ async function requestLlm(body) {
   );
 }
 
+async function requestPronunciation(body) {
+  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
+  workerUrl.searchParams.set("pronunciation-test", `${process.pid}-${Date.now()}-${Math.random()}`);
+  const { default: worker } = await import(workerUrl.href);
+  return worker.fetch(
+    new Request("http://localhost/api/pronunciation-demo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }),
+    { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
+    { waitUntil() {}, passThroughOnException() {} },
+  );
+}
+
 test("server-renders the vocab learning experience", async () => {
   const response = await render();
   assert.equal(response.status, 200);
@@ -214,15 +229,29 @@ test("proxies a contextual word question to a local compatible LLM", async () =>
   }
 });
 
+test("rejects pronunciation proxy targets outside the explicit allowlist", async () => {
+  const response = await requestPronunciation({
+    endpoint: "https://127.0.0.1/internal",
+    apiKey: "not-used",
+    text: "hello",
+  });
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /只允许 TokenDance 或 MiniMax/);
+});
+
 test("keeps progress logic local and removes starter-only assets", async () => {
-  const [page, tutor, llmRoute, packageJson, v2App, v2Styles, v2Shortcuts] = await Promise.all([
+  const [page, tutor, llmRoute, pronunciationRoute, packageJson, v2App, v2Styles, v2LiquidStyles, v2Main, v2Shortcuts, rustDb] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/components/WordAiTutor.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/api/llm/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/pronunciation-demo/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
     readFile(new URL("../v2/src/app.tsx", import.meta.url), "utf8"),
     readFile(new URL("../v2/src/styles.css", import.meta.url), "utf8"),
+    readFile(new URL("../v2/src/liquid-glass.css", import.meta.url), "utf8"),
+    readFile(new URL("../v2/src/main.tsx", import.meta.url), "utf8"),
     readFile(new URL("../v2/src/shortcuts.ts", import.meta.url), "utf8"),
+    readFile(new URL("../src-tauri/src/db.rs", import.meta.url), "utf8"),
   ]);
 
   assert.match(page, /localStorage/);
@@ -238,6 +267,10 @@ test("keeps progress logic local and removes starter-only assets", async () => {
   assert.match(llmRoute, /chat\/completions/);
   assert.match(llmRoute, /只围绕当前单词回答/);
   assert.match(llmRoute, /Authorization: `Bearer \$\{apiKey\}`/);
+  assert.match(pronunciationRoute, /ALLOWED_ENDPOINT_HOSTS/);
+  assert.match(pronunciationRoute, /redirect: "error"/);
+  assert.match(pronunciationRoute, /parsed\.protocol !== "https:"/);
+  assert.doesNotMatch(pronunciationRoute, /raw\.slice/);
   assert.match(page, /serializedBookState/);
   assert.match(page, /vocab-flow-book-state-v1/);
   assert.match(page, /vocab-flow-study-history-v1/);
@@ -315,12 +348,39 @@ test("keeps progress logic local and removes starter-only assets", async () => {
   assert.match(page, /review-list-preview/);
   assert.match(page, /今日复习列表/);
   assert.match(v2App, /onStart=\{\(mode, date\) => void openStudy\(mode, date\)\}/);
+  assert.match(v2App, /onStart\("review", activeDate\)/);
+  assert.match(v2App, /onStart\("learn", activeDate\)/);
+  assert.match(v2App, /onClick=\{\(\) => onSelectDate\(item\.date\)\}/);
+  assert.doesNotMatch(v2App, /setRange\("day"\)/);
+  assert.doesNotMatch(v2App, /补做复习/);
+  assert.doesNotMatch(v2App, /补做学习/);
+  assert.match(v2App, /补上打卡/);
+  assert.doesNotMatch(v2App, /提前复习/);
+  assert.doesNotMatch(v2App, /提前学习/);
   assert.match(v2App, /onStart: \(mode: "learn" \| "review", date\?: string\) =>/);
   assert.match(v2App, /scrollIntoView\(\{ behavior: "smooth", block: "end" \}\)/);
   assert.match(v2App, /questionInputRef\.current\?\.focus\(\)/);
   assert.match(v2App, /voiceschanged/);
   assert.match(v2App, /synthesis\.resume\(\)/);
   assert.match(v2App, /speechWatchdogRef/);
+  assert.doesNotMatch(v2App, /Youdao|youdao|有道/);
+  assert.match(v2App, /AI_AUDIO_CACHE_LIMIT = 8/);
+  assert.match(v2App, /snapshot\.currentBook\?\.id/);
+  assert.match(v2App, /word\.word,/);
+  assert.match(v2App, /llmSettings\.endpoint,/);
+  assert.match(v2App, /disposeAiAudioEntry/);
+  assert.match(v2App, /audio\.preload = "auto"/);
+  assert.match(v2App, /void speakAiWord\(word, request, \(\) => speakSystemWord\(word, request\)\)/);
+  assert.match(v2App, /AI 失败时回退到现有语音/);
+  assert.match(v2App, /proofreadBook/);
+  assert.match(v2App, /proofread-progress/);
+  assert.match(v2App, /proofread-progress-bar/);
+  assert.match(v2App, /proofread-window/);
+  assert.match(v2App, /从断点继续/);
+  assert.match(v2App, /最多自动尝试 3 次/);
+  assert.match(rustDb, /MAX_PROOFREAD_ATTEMPTS: u32 = 3/);
+  assert.match(v2App, /AI 校对/);
+  assert.match(v2App, /确认应用所选修正/);
   assert.match(v2App, /maxAttempts = 4/);
   assert.match(v2App, /onCompositionStart/);
   assert.match(v2App, /jian-ci-auto-pronounce-after-answer/);
@@ -376,6 +436,30 @@ test("keeps progress logic local and removes starter-only assets", async () => {
   assert.match(v2Styles, /\.vocabulary-card \{/);
   assert.match(v2Styles, /\.bookmark-button\.saved/);
   assert.match(v2Styles, /\.sidebar-collapsed \.nav-item b/);
+  assert.match(v2Main, /liquid-glass\.css/);
+  assert.match(v2App, /dataset\.effectiveTheme/);
+  assert.match(v2App, /ai-drawer-backdrop/);
+  assert.match(v2App, /className="sidebar-toolbar"/);
+  assert.match(v2App, /aria-expanded=\{!sidebarCollapsed\}/);
+  assert.match(v2App, /className="nav-section-label">学习/);
+  assert.match(v2App, /className="nav-section-label">词汇/);
+  assert.match(v2App, /className="nav-section-label">偏好/);
+  assert.match(v2LiquidStyles, /backdrop-filter/);
+  assert.match(v2LiquidStyles, /border-right: 1px solid var\(--liquid-line\)/);
+  assert.match(v2LiquidStyles, /\.sidebar-panel-icon/);
+  assert.match(v2LiquidStyles, /prefers-reduced-motion/);
+  assert.match(v2LiquidStyles, /--cyberpunk_dark_mode-color-1:\s*#0f172a/);
+  assert.match(v2LiquidStyles, /--cyberpunk_dark_mode-color-2:\s*#1e293b/);
+  assert.match(v2LiquidStyles, /--cyberpunk_dark_mode-color-3:\s*#38bdf8/);
+  assert.match(v2LiquidStyles, /--cyberpunk_dark_mode-color-4:\s*#c084fc/);
+  assert.match(v2LiquidStyles, /--cyberpunk_dark_mode-color-5:\s*#f472b6/);
+  assert.match(v2LiquidStyles, /\.task-card\.review \.task-icon \{ background: var\(--secondary-fill\)/);
+  assert.match(v2LiquidStyles, /\.task-card\.learn \.task-icon \{ background: var\(--accent-fill\)/);
+  assert.match(v2LiquidStyles, /\.book-card-actions \.danger-button[^}]+var\(--danger-soft\)[^}]+var\(--danger-text\)/);
+  assert.match(v2LiquidStyles, /:root\[data-effective-theme\] \.calendar-explorer-day \{[^}]+background: var\(--liquid-control\)/);
+  assert.doesNotMatch(v2LiquidStyles, /#1a2c33|#1c4e45|#285449|#55c9a5/);
+  assert.match(v2LiquidStyles, /--liquid-surface:\s*color-mix\(in srgb, var\(--cyberpunk_dark_mode-color-2\) 96%, var\(--cyberpunk_dark_mode-color-1\)\)/);
+  assert.match(v2LiquidStyles, /--liquid-glass-strong:\s*color-mix\(in srgb, var\(--cyberpunk_dark_mode-color-2\) 97%, transparent\)/);
   assert.doesNotMatch(page, /multiple size=\{3\}/);
   assert.doesNotMatch(page, /按住 Command 可多选/);
   assert.doesNotMatch(page, /<span className="nav-badge muted">\{customWords\.length\}<\/span>/);

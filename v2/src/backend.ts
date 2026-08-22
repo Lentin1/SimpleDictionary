@@ -5,6 +5,9 @@ import type {
   ImportWordInput,
   LlmMessage,
   LlmSettings,
+  PronunciationAudio,
+  PronunciationSettings,
+  ProofreadIssue,
   ScheduleDayInput,
   StudySessionSnapshot,
   StudyWord,
@@ -63,12 +66,37 @@ export function saveLlmSettings(endpoint: string, model: string, apiKey: string)
   return invoke<LlmSettings>("save_llm_settings", { endpoint, model, apiKey });
 }
 
+export function loadPronunciationSettings() {
+  return invoke<PronunciationSettings>("get_pronunciation_settings");
+}
+
+export function savePronunciationSettings(settings: PronunciationSettings) {
+  return invoke<PronunciationSettings>("save_pronunciation_settings", {
+    enabled: settings.enabled,
+    model: settings.model,
+    voiceId: settings.voiceId,
+    priority: settings.priority,
+  });
+}
+
+export function synthesizePronunciation(text: string) {
+  return invoke<PronunciationAudio>("synthesize_pronunciation", { text });
+}
+
 export function askLlm(
   word: StudyWord & { key: string },
   answer: StudySessionSnapshot["answer"],
   messages: LlmMessage[],
 ) {
   return invoke<string>("ask_llm", { input: { word, answer, messages } });
+}
+
+export function proofreadBook(bookId: string) {
+  return invoke<ProofreadIssue[]>("proofread_book", { bookId });
+}
+
+export function applyBookProofread(bookId: string, changes: ProofreadIssue[]) {
+  return invoke<AppSnapshot>("apply_book_proofread", { bookId, changes });
 }
 
 export function startStudy(mode: "learn" | "review", date?: string) {

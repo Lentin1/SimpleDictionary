@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { answerVocabularyWord, answerWord, askLlm, checkIn, deleteBook, getBackupJson, getBookWords, getVocabularyWords, importBook, leaveStudy, leaveVocabularyStudy, loadLlmSettings, loadSnapshot, nextVocabularyWord, nextWord, renameBook, saveLlmSettings, saveSchedule, setActiveBook, setVocabularyWord, startStudy, startVocabularyStudy, undoAnswer, undoVocabularyAnswer } from "./backend";
-import type { AppSnapshot, BookWord, ImportWordInput, LlmMessage, LlmSettings, ScheduleDayInput, StudySessionSnapshot, View, VocabularyWord } from "./types";
+import { listen } from "@tauri-apps/api/event";
+import { answerVocabularyWord, answerWord, applyBookProofread, askLlm, checkIn, deleteBook, getBackupJson, getBookWords, getVocabularyWords, importBook, leaveStudy, leaveVocabularyStudy, loadLlmSettings, loadPronunciationSettings, loadSnapshot, nextVocabularyWord, nextWord, proofreadBook, renameBook, saveLlmSettings, savePronunciationSettings as savePronunciationSettingsCommand, saveSchedule, setActiveBook, setVocabularyWord, startStudy, startVocabularyStudy, synthesizePronunciation, undoAnswer, undoVocabularyAnswer } from "./backend";
+import type { AppSnapshot, BookWord, ImportWordInput, LlmMessage, LlmSettings, PronunciationAudio, PronunciationPriority, PronunciationSettings, ProofreadIssue, ProofreadProgress, ScheduleDayInput, StudySessionSnapshot, View, VocabularyWord } from "./types";
 import { parsePdfImport } from "../../lib/pdf-import";
 import { shouldSubmitAiQuestion } from "./ai-input";
 import { selectPronunciationVoice } from "./speech-voice";
@@ -10,8 +11,16 @@ import type { ShortcutAction, ShortcutBinding, ShortcutBindings } from "./shortc
 
 type ThemeMode = "system" | "light" | "dark";
 type StudyWord = NonNullable<StudySessionSnapshot["current"]>;
+type AiAudioEntry = { audio: HTMLAudioElement; url: string };
+type ProofreadState = {
+  book: AppSnapshot["books"][number];
+  loading: boolean;
+  issues: ProofreadIssue[];
+  error?: string;
+};
 
 const AUTO_PRONOUNCE_STORAGE_KEY = "jian-ci-auto-pronounce-after-answer";
+const AI_AUDIO_CACHE_LIMIT = 8;
 
 const AI_SUGGESTIONS = [
   {
@@ -51,6 +60,17 @@ const initialSnapshot: AppSnapshot = {
 };
 
 const emptyLlmSettings: LlmSettings = { endpoint: "", model: "", configured: false };
+const defaultPronunciationSettings: PronunciationSettings = { enabled: true, model: "minimax-speech-2.8-turbo", voiceId: "English_PlayfulGirl", priority: "ai-first" };
+
+function disposeAiAudioEntry({ audio, url }: AiAudioEntry) {
+  audio.onplay = null;
+  audio.onended = null;
+  audio.onerror = null;
+  audio.pause();
+  audio.removeAttribute("src");
+  audio.load();
+  URL.revokeObjectURL(url);
+}
 
 function formatDate(date: string) {
   if (!date) return "今天";
@@ -70,15 +90,20 @@ function progress(snapshot: AppSnapshot) {
 export function App() {
   const [snapshot, setSnapshot] = useState(initialSnapshot);
   const [view, setView] = useState<View>("today");
-  const [loading, setLoading] = useState(true);
   const [aiOpen, setAiOpen] = useState(false);
   const [llmSettings, setLlmSettings] = useState(emptyLlmSettings);
   const [llmSettingsLoaded, setLlmSettingsLoaded] = useState(false);
+  const [pronunciationSettings, setPronunciationSettings] = useState(defaultPronunciationSettings);
+  const [pronunciationSettingsLoaded, setPronunciationSettingsLoaded] = useState(false);
   const [aiConversation, setAiConversation] = useState<{ wordKey: string; messages: LlmMessage[] } | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [studySession, setStudySession] = useState<StudySessionSnapshot | null>(null);
   const [vocabularyWords, setVocabularyWords] = useState<VocabularyWord[]>([]);
   const [bookPreview, setBookPreview] = useState<{ book: AppSnapshot["books"][number]; words: BookWord[] } | null>(null);
+  const [proofreadState, setProofreadState] = useState<ProofreadState | null>(null);
+  const [proofreadProgress, setProofreadProgress] = useState<ProofreadProgress | null>(null);
+  const [proofreadCollapsed, setProofreadCollapsed] = useState(false);
+  const [proofreadWindowSize, setProofreadWindowSize] = useState<"compact" | "large">("compact");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
       return window.localStorage.getItem("jian-ci-sidebar") === "collapsed";
@@ -103,17 +128,36 @@ export function App() {
   });
   const [shortcuts, setShortcuts] = useState<ShortcutBindings>(() => loadShortcutBindings());
   const [speakingWordKey, setSpeakingWordKey] = useState<string | null>(null);
+  const [pronunciationStatus, setPronunciationStatus] = useState<{ wordKey: string; kind: "fallback"; message: string } | null>(null);
   const [systemDark, setSystemDark] = useState(() => window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ?? false);
   const speechTimerRef = useRef<number | null>(null);
   const speechWatchdogRef = useRef<number | null>(null);
   const speechAttemptRef = useRef(0);
   const speechRequestRef = useRef(0);
   const speechVoicesRef = useRef<SpeechSynthesisVoice[]>([]);
+  const aiAudioRef = useRef<HTMLAudioElement | null>(null);
+  const aiAudioCacheRef = useRef(new Map<string, AiAudioEntry>());
+  const aiAudioPendingRef = useRef(new Map<string, Promise<AiAudioEntry>>());
+
+  const clearAiAudio = useCallback(() => {
+    const audio = aiAudioRef.current;
+    if (!audio) return;
+    audio.onplay = null;
+    audio.onended = null;
+    audio.onerror = null;
+    audio.pause();
+    audio.currentTime = 0;
+    aiAudioRef.current = null;
+  }, []);
+
+  const clearAiAudioCache = useCallback(() => {
+    clearAiAudio();
+    for (const entry of aiAudioCacheRef.current.values()) disposeAiAudioEntry(entry);
+    aiAudioCacheRef.current.clear();
+  }, [clearAiAudio]);
 
   useEffect(() => {
-    loadSnapshot()
-      .then(setSnapshot)
-      .finally(() => setLoading(false));
+    loadSnapshot().then(setSnapshot);
     getVocabularyWords()
       .then(setVocabularyWords)
       .catch(() => setVocabularyWords([]));
@@ -121,6 +165,25 @@ export function App() {
       .then(setLlmSettings)
       .catch(() => setLlmSettings(emptyLlmSettings))
       .finally(() => setLlmSettingsLoaded(true));
+    loadPronunciationSettings()
+      .then(setPronunciationSettings)
+      .catch(() => setPronunciationSettings(defaultPronunciationSettings))
+      .finally(() => setPronunciationSettingsLoaded(true));
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    let unlisten: (() => void) | undefined;
+    void listen<ProofreadProgress>("proofread-progress", (event) => {
+      if (active) setProofreadProgress(event.payload);
+    }).then((cleanup) => {
+      if (active) unlisten = cleanup;
+      else cleanup();
+    });
+    return () => {
+      active = false;
+      unlisten?.();
+    };
   }, []);
 
   useEffect(() => {
@@ -172,6 +235,7 @@ export function App() {
 
   useEffect(() => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
+    clearAiAudio();
     speechRequestRef.current += 1;
     if (speechTimerRef.current !== null) {
       window.clearTimeout(speechTimerRef.current);
@@ -181,22 +245,29 @@ export function App() {
       window.clearTimeout(speechWatchdogRef.current);
       speechWatchdogRef.current = null;
     }
-  }, [studySession?.current?.key, view]);
+  }, [clearAiAudio, studySession?.current?.key, view]);
 
   useEffect(() => () => {
     speechRequestRef.current += 1;
     if (speechTimerRef.current !== null) window.clearTimeout(speechTimerRef.current);
     if (speechWatchdogRef.current !== null) window.clearTimeout(speechWatchdogRef.current);
     if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
-  }, []);
+    clearAiAudioCache();
+  }, [clearAiAudioCache]);
 
   const percent = progress(snapshot);
   const effectiveTheme = theme === "system" ? (systemDark ? "dark" : "light") : theme;
 
-  const speakWord = useCallback((word: StudyWord) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") return;
+  useEffect(() => {
+    document.documentElement.dataset.effectiveTheme = effectiveTheme;
+  }, [effectiveTheme]);
+
+  const speakSystemWord = useCallback((word: StudyWord, request: number) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
+      setSpeakingWordKey((current) => current === word.key ? null : current);
+      return;
+    }
     const synthesis = window.speechSynthesis;
-    const request = ++speechRequestRef.current;
     if (speechTimerRef.current !== null) window.clearTimeout(speechTimerRef.current);
     if (speechWatchdogRef.current !== null) window.clearTimeout(speechWatchdogRef.current);
     synthesis.cancel();
@@ -276,6 +347,111 @@ export function App() {
     }, 40);
   }, []);
 
+  const preloadAiAudio = useCallback((word: StudyWord) => {
+    const cacheKey = JSON.stringify([
+      snapshot.currentBook?.id ?? "",
+      word.key,
+      word.word,
+      llmSettings.endpoint,
+      pronunciationSettings.model,
+      pronunciationSettings.voiceId,
+    ]);
+    const cached = aiAudioCacheRef.current.get(cacheKey);
+    if (cached) {
+      aiAudioCacheRef.current.delete(cacheKey);
+      aiAudioCacheRef.current.set(cacheKey, cached);
+      return Promise.resolve(cached);
+    }
+    const pending = aiAudioPendingRef.current.get(cacheKey);
+    if (pending) return pending;
+    const request = (async () => {
+      const result: PronunciationAudio = await synthesizePronunciation(word.word);
+      const hex = result.audioHex.trim();
+      if (!hex || hex.length % 2 !== 0 || !/^[0-9a-f]+$/i.test(hex)) throw new Error("MiniMax 音频数据无效");
+      const bytes = new Uint8Array(hex.match(/.{1,2}/g)!.map((pair) => Number.parseInt(pair, 16)));
+      const url = URL.createObjectURL(new Blob([bytes], { type: result.mimeType || "audio/mpeg" }));
+      const entry: AiAudioEntry = { audio: new Audio(url), url };
+      entry.audio.preload = "auto";
+      entry.audio.load();
+      aiAudioCacheRef.current.set(cacheKey, entry);
+      while (aiAudioCacheRef.current.size > AI_AUDIO_CACHE_LIMIT) {
+        const oldestKey = aiAudioCacheRef.current.keys().next().value as string | undefined;
+        if (!oldestKey) break;
+        const oldestEntry = aiAudioCacheRef.current.get(oldestKey);
+        aiAudioCacheRef.current.delete(oldestKey);
+        if (oldestEntry) disposeAiAudioEntry(oldestEntry);
+      }
+      return entry;
+    })();
+    aiAudioPendingRef.current.set(cacheKey, request);
+    void request.then(
+      () => { if (aiAudioPendingRef.current.get(cacheKey) === request) aiAudioPendingRef.current.delete(cacheKey); },
+      () => { if (aiAudioPendingRef.current.get(cacheKey) === request) aiAudioPendingRef.current.delete(cacheKey); },
+    );
+    return request;
+  }, [llmSettings.endpoint, pronunciationSettings.model, pronunciationSettings.voiceId, snapshot.currentBook?.id]);
+
+  useEffect(() => {
+    const word = studySession?.current;
+    const shouldPreload = view === "learn"
+      && Boolean(word)
+      && pronunciationSettings.enabled
+      && pronunciationSettings.priority === "ai-first"
+      && llmSettings.endpoint.trim().length > 0;
+    if (!shouldPreload || !word) return;
+    void preloadAiAudio(word).catch(() => {
+      // The click path will show the diagnostic and fall back to the existing voice.
+    });
+  }, [llmSettings.endpoint, preloadAiAudio, pronunciationSettings.enabled, pronunciationSettings.priority, studySession, view]);
+
+  const speakAiWord = useCallback(async (word: StudyWord, request: number, fallback: () => void) => {
+    try {
+      const entry = await preloadAiAudio(word);
+      if (request !== speechRequestRef.current) return;
+      clearAiAudio();
+      const { audio } = entry;
+      audio.currentTime = 0;
+      aiAudioRef.current = audio;
+      audio.onplay = () => {
+        if (request === speechRequestRef.current && aiAudioRef.current === audio) setSpeakingWordKey(word.key);
+      };
+      audio.onended = () => {
+        if (request !== speechRequestRef.current || aiAudioRef.current !== audio) return;
+        aiAudioRef.current = null;
+        setSpeakingWordKey((current) => current === word.key ? null : current);
+      };
+      audio.onerror = () => {
+        if (aiAudioRef.current === audio) aiAudioRef.current = null;
+        fallback();
+      };
+      setSpeakingWordKey(word.key);
+      await audio.play();
+    } catch (error) {
+      if (request === speechRequestRef.current) {
+        const message = error instanceof Error ? error.message : String(error);
+        setPronunciationStatus({ wordKey: word.key, kind: "fallback", message: `MiniMax 失败，已回退现有语音：${message}` });
+        fallback();
+      }
+    }
+  }, [clearAiAudio, preloadAiAudio]);
+
+  const speakWord = useCallback((word: StudyWord) => {
+    const request = ++speechRequestRef.current;
+    if (speechTimerRef.current !== null) window.clearTimeout(speechTimerRef.current);
+    if (speechWatchdogRef.current !== null) window.clearTimeout(speechWatchdogRef.current);
+    if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
+    clearAiAudio();
+    const aiFirst = pronunciationSettings.enabled
+      && pronunciationSettings.priority === "ai-first"
+      && llmSettings.endpoint.trim().length > 0;
+    setPronunciationStatus(null);
+    if (aiFirst) {
+      void speakAiWord(word, request, () => speakSystemWord(word, request));
+    } else {
+      speakSystemWord(word, request);
+    }
+  }, [clearAiAudio, llmSettings.endpoint, pronunciationSettings.enabled, pronunciationSettings.priority, speakAiWord, speakSystemWord]);
+
   async function chooseBook(bookId: string) {
     const next = await setActiveBook(bookId);
     setSnapshot(next);
@@ -307,10 +483,45 @@ export function App() {
     setLlmSettings(next);
   }
 
+  async function savePronunciationSettings(settings: PronunciationSettings) {
+    const next = await savePronunciationSettingsCommand(settings);
+    setPronunciationSettings(next);
+  }
+
   async function openBookPreview(bookId: string) {
     const book = snapshot.books.find((item) => item.id === bookId);
     if (!book) return;
     setBookPreview({ book, words: await getBookWords(bookId) });
+  }
+
+  async function startBookProofread(bookId: string) {
+    const book = snapshot.books.find((item) => item.id === bookId);
+    if (!book) return;
+    setProofreadCollapsed(false);
+    setProofreadProgress({ bookId, completed: 0, total: book.wordCount, issuesFound: 0 });
+    setProofreadState({ book, loading: true, issues: [] });
+    try {
+      const issues = await proofreadBook(bookId);
+      setProofreadState({ book, loading: false, issues, error: undefined });
+      setProofreadProgress(null);
+    } catch (error) {
+      setProofreadState({ book, loading: false, issues: [], error: error instanceof Error ? error.message : String(error) });
+    }
+  }
+
+  async function applyProofreadChanges(bookId: string, changes: ProofreadIssue[]) {
+    try {
+      const next = await applyBookProofread(bookId, changes);
+      setSnapshot(next);
+      if (bookPreview?.book.id === bookId) {
+        const book = next.books.find((item) => item.id === bookId);
+        if (book) setBookPreview({ book, words: await getBookWords(bookId) });
+      }
+      setProofreadState(null);
+      setProofreadProgress(null);
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : String(error));
+    }
   }
 
   async function exportBackup() {
@@ -444,87 +655,63 @@ export function App() {
   const vocabularyKeys = new Set(vocabularyWords.map((word) => word.key));
 
   return (
-    <main className={sidebarCollapsed ? "app-shell sidebar-collapsed" : "app-shell"}>
+    <main className={sidebarCollapsed ? "app-shell sidebar-collapsed" : "app-shell"} data-view={view}>
       <aside className="sidebar">
-        <div className="brand-lockup">
-          <div className="book-logo" aria-hidden="true">
-            <svg viewBox="0 0 64 64" aria-hidden="true">
-              <path d="M8 12h19c7 0 10 4 10 10v31H18c-5.5 0-10-4.5-10-10V12Z" />
-              <path d="M56 12H37c-7 0-10 4-10 10v31h19c5.5 0 10-4.5 10-10V12Z" />
-              <path className="book-logo-center" d="M32 22v31" />
-              <path className="book-logo-line" d="M14 24h13M14 33h13M37 24h13M37 33h13" />
-            </svg>
-          </div>
-          <div className="brand-copy">
+        <div className="sidebar-toolbar">
+          <div className="sidebar-title" aria-label="简辞">
             <strong>简辞</strong>
-            <small>SIMPLE DICTIONARY</small>
           </div>
           <button
             className="sidebar-toggle"
             type="button"
             aria-label={sidebarCollapsed ? "展开侧边栏" : "折叠侧边栏"}
+            aria-expanded={!sidebarCollapsed}
             title={sidebarCollapsed ? "展开侧边栏" : "折叠侧边栏"}
-            onClick={() => setSidebarCollapsed((current) => !current)}
+            onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
           >
-            <svg
-              className={sidebarCollapsed ? "sidebar-toggle-icon" : "sidebar-toggle-icon is-reversed"}
-              viewBox="0 0 22 24"
-              aria-hidden="true"
-            >
-              <path d="M5 4 14 12 5 20" />
-            </svg>
+            <SidebarPanelIcon />
           </button>
         </div>
 
         <nav className="primary-nav" aria-label="主导航">
+          <p className="nav-section-label">学习</p>
           <button className={view === "today" ? "nav-item active" : "nav-item"} onClick={() => setView("today")} title={sidebarCollapsed ? "今日学习" : undefined}>
-            <span className="nav-icon">◷</span>
+            <span className="nav-icon"><NavIcon name="today" /></span>
             <span>今日学习</span>
             <b>{snapshot.today.studiedCount} / {snapshot.today.targetCount || "—"}</b>
           </button>
+          <p className="nav-section-label">词汇</p>
           <button className={view === "books" ? "nav-item active" : "nav-item"} onClick={() => setView("books")} title={sidebarCollapsed ? "我的词书" : undefined}>
-            <span className="nav-icon">▤</span>
+            <span className="nav-icon"><NavIcon name="books" /></span>
             <span>我的词书</span>
           </button>
           <button className={view === "vocabulary" ? "nav-item active" : "nav-item"} onClick={() => setView("vocabulary")} title={sidebarCollapsed ? `生词本（${vocabularyWords.length}）` : undefined}>
-            <span className="nav-icon">◇</span>
+            <span className="nav-icon"><NavIcon name="vocabulary" /></span>
             <span>生词本</span>
             <b>{vocabularyWords.length}</b>
           </button>
+          <p className="nav-section-label">偏好</p>
           <button className={view === "settings" ? "nav-item active" : "nav-item"} onClick={() => setView("settings")} title={sidebarCollapsed ? "设置" : undefined}>
-            <span className="nav-icon" aria-hidden="true">⚙</span>
+            <span className="nav-icon"><NavIcon name="settings" /></span>
             <span>设置</span>
           </button>
         </nav>
 
-        <div className="sidebar-footer">
-          <div className="storage-chip">
-            <span className="status-dot" />
-            <span>本地 SQLite</span>
-          </div>
-          <small>离线优先 · 数据保存在本机</small>
-        </div>
       </aside>
 
-      <section className="content">
-        <header className="topbar">
+      <section className={view === "learn" ? "content learning-content" : "content"}>
+        {view === "today" && <header className="topbar">
           <div>
             <p className="eyebrow">{formatDate(snapshot.today.date)}</p>
             <h1>{timeGreeting()}</h1>
           </div>
-          <div className="topbar-meta">
-            <span className="migration-badge">{loading ? "正在打开" : "本地数据"}</span>
-            <button className="theme-button" aria-label="打开外观设置" title="打开外观设置" onClick={() => setView("settings")}>
-              {effectiveTheme === "dark" ? <SunIcon /> : <MoonIcon />}
-            </button>
-          </div>
-        </header>
+        </header>}
 
         {view === "today" && (
           <TodayPage snapshot={snapshot} percent={percent} onStart={(mode, date) => void openStudy(mode, date)} onSaveSchedule={savePlan} onCheckIn={handleCheckIn} />
         )}
         {view === "books" && (
-          <BooksPage snapshot={snapshot} onChoose={chooseBook} onRename={editBook} onDelete={removeBook} onImport={addBook} onView={openBookPreview} onExport={exportBackup} />
+          <BooksPage snapshot={snapshot} onChoose={chooseBook} onRename={editBook} onDelete={removeBook} onImport={addBook} onView={openBookPreview} onProofread={startBookProofread} proofreadBookId={proofreadState?.loading ? proofreadState.book.id : null} onExport={exportBackup} />
         )}
         {view === "vocabulary" && (
           <VocabularyPage
@@ -538,7 +725,7 @@ export function App() {
         )}
         {view === "settings" && (
           <SettingsPage
-            key={llmSettingsLoaded ? "settings-loaded" : "settings-loading"}
+            key={`${llmSettingsLoaded}|${pronunciationSettingsLoaded}`}
             theme={theme}
             effectiveTheme={effectiveTheme}
             onThemeChange={setTheme}
@@ -550,6 +737,9 @@ export function App() {
             llmSettings={llmSettings}
             llmSettingsLoaded={llmSettingsLoaded}
             onSaveAiSettings={saveAiSettings}
+            pronunciationSettings={pronunciationSettings}
+            pronunciationSettingsLoaded={pronunciationSettingsLoaded}
+            onSavePronunciationSettings={savePronunciationSettings}
           />
         )}
         {view === "learn" && (
@@ -566,6 +756,7 @@ export function App() {
             autoPronounceAfterAnswer={autoPronounceAfterAnswer}
             onAutoPronounceChange={setAutoPronounceAfterAnswer}
             speakingWordKey={speakingWordKey}
+            pronunciationStatus={pronunciationStatus}
             onPronounce={speakWord}
             shortcuts={shortcuts}
             saved={Boolean(studySession?.current && vocabularyKeys.has(studySession.current.key))}
@@ -574,8 +765,9 @@ export function App() {
         )}
       </section>
 
-      {aiOpen && <AiDrawer key={`${llmSettings.endpoint}|${llmSettings.model}|${llmSettings.configured}`} word={studySession?.current ?? null} answer={studySession?.answer ?? null} settings={llmSettings} messages={aiMessages} onMessagesChange={(messages) => { if (aiWordKey) setAiConversation({ wordKey: aiWordKey, messages }); }} onSaveSettings={saveAiSettings} onClose={() => setAiOpen(false)} />}
+      {aiOpen && <><button type="button" className="ai-drawer-backdrop" tabIndex={-1} aria-label="关闭 AI 面板" onClick={() => setAiOpen(false)} /><AiDrawer key={`${llmSettings.endpoint}|${llmSettings.model}|${llmSettings.configured}`} word={studySession?.current ?? null} answer={studySession?.answer ?? null} settings={llmSettings} messages={aiMessages} onMessagesChange={(messages) => { if (aiWordKey) setAiConversation({ wordKey: aiWordKey, messages }); }} onSaveSettings={saveAiSettings} onClose={() => setAiOpen(false)} /></>}
       {bookPreview && <BookPreview book={bookPreview.book} words={bookPreview.words} savedKeys={vocabularyKeys} onToggleSaved={(wordKey, saved) => void toggleVocabularyWord(wordKey, saved)} onClose={() => setBookPreview(null)} />}
+      {proofreadState && <ProofreadDialog key={`${proofreadState.book.id}|${proofreadState.loading}|${proofreadState.issues.map((issue) => issue.key).join(",")}`} state={proofreadState} progress={proofreadProgress} collapsed={proofreadCollapsed} windowSize={proofreadWindowSize} onToggleCollapsed={() => setProofreadCollapsed((collapsed) => !collapsed)} onToggleSize={() => setProofreadWindowSize((size) => size === "compact" ? "large" : "compact")} onRetry={() => void startBookProofread(proofreadState.book.id)} onClose={() => { setProofreadState(null); setProofreadProgress(null); }} onApply={(changes) => void applyProofreadChanges(proofreadState.book.id, changes)} />}
     </main>
   );
 }
@@ -592,12 +784,32 @@ function SystemThemeIcon() {
   return <svg className="theme-icon system-theme-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2" /><path d="M8 21h8M12 17v4" /></svg>;
 }
 
-function SettingsPage({ theme, effectiveTheme, onThemeChange, autoPronounceAfterAnswer, onAutoPronounceChange, shortcuts, onShortcutChange, onResetShortcuts, llmSettings, llmSettingsLoaded, onSaveAiSettings }: { theme: ThemeMode; effectiveTheme: "light" | "dark"; onThemeChange: (theme: ThemeMode) => void; autoPronounceAfterAnswer: boolean; onAutoPronounceChange: (enabled: boolean) => void; shortcuts: ShortcutBindings; onShortcutChange: (action: ShortcutAction, shortcut: ShortcutBinding) => void; onResetShortcuts: () => void; llmSettings: LlmSettings; llmSettingsLoaded: boolean; onSaveAiSettings: (endpoint: string, model: string, apiKey: string) => Promise<void> }) {
+function SidebarPanelIcon() {
+  return <svg className="sidebar-panel-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5" /><path d="M9 4v16" /><path d="m6.4 10.2-1.8 1.8 1.8 1.8" /></svg>;
+}
+
+function NavIcon({ name }: { name: "today" | "books" | "vocabulary" | "settings" }) {
+  const paths = {
+    today: <><circle cx="12" cy="12" r="8" /><path d="M12 7v5l3.5 2" /></>,
+    books: <><path d="M5 4.5h11.5A2.5 2.5 0 0 1 19 7v12H7.5A2.5 2.5 0 0 1 5 16.5v-12Z" /><path d="M5 16.5A2.5 2.5 0 0 1 7.5 14H19M9 8h6" /></>,
+    vocabulary: <><path d="M7 4h10a2 2 0 0 1 2 2v14l-7-4-7 4V6a2 2 0 0 1 2-2Z" /><path d="M9 8h6" /></>,
+    settings: <><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.09a2 2 0 0 1 1 1.74v.5a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z" /><circle cx="12" cy="12" r="3" /></>,
+  };
+  return <svg viewBox="0 0 24 24" aria-hidden="true">{paths[name]}</svg>;
+}
+
+function SettingsPage({ theme, effectiveTheme, onThemeChange, autoPronounceAfterAnswer, onAutoPronounceChange, shortcuts, onShortcutChange, onResetShortcuts, llmSettings, llmSettingsLoaded, onSaveAiSettings, pronunciationSettings, pronunciationSettingsLoaded, onSavePronunciationSettings }: { theme: ThemeMode; effectiveTheme: "light" | "dark"; onThemeChange: (theme: ThemeMode) => void; autoPronounceAfterAnswer: boolean; onAutoPronounceChange: (enabled: boolean) => void; shortcuts: ShortcutBindings; onShortcutChange: (action: ShortcutAction, shortcut: ShortcutBinding) => void; onResetShortcuts: () => void; llmSettings: LlmSettings; llmSettingsLoaded: boolean; onSaveAiSettings: (endpoint: string, model: string, apiKey: string) => Promise<void>; pronunciationSettings: PronunciationSettings; pronunciationSettingsLoaded: boolean; onSavePronunciationSettings: (settings: PronunciationSettings) => Promise<void> }) {
   const [endpoint, setEndpoint] = useState(llmSettings.endpoint);
   const [model, setModel] = useState(llmSettings.model);
   const [apiKey, setApiKey] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<{ kind: "success" | "error"; message: string } | null>(null);
+  const [ttsEnabled, setTtsEnabled] = useState(pronunciationSettings.enabled);
+  const [ttsModel, setTtsModel] = useState(pronunciationSettings.model);
+  const [ttsVoiceId, setTtsVoiceId] = useState(pronunciationSettings.voiceId);
+  const [ttsPriority, setTtsPriority] = useState<PronunciationPriority>(pronunciationSettings.priority);
+  const [ttsSaving, setTtsSaving] = useState(false);
+  const [ttsSaveStatus, setTtsSaveStatus] = useState<{ kind: "success" | "error"; message: string } | null>(null);
 
   async function handleSaveAiSettings() {
     setSaving(true);
@@ -610,6 +822,19 @@ function SettingsPage({ theme, effectiveTheme, onThemeChange, autoPronounceAfter
       setSaveStatus({ kind: "error", message: error instanceof Error ? error.message : String(error) });
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleSavePronunciationSettings() {
+    setTtsSaving(true);
+    setTtsSaveStatus(null);
+    try {
+      await onSavePronunciationSettings({ enabled: ttsEnabled, model: ttsModel, voiceId: ttsVoiceId, priority: ttsPriority });
+      setTtsSaveStatus({ kind: "success", message: "AI 发音设置已保存" });
+    } catch (error) {
+      setTtsSaveStatus({ kind: "error", message: error instanceof Error ? error.message : String(error) });
+    } finally {
+      setTtsSaving(false);
     }
   }
 
@@ -640,8 +865,20 @@ function SettingsPage({ theme, effectiveTheme, onThemeChange, autoPronounceAfter
       </section>
 
       <section className="settings-card setting-row">
-        <div><p className="eyebrow">学习</p><h3>答题后自动发音</h3><p>选择“认识”或“不认识”后，自动播放当前单词的系统英语发音。</p></div>
+        <div><p className="eyebrow">学习</p><h3>答题后自动发音</h3><p>选择“认识”或“不认识”后，按上面的语音优先级自动播放；原有的 macOS 系统语音仍会保留。</p></div>
         <label className="auto-pronounce-toggle setting-switch"><input type="checkbox" checked={autoPronounceAfterAnswer} onChange={(event) => onAutoPronounceChange(event.target.checked)} /><span className="toggle-track" aria-hidden="true"><span /></span><span>{autoPronounceAfterAnswer ? "已开启" : "已关闭"}</span></label>
+      </section>
+
+      <section className="settings-card">
+        <div className="settings-card-heading"><div><p className="eyebrow">AI 发音</p><h3>MiniMax 语音合成</h3></div><span>{!pronunciationSettingsLoaded ? "正在读取" : ttsEnabled ? "已启用" : "已关闭"}</span></div>
+        <p className="settings-card-description">AI 发音与 AI 助教共用同一个接口地址和 macOS 钥匙串里的 API Key。默认使用 MiniMax Speech-2.8-Turbo 与 English_PlayfulGirl，失败时保留现有语音作为兜底。</p>
+        <div className="settings-form">
+          <label className="settings-input"><span>启用 MiniMax AI 发音</span><span className="auto-pronounce-toggle"><input type="checkbox" checked={ttsEnabled} onChange={(event) => { setTtsEnabled(event.target.checked); setTtsSaveStatus(null); }} disabled={!pronunciationSettingsLoaded} /><span className="toggle-track" aria-hidden="true"><span /></span><span>{ttsEnabled ? "已开启" : "已关闭"}</span></span></label>
+          <label className="settings-input"><span>MiniMax 模型 ID</span><input value={ttsModel} onChange={(event) => { setTtsModel(event.target.value); setTtsSaveStatus(null); }} placeholder="minimax-speech-2.8-turbo" disabled={!pronunciationSettingsLoaded} /></label>
+          <label className="settings-input"><span>MiniMax 音色 ID</span><input value={ttsVoiceId} onChange={(event) => { setTtsVoiceId(event.target.value); setTtsSaveStatus(null); }} placeholder="English_PlayfulGirl" disabled={!pronunciationSettingsLoaded} /></label>
+          <div className="settings-input settings-input-wide"><span>语音优先级</span><div className="settings-priority-grid" role="group" aria-label="语音优先级"><button type="button" className={ttsPriority === "ai-first" ? "selected" : ""} onClick={() => { setTtsPriority("ai-first"); setTtsSaveStatus(null); }}>AI 发音优先<small>MiniMax 失败时使用现有语音</small></button><button type="button" className={ttsPriority === "system-first" ? "selected" : ""} onClick={() => { setTtsPriority("system-first"); setTtsSaveStatus(null); }}>现有语音优先<small>保留当前语音，AI 作为独立配置</small></button></div></div>
+        </div>
+        <div className="settings-save-row"><p>接口地址和 API Key 请在下面的“AI 助教”配置中填写；TokenDance 等网关会自动使用对应的 MiniMax T2A 路径。</p><div><span className={ttsSaveStatus ? `settings-status ${ttsSaveStatus.kind}` : "settings-status"} role="status" aria-live="polite">{ttsSaveStatus?.message}</span><button type="button" className="primary-button" onClick={() => void handleSavePronunciationSettings()} disabled={ttsSaving || !pronunciationSettingsLoaded}>{ttsSaving ? "正在保存…" : "保存 AI 发音设置"}</button></div></div>
       </section>
 
       <ShortcutSettings shortcuts={shortcuts} onChange={onShortcutChange} onReset={onResetShortcuts} />
@@ -751,13 +988,16 @@ function timeGreeting() {
 
 function TodayPage({ snapshot, percent, onStart, onSaveSchedule, onCheckIn }: { snapshot: AppSnapshot; percent: number; onStart: (mode: "learn" | "review", date?: string) => void; onSaveSchedule: (days: ScheduleDayInput[]) => Promise<void>; onCheckIn: (date: string) => Promise<void> }) {
   const [editingPlan, setEditingPlan] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(snapshot.today.date);
   const today = snapshot.today;
+  const activeDate = selectedDate || today.date;
+  const selectedPlan = snapshot.schedule.find((day) => day.date === activeDate);
+  const selectedIsToday = activeDate === today.date;
+  const selectedIsFuture = activeDate > today.date;
+  const selectedStudyChapters = selectedIsToday ? today.studyChapters : selectedPlan?.studyChapters ?? [];
+  const selectedReviewChapters = selectedIsToday ? today.reviewChapters : selectedPlan?.reviewChapters ?? [];
+  const selectedDateLabel = selectedIsToday ? "今日" : activeDate;
   const calendarDates = buildWeekDates(today.date);
-  const yesterday = shiftDate(today.date, -1);
-  const tomorrow = shiftDate(today.date, 1);
-  const yesterdayPlan = snapshot.schedule.find((day) => day.date === yesterday);
-  const tomorrowPlan = snapshot.schedule.find((day) => day.date === tomorrow);
-  const yesterdayRecord = snapshot.history.find((item) => item.date === yesterday);
   return (
     <div className="page-stack">
       <section className="hero-panel">
@@ -783,9 +1023,10 @@ function TodayPage({ snapshot, percent, onStart, onSaveSchedule, onCheckIn }: { 
           })}
         </div>
         <div className="hero-footer">
-          <div>
+          <div className="hero-progress-summary">
             <span className="eyebrow">{snapshot.currentBook?.name ?? "当前词书"}</span>
             <strong>{today.studiedCount} / {today.targetCount} 个单词</strong>
+            <div className="hero-progress-track" aria-label={`今日进度 ${percent}%`}><span style={{ width: `${percent}%` }} /></div>
           </div>
           <div className="hero-actions">
             {today.targetCount > 0 && today.studiedCount >= today.targetCount && !today.checkedIn && <button className="secondary-button" onClick={() => void onCheckIn(today.date)}>今日打卡</button>}
@@ -794,41 +1035,20 @@ function TodayPage({ snapshot, percent, onStart, onSaveSchedule, onCheckIn }: { 
         </div>
       </section>
 
-      <CalendarExplorer snapshot={snapshot} onCheckIn={onCheckIn} />
+      <CalendarExplorer snapshot={snapshot} selectedDate={activeDate} onSelectDate={setSelectedDate} onCheckIn={onCheckIn} />
 
       <div className="two-column-grid">
-        <button className="task-card review" onClick={() => onStart("review")}>
+        <button className="task-card review" onClick={() => onStart("review", activeDate)} disabled={selectedIsFuture || selectedReviewChapters.length === 0}>
           <span className="task-icon">↻</span>
-          <div><small>按章节复习</small><strong>{today.reviewChapters.length ? today.reviewChapters.join("、") : "今天没有到期复习"}</strong></div>
+          <div><small>{selectedDateLabel} · 按章节复习</small><strong>{selectedReviewChapters.length ? selectedReviewChapters.join("、") : selectedIsFuture ? "未来计划暂不可开始" : "该日没有安排复习"}</strong></div>
           <span className="arrow">→</span>
         </button>
-        <button className="task-card learn" onClick={() => onStart("learn")}>
+        <button className="task-card learn" onClick={() => onStart("learn", activeDate)} disabled={selectedIsFuture || selectedStudyChapters.length === 0}>
           <span className="task-icon">＋</span>
-          <div><small>学习新词</small><strong>{today.studyChapters.join("、") || "今日暂无新词"}</strong></div>
+          <div><small>{selectedDateLabel} · 学习新词</small><strong>{selectedStudyChapters.length ? selectedStudyChapters.join("、") : selectedIsFuture ? "未来计划暂不可开始" : "该日没有安排新词"}</strong></div>
           <span className="arrow">→</span>
         </button>
       </div>
-
-      {(yesterdayPlan || tomorrowPlan) && <section className="date-task-section">
-        <div className="section-heading"><div><p className="eyebrow">跨日任务</p><h3>提前学习与补打卡</h3></div><span className="muted">按章节独立记录</span></div>
-        <div className="date-task-grid">
-          {yesterdayPlan && !yesterdayRecord?.checkedIn && <article className="date-task-card makeup"><div><span className="date-task-label">昨天 · {yesterday}</span><strong>{yesterdayRecord?.completed ? "昨天任务已完成，可以补打卡" : "昨天还有章节任务"}</strong><small>学习 {yesterdayPlan.studyChapters.join("、") || "无"} · 复习 {yesterdayPlan.reviewChapters.join("、") || "无"}</small></div><div className="date-task-actions"><button className="secondary-button" onClick={() => onStart("review", yesterday)} disabled={!yesterdayPlan.reviewChapters.length}>补做复习</button><button className="secondary-button" onClick={() => onStart("learn", yesterday)} disabled={!yesterdayPlan.studyChapters.length}>补做学习</button>{yesterdayRecord?.completed && <button className="primary-button" onClick={() => void onCheckIn(yesterday)}>补上打卡</button>}</div></article>}
-          {tomorrowPlan && <article className="date-task-card ahead"><div><span className="date-task-label">明天 · {tomorrow}</span><strong>提前完成明天的章节</strong><small>学习 {tomorrowPlan.studyChapters.join("、") || "无"} · 复习 {tomorrowPlan.reviewChapters.join("、") || "无"}</small></div><div className="date-task-actions"><button className="secondary-button" onClick={() => onStart("review", tomorrow)} disabled={!tomorrowPlan.reviewChapters.length}>提前复习</button><button className="secondary-button" onClick={() => onStart("learn", tomorrow)} disabled={!tomorrowPlan.studyChapters.length}>提前学习</button></div></article>}
-        </div>
-      </section>}
-
-      <section className="progress-panel">
-        <div className="section-heading">
-          <div><p className="eyebrow">今日进度</p><h2>{snapshot.currentBook?.name ?? "当前词书"}</h2></div>
-          <span className="progress-percent">{percent}%</span>
-        </div>
-        <div className="progress-layout">
-          <div className="progress-ring" style={{ "--progress": `${percent * 3.6}deg` } as React.CSSProperties}><strong>{percent}%</strong><small>完成</small></div>
-          <div><strong className="progress-number">{today.studiedCount} <small>/ {today.targetCount}</small></strong><p>今日计划已学单词</p><p className="muted">还差 {Math.max(0, today.targetCount - today.studiedCount)} 个单词</p></div>
-        </div>
-        <div className="progress-bar"><span style={{ width: `${percent}%` }} /></div>
-        <div className="progress-foot"><span>按章节安排 · {today.studyChapters.length} 个学习章节</span><span>{today.checkedIn ? "今日已打卡" : "完成后可打卡"}</span></div>
-      </section>
 
       <section className="plan-summary">
         <div><p className="eyebrow">章节学习计划</p><strong>每天可安排多个学习章节和复习章节</strong><p>{today.studyChapters.length ? `今天学习 ${today.studyChapters.join("、")}` : "今天暂未安排新词"} · {today.reviewChapters.length ? `复习 ${today.reviewChapters.join("、")}` : "暂无复习章节"}</p></div>
@@ -851,13 +1071,6 @@ function buildWeekDates(dateKey: string) {
     date.setDate(anchor.getDate() + index);
     return { weekday, day: date.getDate(), date: date.toISOString().slice(0, 10) };
   });
-}
-
-function shiftDate(dateKey: string, offset: number) {
-  const safeDateKey = dateKey || new Date().toISOString().slice(0, 10);
-  const date = new Date(`${safeDateKey}T12:00:00`);
-  date.setDate(date.getDate() + offset);
-  return date.toISOString().slice(0, 10);
 }
 
 function buildMonthDates(dateKey: string) {
@@ -884,12 +1097,13 @@ function calendarStatus(snapshot: AppSnapshot, date: string) {
   return date > snapshot.today.date ? "future" : "missed";
 }
 
-function CalendarExplorer({ snapshot, onCheckIn }: { snapshot: AppSnapshot; onCheckIn: (date: string) => Promise<void> }) {
+function CalendarExplorer({ snapshot, selectedDate, onSelectDate, onCheckIn }: { snapshot: AppSnapshot; selectedDate: string; onSelectDate: (date: string) => void; onCheckIn: (date: string) => Promise<void> }) {
   const effectiveToday = snapshot.today.date || new Date().toISOString().slice(0, 10);
   const [range, setRange] = useState<"month" | "week" | "day">("week");
-  const [cursor, setCursor] = useState(effectiveToday);
-  const activeCursor = cursor || effectiveToday;
-  const todayRecord = recordFor(snapshot, effectiveToday);
+  const activeCursor = selectedDate || effectiveToday;
+  const selectedRecord = recordFor(snapshot, activeCursor);
+  const isPast = activeCursor < effectiveToday;
+  const isToday = activeCursor === effectiveToday;
   const dates = range === "month" ? buildMonthDates(activeCursor) : range === "week" ? buildWeekDates(activeCursor) : buildWeekDates(activeCursor).filter((item) => item.date === activeCursor);
   const cursorDate = new Date(`${activeCursor}T12:00:00`);
   const title = range === "month" ? `${cursorDate.getFullYear()} 年 ${cursorDate.getMonth() + 1} 月` : range === "week" ? `第 ${cursorDate.getMonth() + 1} 月 · 本周` : `${cursorDate.getMonth() + 1} 月 ${cursorDate.getDate()} 日`;
@@ -898,15 +1112,21 @@ function CalendarExplorer({ snapshot, onCheckIn }: { snapshot: AppSnapshot; onCh
     if (range === "month") date.setMonth(date.getMonth() + direction);
     else if (range === "week") date.setDate(date.getDate() + direction * 7);
     else date.setDate(date.getDate() + direction);
-    setCursor(date.toISOString().slice(0, 10));
+    onSelectDate(date.toISOString().slice(0, 10));
   }
   return (
     <section className="calendar-explorer">
-      <div className="calendar-explorer-heading"><div><p className="eyebrow">学习日历</p><h3>{title}</h3></div><div className="calendar-explorer-actions"><div className="calendar-range-switcher" role="tablist" aria-label="日历范围">{(["month", "week", "day"] as const).map((value) => <button key={value} role="tab" aria-selected={range === value} className={range === value ? "selected" : ""} onClick={() => setRange(value)}>{value === "month" ? "月" : value === "week" ? "周" : "日"}</button>)}</div><button className="calendar-nav-button" onClick={() => move(-1)} aria-label="上一个时间段">‹</button><button className="calendar-nav-button" onClick={() => setCursor(snapshot.today.date)}>今天</button><button className="calendar-nav-button" onClick={() => move(1)} aria-label="下一个时间段">›</button></div></div>
+      <div className="calendar-explorer-heading"><div><p className="eyebrow">学习日历</p><h3>{title}</h3></div><div className="calendar-explorer-actions"><div className="calendar-range-switcher" role="tablist" aria-label="日历范围">{(["month", "week", "day"] as const).map((value) => <button key={value} role="tab" aria-selected={range === value} className={range === value ? "selected" : ""} onClick={() => setRange(value)}>{value === "month" ? "月" : value === "week" ? "周" : "日"}</button>)}</div><button className="calendar-nav-button" onClick={() => move(-1)} aria-label="上一个时间段">‹</button><button className="calendar-nav-button" onClick={() => onSelectDate(snapshot.today.date)}>今天</button><button className="calendar-nav-button" onClick={() => move(1)} aria-label="下一个时间段">›</button></div></div>
       {range === "month" && <div className="calendar-month-labels">{weekDays.map((day) => <span key={day}>{day}</span>)}</div>}
-      {range !== "day" && <div className={range === "month" ? "calendar-month-grid" : "calendar-explorer-week"}>{dates.map((item) => { const status = calendarStatus(snapshot, item.date); const record = recordFor(snapshot, item.date); return <button type="button" className={`calendar-explorer-day ${status} ${item.date === snapshot.today.date ? "today" : ""} ${"inMonth" in item && !item.inMonth ? "outside" : ""}`} key={item.date} onClick={() => { setCursor(item.date); setRange("day"); }}><small>{range === "week" ? item.weekday : ""}</small><strong>{item.day}</strong><span>{record?.studiedCount ? `${record.studiedCount} 词` : ""}</span><i /></button>; })}</div>}
+      {range !== "day" && <div className={range === "month" ? "calendar-month-grid" : "calendar-explorer-week"}>{dates.map((item) => { const status = calendarStatus(snapshot, item.date); const record = recordFor(snapshot, item.date); return <button type="button" className={`calendar-explorer-day ${status} ${item.date === snapshot.today.date ? "today" : ""} ${item.date === activeCursor ? "selected" : ""} ${"inMonth" in item && !item.inMonth ? "outside" : ""}`} aria-pressed={item.date === activeCursor} key={item.date} onClick={() => onSelectDate(item.date)}><small>{range === "week" ? item.weekday : ""}</small><strong>{item.day}</strong><span>{record?.studiedCount ? `${record.studiedCount} 词` : ""}</span><i /></button>; })}</div>}
       {range === "day" && <DayChart record={recordFor(snapshot, activeCursor)} date={activeCursor} />}
-      <div className={`calendar-explorer-footer ${todayRecord?.checkedIn ? "done" : ""}`}><span>{todayRecord?.checkedIn ? "今日已打卡" : todayRecord?.completed ? "今日任务已完成" : `今日已学 ${todayRecord?.studiedCount ?? snapshot.today.studiedCount} / ${todayRecord?.targetCount || snapshot.today.targetCount} 个单词`}</span>{todayRecord?.completed && !todayRecord.checkedIn && <button className="secondary-button" onClick={() => void onCheckIn(effectiveToday)}>今日打卡</button>}</div>
+      <div className={`calendar-explorer-footer ${selectedRecord?.checkedIn ? "done" : ""}`}>
+        <span>{selectedRecord?.checkedIn ? `${isToday ? "今日" : activeCursor} 已打卡` : selectedRecord?.completed ? `${isToday ? "今日" : activeCursor} 任务已完成` : isToday ? `今日已学 ${selectedRecord?.studiedCount ?? snapshot.today.studiedCount} / ${selectedRecord?.targetCount || snapshot.today.targetCount} 个单词` : isPast ? `${activeCursor} 尚未完成` : `${activeCursor} 尚未开始`}</span>
+        <div className="calendar-explorer-day-actions">
+          {isPast && selectedRecord?.completed && !selectedRecord.checkedIn && <button className="primary-button" onClick={() => void onCheckIn(activeCursor)}>补上打卡</button>}
+          {isToday && selectedRecord?.completed && !selectedRecord.checkedIn && <button className="secondary-button" onClick={() => void onCheckIn(effectiveToday)}>今日打卡</button>}
+        </div>
+      </div>
     </section>
   );
 }
@@ -960,7 +1180,7 @@ function ScheduleEditor({ snapshot, onSave, onClose }: { snapshot: AppSnapshot; 
 
   return (
     <section className="schedule-editor">
-      <div className="schedule-editor-heading"><div><p className="eyebrow">按天安排</p><h3>学习与复习章节</h3><p>同一天可以选择多个章节；绿色表示已经选中。</p></div><button className="drawer-close-button" onClick={onClose} aria-label="关闭章节计划">×</button></div>
+      <div className="schedule-editor-heading"><div><p className="eyebrow">按天安排</p><h3>学习与复习章节</h3><p>同一天可以选择多个章节；高亮表示已经选中。</p></div><button className="drawer-close-button" onClick={onClose} aria-label="关闭章节计划">×</button></div>
       <div className="schedule-day-list">
         {days.map((day) => (
           <article className={day.date === snapshot.today.date ? "schedule-day today" : "schedule-day"} key={day.dayIndex}>
@@ -981,7 +1201,7 @@ function scheduleDate(start: string, offset: number) {
   return date.toISOString().slice(0, 10);
 }
 
-function BooksPage({ snapshot, onChoose, onRename, onDelete, onImport, onView, onExport }: { snapshot: AppSnapshot; onChoose: (id: string) => void; onRename: (id: string, name: string, note: string) => void; onDelete: (id: string) => void; onImport: (name: string, note: string, words: ImportWordInput[]) => void; onView: (id: string) => Promise<void>; onExport: () => Promise<void> }) {
+function BooksPage({ snapshot, onChoose, onRename, onDelete, onImport, onView, onProofread, proofreadBookId, onExport }: { snapshot: AppSnapshot; onChoose: (id: string) => void; onRename: (id: string, name: string, note: string) => void; onDelete: (id: string) => void; onImport: (name: string, note: string, words: ImportWordInput[]) => void; onView: (id: string) => Promise<void>; onProofread: (id: string) => Promise<void>; proofreadBookId: string | null; onExport: () => Promise<void> }) {
   async function handleImport(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     event.target.value = "";
@@ -1016,7 +1236,7 @@ function BooksPage({ snapshot, onChoose, onRename, onDelete, onImport, onView, o
           <article className={book.active ? "book-card active" : "book-card"} key={book.id}>
             <div className="book-card-icon">▤</div>
             <div className="book-card-copy"><h3>{book.name}</h3><p>{book.wordCount} 个单词 · {book.chapterCount} 个章节</p><small>{book.masteredCount} 个已掌握</small></div>
-            <div className="book-card-actions">{book.active ? <span className="active-label">正在使用</span> : <button onClick={() => onChoose(book.id)}>切换</button>}<button onClick={() => void onView(book.id)}>查看词书</button><button onClick={() => handleRename(book)}>改名</button><button className="danger-button" onClick={() => handleDelete(book)}>删除</button></div>
+            <div className="book-card-actions">{book.active ? <span className="active-label">正在使用</span> : <button onClick={() => onChoose(book.id)}>切换</button>}<button onClick={() => void onView(book.id)}>查看词书</button><button disabled={proofreadBookId !== null} onClick={() => void onProofread(book.id)}>{proofreadBookId === book.id ? "校对中…" : "AI 校对"}</button><button onClick={() => handleRename(book)}>改名</button><button className="danger-button" onClick={() => handleDelete(book)}>删除</button></div>
           </article>
         ))}
       </div>
@@ -1121,7 +1341,70 @@ function BookPreview({ book, words, savedKeys, onToggleSaved, onClose }: { book:
   );
 }
 
-function StudyPage({ session, snapshot, percent, revealed, onAnswer, onNext, onUndo, onBack, onAi, autoPronounceAfterAnswer, onAutoPronounceChange, speakingWordKey, onPronounce, shortcuts, saved, onToggleSaved }: { session: StudySessionSnapshot | null; snapshot: AppSnapshot; percent: number; revealed: boolean; onAnswer: (known: boolean) => void; onNext: () => void; onUndo: () => void; onBack: () => void; onAi: () => void; autoPronounceAfterAnswer: boolean; onAutoPronounceChange: (enabled: boolean) => void; speakingWordKey: string | null; onPronounce: (word: StudyWord) => void; shortcuts: ShortcutBindings; saved: boolean; onToggleSaved: (wordKey: string, saved: boolean) => void }) {
+function ProofreadDialog({ state, progress, collapsed, windowSize, onToggleCollapsed, onToggleSize, onRetry, onClose, onApply }: { state: ProofreadState; progress: ProofreadProgress | null; collapsed: boolean; windowSize: "compact" | "large"; onToggleCollapsed: () => void; onToggleSize: () => void; onRetry: () => void; onClose: () => void; onApply: (changes: ProofreadIssue[]) => void }) {
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(() => new Set(state.issues.map((issue) => issue.key)));
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
+  useEffect(() => {
+    if (!state.loading) return undefined;
+    const startedAt = Date.now();
+    const timer = window.setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [state.loading]);
+
+  const selectedIssues = state.issues.filter((issue) => selectedKeys.has(issue.key));
+  const allSelected = state.issues.length > 0 && selectedIssues.length === state.issues.length;
+  const currentProgress = progress?.bookId === state.book.id ? progress : null;
+  const total = currentProgress?.total ?? state.book.wordCount;
+  const completed = Math.min(currentProgress?.completed ?? 0, total);
+  const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  function toggleIssue(key: string) {
+    setSelectedKeys((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
+
+  return (
+    <section className={`proofread-window ${windowSize} ${collapsed ? "collapsed" : ""}`} role="dialog" aria-label="AI 词书校对">
+        <div className="drawer-heading"><div><p className="eyebrow">AI 词书校对</p><h2>{state.book.name}</h2><p className="modal-subtitle">{state.loading ? `后台逐批检查 · ${completed} / ${total}` : state.error ? "校对中断，词书未修改" : `校对完成 · 发现 ${state.issues.length} 项`}</p></div><div className="proofread-heading-actions"><button type="button" onClick={onToggleSize} aria-label="切换校对窗口大小">{windowSize === "compact" ? "放大" : "缩小"}</button><button type="button" onClick={onToggleCollapsed}>{collapsed ? "展开" : "收起"}</button>{!state.loading && <button type="button" onClick={onClose} aria-label="关闭 AI 词书校对">×</button>}</div></div>
+        {!collapsed && (state.error ? (
+          <div className="proofread-empty" role="alert"><strong>校对没有完成</strong><p className="proofread-error-message">{state.error}</p><p>已检查 {completed} / {total} 个词条。已完成的批次会保留，当前词书没有被修改。</p><button className="secondary-button" type="button" onClick={onRetry}>{completed > 0 ? "从断点继续" : "重新校对"}</button></div>
+        ) : state.loading ? (
+          <div className="proofread-loading" role="status"><div className="proofread-spinner" aria-hidden="true" /><strong>{completed > 0 ? "正在从断点继续校对" : `正在逐批检查 ${total} 个词条…`}</strong><p>已检查 {completed} / {total} 个词条 · 发现 {currentProgress?.issuesFound ?? 0} 项 · {percent}%</p><div className="proofread-progress-bar" aria-label={`校对进度 ${percent}%`}><span style={{ width: `${percent}%` }} /></div><p>已开始请求 AI · 已用时 {elapsedSeconds} 秒</p><p>每批完成后会保存断点；网络波动或 AI 返回异常时最多自动尝试 3 次，失败后可手动从断点继续。词书完成后只显示建议，不会自动修改。</p></div>
+        ) : state.issues.length === 0 ? (
+          <div className="proofread-empty"><strong>没有发现足够明确的问题</strong><p>AI 没有找到可以确信需要修改的拼写、词性或词义错误。词书未发生改变。</p></div>
+        ) : (
+          <>
+            <div className="proofread-toolbar"><label><input type="checkbox" checked={allSelected} onChange={() => setSelectedKeys(allSelected ? new Set() : new Set(state.issues.map((issue) => issue.key)))} /> 全选</label><span>发现 {state.issues.length} 项 · 已选择 {selectedIssues.length} 项</span></div>
+            <div className="proofread-list">
+              {state.issues.map((issue) => (
+                <article className={selectedKeys.has(issue.key) ? "proofread-issue selected" : "proofread-issue"} key={issue.key}>
+                  <label className="proofread-issue-check"><input type="checkbox" checked={selectedKeys.has(issue.key)} onChange={() => toggleIssue(issue.key)} /><span /></label>
+                  <div className="proofread-issue-content">
+                    <div className="proofread-issue-heading"><strong>{issue.originalWord}</strong><span>{issue.category}</span><small>{issue.reason}</small></div>
+                    <div className="proofread-diff-grid">
+                      {issue.originalWord !== issue.correctedWord && <div><small>单词</small><del>{issue.originalWord || "—"}</del><b>→ {issue.correctedWord}</b></div>}
+                      {issue.originalPart !== issue.correctedPart && <div><small>词性</small><del>{issue.originalPart || "—"}</del><b>→ {issue.correctedPart || "—"}</b></div>}
+                      {issue.originalMeaning !== issue.correctedMeaning && <div><small>词义</small><del>{issue.originalMeaning || "—"}</del><b>→ {issue.correctedMeaning || "—"}</b></div>}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </>
+        ))}
+        {!collapsed && <div className="proofread-footer"><span>{state.loading ? "词书尚未修改" : state.error ? "词书尚未修改" : "只会应用勾选项目，原学习进度和单词标识会保留。"}</span><div>{!state.loading && <button className="secondary-button" onClick={onClose}>关闭</button>}{!state.loading && state.issues.length > 0 && <button className="primary-button" onClick={() => onApply(selectedIssues)} disabled={!selectedIssues.length}>确认应用所选修正</button>}</div></div>}
+    </section>
+  );
+}
+
+function StudyPage({ session, snapshot, percent, revealed, onAnswer, onNext, onUndo, onBack, onAi, autoPronounceAfterAnswer, onAutoPronounceChange, speakingWordKey, pronunciationStatus, onPronounce, shortcuts, saved, onToggleSaved }: { session: StudySessionSnapshot | null; snapshot: AppSnapshot; percent: number; revealed: boolean; onAnswer: (known: boolean) => void; onNext: () => void; onUndo: () => void; onBack: () => void; onAi: () => void; autoPronounceAfterAnswer: boolean; onAutoPronounceChange: (enabled: boolean) => void; speakingWordKey: string | null; pronunciationStatus: { wordKey: string; kind: "fallback"; message: string } | null; onPronounce: (word: StudyWord) => void; shortcuts: ShortcutBindings; saved: boolean; onToggleSaved: (wordKey: string, saved: boolean) => void }) {
   const word = session?.current;
   const vocabularyMode = session?.mode === "vocabulary";
   const sessionDate = vocabularyMode ? "生词本" : session?.date && snapshot.today.date ? taskDateLabel(session.date, snapshot.today.date) : "今日计划";
@@ -1131,7 +1414,7 @@ function StudyPage({ session, snapshot, percent, revealed, onAnswer, onNext, onU
       <div className="study-heading"><div><p className="eyebrow">{sessionDate} · {vocabularyMode ? "专项复习" : session?.mode === "review" ? "复习" : "学习"} · {word?.chapter ?? "按章节"}</p><h2>{vocabularyMode ? "复习生词" : session?.mode === "review" ? "复习旧词" : "学习新词"}</h2></div><div className="study-heading-actions"><span>{session?.remainingCount ?? 0} 个待完成</span><label className="auto-pronounce-toggle" title="确认认识或不认识后自动播放当前单词"><input type="checkbox" checked={autoPronounceAfterAnswer} onChange={(event) => onAutoPronounceChange(event.target.checked)} /><span className="toggle-track" aria-hidden="true"><span /></span><span>答题后发音</span></label><button className="secondary-button" onClick={onBack}>{vocabularyMode ? "退出复习" : "退出学习"}</button></div></div>
       <article className={revealed ? "study-card revealed" : "study-card"}>
         <div className="study-card-top"><span className="tag">{word?.tag || "TOEFL"}</span><div className="study-card-tools">{word && <button type="button" className={saved ? "bookmark-button saved" : "bookmark-button"} aria-label={saved ? `从生词本移除 ${word.word}` : `将 ${word.word} 加入生词本`} title={saved ? "移除生词" : "收藏生词"} onClick={() => onToggleSaved(word.key, !saved)}><BookmarkIcon filled={saved} /></button>}<button className="ai-trigger" onClick={onAi}>问问 AI</button></div></div>
-        {word ? <div className="word-center"><h2>{word.word}</h2><div className="phonetic-row"><p className="phonetic">{word.phonetic}</p><button type="button" className={`pronounce-button ${speakingWordKey === word.key ? "is-speaking" : ""}`} aria-label={`播放 ${word.word} 的发音`} title="使用 Samantha 播放（不可用时回退到系统英语音色）" onClick={() => onPronounce(word)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l4 3V7l-4 3H4Z" /><path d="M15 9.5a4 4 0 0 1 0 5M17.5 7a7.5 7.5 0 0 1 0 10" /></svg></button></div>{revealed ? <div className="meaning-list" aria-label="词性和释义">{studySenses(word).map((sense, index) => <div className="meaning-line" key={`${sense.part}-${index}`}><b>{sense.part}</b><strong>{sense.meaning}</strong></div>)}</div> : <p className="hint">先回想它的意思，再选择你的答案</p>}</div> : <div className="word-center empty-state"><h2>今天完成了</h2><p className="meaning">这一章节的任务已完成</p></div>}
+      {word ? <div className="word-center"><h2>{word.word}</h2><div className="phonetic-row"><p className="phonetic">{word.phonetic}</p><button type="button" className={`pronounce-button ${speakingWordKey === word.key ? "is-speaking" : ""}`} aria-label={`播放 ${word.word} 的发音`} title="按设置中的语音优先级播放；AI 失败时回退到现有语音" onClick={() => onPronounce(word)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l4 3V7l-4 3H4Z" /><path d="M15 9.5a4 4 0 0 1 0 5M17.5 7a7.5 7.5 0 0 1 0 10" /></svg></button></div>{pronunciationStatus?.wordKey === word.key && <p className={`pronunciation-status ${pronunciationStatus.kind}`} role="status" aria-live="polite">{pronunciationStatus.message}</p>}{revealed ? <div className="meaning-list" aria-label="词性和释义">{studySenses(word).map((sense, index) => <div className="meaning-line" key={`${sense.part}-${index}`}><b>{sense.part}</b><strong>{sense.meaning}</strong></div>)}</div> : <p className="hint">先回想它的意思，再选择你的答案</p>}</div> : <div className="word-center empty-state"><h2>今天完成了</h2><p className="meaning">这一章节的任务已完成</p></div>}
         {word && (!revealed ? <div className="answer-grid"><button className="answer unknown" onClick={() => onAnswer(false)}><strong>不认识</strong><small>查看释义，并放到队尾复习</small></button><button className="answer known" onClick={() => onAnswer(true)}><strong>认识</strong><small>查看释义，并继续下一个</small></button></div> : <div className="revealed-actions"><span className="answer-status">{session?.answer === "unknown" ? `✓ 已加入${vocabularyMode ? "本轮" : "本章"}队尾` : `✓ 已记录${vocabularyMode ? "单词掌握状态" : "本章学习进度"}`}</span><div className="revealed-action-buttons"><button className="secondary-button undo-button" onClick={onUndo}>撤销选择 <kbd>{formatShortcut(shortcuts.undo)}</kbd></button><button className="primary-button next-button" onClick={onNext}>下一个单词 <kbd>{formatShortcut(shortcuts.advance)}</kbd> <span>→</span></button></div></div>)}
       </article>
       <p className="keyboard-hint">使用键盘 <kbd>{formatShortcut(shortcuts.answerUnknown)}</kbd> 不认识 · <kbd>{formatShortcut(shortcuts.answerKnown)}</kbd> 认识 · <kbd>{formatShortcut(shortcuts.advance)}</kbd> 下一个 · <kbd>{formatShortcut(shortcuts.undo)}</kbd> 撤销 · <kbd>{formatShortcut(shortcuts.pronounce)}</kbd> 发音 · <kbd>{formatShortcut(shortcuts.openAi)}</kbd> 打开 AI</p>
@@ -1150,8 +1433,8 @@ function StudyPage({ session, snapshot, percent, revealed, onAnswer, onNext, onU
 
 function taskDateLabel(date: string, today: string) {
   if (date === today) return "今日计划";
-  if (date < today) return "昨日补做";
-  return "明日提前";
+  if (date < today) return "补做任务";
+  return "今日计划";
 }
 
 function AiDrawer({ word, answer, settings, messages, onMessagesChange, onSaveSettings, onClose }: { word: StudySessionSnapshot["current"]; answer: StudySessionSnapshot["answer"]; settings: LlmSettings; messages: LlmMessage[]; onMessagesChange: (messages: LlmMessage[]) => void; onSaveSettings: (endpoint: string, model: string, apiKey: string) => Promise<void>; onClose: () => void }) {

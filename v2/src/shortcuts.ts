@@ -27,7 +27,7 @@ export const SHORTCUT_ACTIONS: ReadonlyArray<{ action: ShortcutAction; label: st
   { action: "answerKnown", label: "认识", description: "查看释义并记录进度" },
   { action: "advance", label: "查看释义 / 下一个", description: "揭示答案或进入下一个单词" },
   { action: "undo", label: "撤销选择", description: "撤销最近一次答题" },
-  { action: "pronounce", label: "播放发音", description: "播放当前单词的系统发音" },
+  { action: "pronounce", label: "播放发音", description: "按设置播放 MiniMax 或 macOS 系统发音" },
   { action: "openAi", label: "打开 AI", description: "打开当前单词的 AI 助教" },
 ];
 

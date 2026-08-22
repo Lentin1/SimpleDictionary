@@ -2,10 +2,13 @@ use chrono::{Local, Timelike};
 use rusqlite::{params, types::ValueRef, Connection, OptionalExtension};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Map, Value};
+use std::collections::HashMap;
 use std::fmt;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::thread;
+use std::time::Duration;
 
 const LEGACY_STATE: &str = "simple-dictionary-state.json";
 
@@ -198,6 +201,27 @@ pub struct LlmSettings {
     pub configured: bool,
 }
 
+#[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct PronunciationSettings {
+    pub enabled: bool,
+    pub model: String,
+    pub voice_id: String,
+    pub priority: String,
+}
+
+#[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct PronunciationAudio {
+    pub audio_hex: String,
+    pub mime_type: String,
+}
+
+const DEFAULT_TTS_MODEL: &str = "minimax-speech-2.8-turbo";
+const DEFAULT_TTS_VOICE_ID: &str = "English_PlayfulGirl";
+const DEFAULT_TTS_PRIORITY: &str = "ai-first";
+const MAX_PROOFREAD_ATTEMPTS: u32 = 3;
+
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct LlmMessageInput {
@@ -211,6 +235,31 @@ pub struct LlmAskInput {
     pub word: StudyWord,
     pub answer: Option<String>,
     pub messages: Vec<LlmMessageInput>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ProofreadIssue {
+    pub key: String,
+    pub original_word: String,
+    pub corrected_word: String,
+    pub original_part: String,
+    pub corrected_part: String,
+    pub original_meaning: String,
+    pub corrected_meaning: String,
+    pub category: String,
+    pub reason: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct ProofreadSuggestion {
+    pub key: String,
+    pub corrected_word: Option<String>,
+    pub corrected_part: Option<String>,
+    pub corrected_meaning: Option<String>,
+    pub category: Option<String>,
+    pub reason: Option<String>,
 }
 
 const KEYCHAIN_SERVICE: &str = "com.vocabflow.jianci.llm";
@@ -292,6 +341,14 @@ pub fn initialize(state: &DbState) -> Result<(), DbError> {
         CREATE TABLE IF NOT EXISTS vocabulary_sessions (
           book_id TEXT PRIMARY KEY,
           payload_json TEXT NOT NULL DEFAULT '{}',
+          updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS proofread_jobs (
+          book_id TEXT PRIMARY KEY REFERENCES books(id) ON DELETE CASCADE,
+          source_fingerprint TEXT NOT NULL,
+          total INTEGER NOT NULL,
+          completed INTEGER NOT NULL DEFAULT 0,
+          issues_json TEXT NOT NULL DEFAULT '[]',
           updated_at TEXT NOT NULL
         );
         CREATE TABLE IF NOT EXISTS snapshots (
@@ -472,6 +529,7 @@ pub fn start_vocabulary_study(state: &DbState) -> Result<StudySessionSnapshot, D
             .and_then(Value::as_array)
             .is_some_and(|queue| !queue.is_empty());
         if !completed && has_queue {
+            commit_pending_unknown_answer(&mut payload)?;
             save_vocabulary_session(&connection, &book_id, &payload)?;
             return session_snapshot(&connection, &book_id, payload);
         }
@@ -723,6 +781,7 @@ pub fn leave_vocabulary_study(state: &DbState) -> Result<StudySessionSnapshot, D
         .optional()?
         .ok_or_else(|| DbError::Message("当前没有生词复习会话".to_string()))?;
     let mut payload: Value = serde_json::from_str(&raw)?;
+    commit_pending_unknown_answer(&mut payload)?;
     let has_answer = payload.get("answer").and_then(Value::as_str).is_some();
     if let Some(object) = payload.as_object_mut() {
         object.insert("active".to_string(), json!(false));
@@ -810,6 +869,169 @@ pub fn save_llm_settings(
     get_llm_settings(state)
 }
 
+pub fn get_pronunciation_settings(state: &DbState) -> Result<PronunciationSettings, DbError> {
+    let connection = Connection::open(&state.path)?;
+    let llm_endpoint = meta_value(&connection, "llm_endpoint");
+    let enabled = meta_value(&connection, "pronunciation_ai_enabled")
+        .map(|value| value == "1")
+        .unwrap_or(true);
+    let stored_model = meta_value(&connection, "pronunciation_ai_model")
+        .filter(|value| !value.trim().is_empty())
+        .unwrap_or_else(|| DEFAULT_TTS_MODEL.to_string());
+    let model = normalize_tts_model(&stored_model, llm_endpoint.as_deref().unwrap_or(""));
+    let voice_id = meta_value(&connection, "pronunciation_ai_voice_id")
+        .filter(|value| !value.trim().is_empty())
+        .unwrap_or_else(|| DEFAULT_TTS_VOICE_ID.to_string());
+    let priority = match meta_value(&connection, "pronunciation_priority").as_deref() {
+        Some("system-first") => "system-first".to_string(),
+        _ => DEFAULT_TTS_PRIORITY.to_string(),
+    };
+    Ok(PronunciationSettings {
+        enabled,
+        model,
+        voice_id,
+        priority,
+    })
+}
+
+pub fn save_pronunciation_settings(
+    state: &DbState,
+    enabled: bool,
+    model: &str,
+    voice_id: &str,
+    priority: &str,
+) -> Result<PronunciationSettings, DbError> {
+    let model = model.trim();
+    let voice_id = voice_id.trim();
+    if model.is_empty() || voice_id.is_empty() {
+        return Err(DbError::Message("请填写 AI 发音模型和音色 ID".to_string()));
+    }
+    if priority != "ai-first" && priority != "system-first" {
+        return Err(DbError::Message("语音优先级设置无效".to_string()));
+    }
+    let connection = Connection::open(&state.path)?;
+    let llm_endpoint = meta_value(&connection, "llm_endpoint");
+    let model = normalize_tts_model(model, llm_endpoint.as_deref().unwrap_or(""));
+    for (key, value) in [
+        ("pronunciation_ai_enabled", if enabled { "1" } else { "0" }),
+        ("pronunciation_ai_model", model.as_str()),
+        ("pronunciation_ai_voice_id", voice_id),
+        ("pronunciation_priority", priority),
+    ] {
+        connection.execute(
+            "INSERT INTO meta(key, value) VALUES(?1, ?2) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            params![key, value],
+        )?;
+    }
+    create_snapshot(state, "保存 AI 发音设置")?;
+    get_pronunciation_settings(state)
+}
+
+pub fn synthesize_pronunciation(
+    state: &DbState,
+    text: &str,
+) -> Result<PronunciationAudio, DbError> {
+    let text = text.trim();
+    if text.is_empty() {
+        return Err(DbError::Message("没有可朗读的单词".to_string()));
+    }
+    if text.chars().count() > 240 {
+        return Err(DbError::Message("单词发音文本过长".to_string()));
+    }
+    let settings = get_pronunciation_settings(state)?;
+    let llm_endpoint = meta_value(&Connection::open(&state.path)?, "llm_endpoint")
+        .filter(|value| !value.trim().is_empty())
+        .ok_or_else(|| DbError::Message("请先在设置中配置 AI 接口地址".to_string()))?;
+    let endpoint = normalize_tts_endpoint(&llm_endpoint)?;
+    let model = normalize_tts_model(&settings.model, &llm_endpoint);
+    let api_key = keychain_read()?.ok_or_else(|| {
+        DbError::Message("请先在设置中保存 AI API Key；AI 发音与 AI 助教共用同一个 Key".to_string())
+    })?;
+    let request_body = json!({
+        "model": model,
+        "text": text,
+        "stream": false,
+        "language_boost": "English",
+        "output_format": "hex",
+        "voice_setting": {
+            "voice_id": settings.voice_id,
+            "speed": 1,
+            "vol": 1,
+            "pitch": 0
+        },
+        "audio_setting": {
+            "sample_rate": 32000,
+            "bitrate": 128000,
+            "format": "mp3",
+            "channel": 1
+        },
+        "pronunciation_dict": { "tone": [] }
+    })
+    .to_string();
+    let mut command = Command::new("/usr/bin/curl");
+    command.args(["--silent", "--show-error", "--connect-timeout", "10"]);
+    command.args(["--max-time", "20", "-w", "\n%{http_code}", "-X", "POST"]);
+    command.args(["-H", "@-", "-H", "Content-Type: application/json"]);
+    command.args(["--data-raw", &request_body, &endpoint]);
+    let mut child = command
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .map_err(|error| DbError::Message(format!("无法启动 curl：{error}")))?;
+    if let Some(mut stdin) = child.stdin.take() {
+        writeln!(stdin, "Authorization: Bearer {api_key}")?;
+    }
+    let output = child
+        .wait_with_output()
+        .map_err(|error| DbError::Message(format!("无法读取语音响应：{error}")))?;
+    if !output.status.success() {
+        let detail = String::from_utf8_lossy(&output.stderr)
+            .lines()
+            .map(str::trim)
+            .filter(|line| !line.is_empty())
+            .last()
+            .unwrap_or("未能建立网络连接")
+            .chars()
+            .take(240)
+            .collect::<String>();
+        return Err(DbError::Message(format!(
+            "无法连接 MiniMax 语音服务：{detail}"
+        )));
+    }
+    let raw = String::from_utf8_lossy(&output.stdout);
+    let (body, status) = raw.rsplit_once('\n').unwrap_or((raw.as_ref(), "200"));
+    let status_code = status.trim().parse::<u16>().unwrap_or(500);
+    let payload: Value = serde_json::from_str(body)
+        .map_err(|_| DbError::Message("MiniMax 语音接口返回格式无法识别".to_string()))?;
+    let service_status = payload
+        .get("base_resp")
+        .and_then(|base| base.get("status_code"))
+        .and_then(Value::as_i64)
+        .unwrap_or(0);
+    if status_code >= 400 || service_status != 0 {
+        let message = payload
+            .get("base_resp")
+            .and_then(|base| base.get("status_msg"))
+            .and_then(Value::as_str)
+            .unwrap_or("MiniMax 语音请求失败");
+        return Err(DbError::Message(format!(
+            "MiniMax 语音请求失败（HTTP {status_code}）：{}",
+            message.chars().take(240).collect::<String>()
+        )));
+    }
+    let audio_hex = payload
+        .get("data")
+        .and_then(|data| data.get("audio"))
+        .and_then(Value::as_str)
+        .filter(|audio| !audio.is_empty())
+        .ok_or_else(|| DbError::Message("MiniMax 没有返回音频数据".to_string()))?;
+    Ok(PronunciationAudio {
+        audio_hex: audio_hex.to_string(),
+        mime_type: "audio/mpeg".to_string(),
+    })
+}
+
 pub fn ask_llm(state: &DbState, input: LlmAskInput) -> Result<String, DbError> {
     let settings = get_llm_settings(state)?;
     if !settings.configured {
@@ -817,7 +1039,6 @@ pub fn ask_llm(state: &DbState, input: LlmAskInput) -> Result<String, DbError> {
             "请先在 AI 面板配置接口地址和模型".to_string(),
         ));
     }
-    let endpoint = normalize_chat_endpoint(&settings.endpoint)?;
     let messages: Vec<Value> = input.messages.iter().rev().take(12).collect::<Vec<_>>().into_iter().rev().filter_map(|message| {
         let role = message.role.trim();
         let content = message.content.trim();
@@ -857,17 +1078,22 @@ pub fn ask_llm(state: &DbState, input: LlmAskInput) -> Result<String, DbError> {
     .join("\n");
     let mut request_messages = vec![json!({ "role": "system", "content": system_prompt })];
     request_messages.extend(messages);
+    complete_chat_completion(&settings, request_messages, 45)
+}
+
+fn complete_chat_completion(
+    settings: &LlmSettings,
+    request_messages: Vec<Value>,
+    max_seconds: u64,
+) -> Result<String, DbError> {
+    let endpoint = normalize_chat_endpoint(&settings.endpoint)?;
     let request_body =
         json!({ "model": settings.model, "messages": request_messages, "stream": false })
             .to_string();
     let mut command = Command::new("/usr/bin/curl");
+    command.args(["--silent", "--show-error", "--connect-timeout", "10"]);
+    command.arg("--max-time").arg(max_seconds.to_string());
     command.args([
-        "--silent",
-        "--show-error",
-        "--max-time",
-        "45",
-        "--connect-timeout",
-        "10",
         "-w",
         "\n%{http_code}",
         "-X",
@@ -897,9 +1123,18 @@ pub fn ask_llm(state: &DbState, input: LlmAskInput) -> Result<String, DbError> {
         .wait_with_output()
         .map_err(|error| DbError::Message(format!("无法读取 curl 响应：{error}")))?;
     if !output.status.success() {
-        return Err(DbError::Message(
-            "无法连接 LLM API，请检查接口地址和网络".to_string(),
-        ));
+        let detail = String::from_utf8_lossy(&output.stderr)
+            .lines()
+            .map(str::trim)
+            .filter(|line| !line.is_empty())
+            .last()
+            .unwrap_or("未能建立网络连接")
+            .chars()
+            .take(240)
+            .collect::<String>();
+        return Err(DbError::Message(format!(
+            "无法连接 LLM API：{detail}。请检查接口地址、网络或代理设置"
+        )));
     }
     let raw = String::from_utf8_lossy(&output.stdout);
     let (body, status) = raw.rsplit_once('\n').unwrap_or((raw.as_ref(), "200"));
@@ -912,7 +1147,10 @@ pub fn ask_llm(state: &DbState, input: LlmAskInput) -> Result<String, DbError> {
             .and_then(|error| error.get("message"))
             .and_then(Value::as_str)
             .unwrap_or("LLM API 请求失败");
-        return Err(DbError::Message(message.chars().take(300).collect()));
+        return Err(DbError::Message(format!(
+            "LLM API 请求失败（HTTP {status_code}）：{}",
+            message.chars().take(260).collect::<String>()
+        )));
     }
     let content = payload
         .get("choices")
@@ -935,6 +1173,368 @@ pub fn ask_llm(state: &DbState, input: LlmAskInput) -> Result<String, DbError> {
         return Err(DbError::Message("LLM API 没有返回可显示的文本".to_string()));
     }
     Ok(text)
+}
+
+#[derive(Debug)]
+struct ProofreadJob {
+    source_fingerprint: String,
+    total: usize,
+    completed: usize,
+    issues: Vec<ProofreadIssue>,
+}
+
+fn proofread_source_fingerprint(words: &[StudyWord]) -> String {
+    let mut hash = 14_695_981_039_346_656_037_u64;
+    for word in words {
+        for value in [
+            &word.key,
+            &word.chapter,
+            &word.word,
+            &word.phonetic,
+            &word.part,
+            &word.meaning,
+            &word.definition,
+            &word.example,
+            &word.translation,
+            &word.tag,
+        ] {
+            for byte in value.as_bytes() {
+                hash ^= u64::from(*byte);
+                hash = hash.wrapping_mul(1_099_511_628_211);
+            }
+            hash ^= 255;
+            hash = hash.wrapping_mul(1_099_511_628_211);
+        }
+    }
+    format!("{hash:016x}")
+}
+
+fn load_proofread_job(state: &DbState, book_id: &str) -> Result<Option<ProofreadJob>, DbError> {
+    let connection = Connection::open(&state.path)?;
+    let row: Option<(String, i64, i64, String)> = connection
+        .query_row(
+            "SELECT source_fingerprint, total, completed, issues_json FROM proofread_jobs WHERE book_id = ?1",
+            params![book_id],
+            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+        )
+        .optional()?;
+    row.map(|(source_fingerprint, total, completed, issues_json)| {
+        Ok(ProofreadJob {
+            source_fingerprint,
+            total: usize::try_from(total).unwrap_or(0),
+            completed: usize::try_from(completed).unwrap_or(0),
+            issues: serde_json::from_str(&issues_json).unwrap_or_default(),
+        })
+    })
+    .transpose()
+}
+
+fn save_proofread_job(
+    state: &DbState,
+    book_id: &str,
+    source_fingerprint: &str,
+    total: usize,
+    completed: usize,
+    issues: &[ProofreadIssue],
+) -> Result<(), DbError> {
+    let connection = Connection::open(&state.path)?;
+    connection.execute(
+        "INSERT INTO proofread_jobs(book_id, source_fingerprint, total, completed, issues_json, updated_at) VALUES(?1, ?2, ?3, ?4, ?5, ?6) ON CONFLICT(book_id) DO UPDATE SET source_fingerprint = excluded.source_fingerprint, total = excluded.total, completed = excluded.completed, issues_json = excluded.issues_json, updated_at = excluded.updated_at",
+        params![
+            book_id,
+            source_fingerprint,
+            i64::try_from(total).unwrap_or(i64::MAX),
+            i64::try_from(completed).unwrap_or(i64::MAX),
+            serde_json::to_string(issues)?,
+            now(),
+        ],
+    )?;
+    Ok(())
+}
+
+pub fn proofread_book<F>(
+    state: &DbState,
+    book_id: &str,
+    on_progress: F,
+) -> Result<Vec<ProofreadIssue>, DbError>
+where
+    F: Fn(usize, usize, usize),
+{
+    let settings = get_llm_settings(state)?;
+    if !settings.configured {
+        return Err(DbError::Message(
+            "请先在设置中配置 AI 接口和模型，再开始词书校对".to_string(),
+        ));
+    }
+    let words = get_book_words(state, book_id)?;
+    if words.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let words_by_key: HashMap<&str, &StudyWord> =
+        words.iter().map(|word| (word.key.as_str(), word)).collect();
+    let source_fingerprint = proofread_source_fingerprint(&words);
+    let stored_job = load_proofread_job(state, book_id)?;
+    let can_resume = stored_job.as_ref().is_some_and(|job| {
+        job.source_fingerprint == source_fingerprint
+            && job.total == words.len()
+            && job.completed <= words.len()
+    });
+    let mut completed = 0;
+    let mut issues_by_key = HashMap::new();
+    if can_resume {
+        if let Some(job) = stored_job {
+            completed = job.completed;
+            for issue in job.issues {
+                if let Some(original) = words_by_key.get(issue.key.as_str()) {
+                    if issue.original_word == original.word
+                        && issue.original_part == original.part
+                        && issue.original_meaning == original.meaning
+                    {
+                        issues_by_key.insert(issue.key.clone(), issue);
+                    }
+                }
+            }
+        }
+    } else {
+        save_proofread_job(state, book_id, &source_fingerprint, words.len(), 0, &[])?;
+    }
+    on_progress(completed, words.len(), issues_by_key.len());
+
+    if completed == words.len() {
+        return Ok(words
+            .iter()
+            .filter_map(|word| issues_by_key.remove(&word.key))
+            .collect());
+    }
+
+    for chunk in words[completed..].chunks(80) {
+        let entries = chunk
+            .iter()
+            .map(|word| {
+                json!({
+                    "key": word.key,
+                    "word": word.word,
+                    "part": word.part,
+                    "meaning": word.meaning,
+                    "definition": word.definition,
+                    "example": word.example,
+                    "translation": word.translation,
+                })
+            })
+            .collect::<Vec<_>>();
+        let system_prompt = [
+            "你是中文背单词应用“简辞”的词书校对器。",
+            "只找明显、客观、值得修正的问题，不要润色，不要替用户改写正常释义。",
+            "重点检查：单词拼写错误或多余的连字符等符号；词性和词义明显不匹配；单词与中文释义完全不符。",
+            "合法的复合词连字符、缩写、专有名词、多个词性和多个义项都不要擅自删除或改写。",
+            "只有确信是明显错误时才返回；拿不准就忽略。",
+            "必须只返回 JSON 数组，不要 Markdown，不要解释。每项字段为 key、correctedWord、correctedPart、correctedMeaning、category、reason。没有需要修正的字段返回 null。",
+        ]
+        .join("\n");
+        let user_prompt = format!(
+            "请校对下面这批词条。key 必须原样保留，correctedWord、correctedPart、correctedMeaning 只填写需要改变的字段，否则填 null。category 只能使用“拼写/符号”“词性与词义”“词义明显不符”之一。reason 用简短中文说明。\n{}",
+            serde_json::to_string(&entries)?
+        );
+        let request_messages = vec![
+            json!({ "role": "system", "content": system_prompt }),
+            json!({ "role": "user", "content": user_prompt }),
+        ];
+        let suggestions = {
+            let mut attempt = 1_u32;
+            loop {
+                match complete_chat_completion(&settings, request_messages.clone(), 60)
+                    .and_then(|response| parse_proofread_suggestions(&response))
+                {
+                    Ok(value) => break value,
+                    Err(error) => {
+                        if !should_retry_proofread_error(&error)
+                            || attempt >= MAX_PROOFREAD_ATTEMPTS
+                        {
+                            return Err(error);
+                        }
+                        let delay_seconds =
+                            2_u64.saturating_mul(1_u64 << attempt.saturating_sub(1).min(4));
+                        thread::sleep(Duration::from_secs(delay_seconds));
+                        attempt = attempt.saturating_add(1);
+                    }
+                }
+            }
+        };
+        for suggestion in suggestions {
+            let Some(original) = words_by_key.get(suggestion.key.trim()) else {
+                continue;
+            };
+            let corrected_word = suggestion
+                .corrected_word
+                .as_deref()
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .unwrap_or(original.word.as_str())
+                .to_string();
+            let corrected_part = suggestion
+                .corrected_part
+                .as_deref()
+                .map(str::trim)
+                .unwrap_or(original.part.as_str())
+                .to_string();
+            let corrected_meaning = suggestion
+                .corrected_meaning
+                .as_deref()
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .unwrap_or(original.meaning.as_str())
+                .to_string();
+            if corrected_word == original.word
+                && corrected_part == original.part
+                && corrected_meaning == original.meaning
+            {
+                continue;
+            }
+            issues_by_key.insert(
+                original.key.clone(),
+                ProofreadIssue {
+                    key: original.key.clone(),
+                    original_word: original.word.clone(),
+                    corrected_word,
+                    original_part: original.part.clone(),
+                    corrected_part,
+                    original_meaning: original.meaning.clone(),
+                    corrected_meaning,
+                    category: suggestion
+                        .category
+                        .filter(|value| !value.trim().is_empty())
+                        .unwrap_or_else(|| "其他".to_string()),
+                    reason: suggestion
+                        .reason
+                        .filter(|value| !value.trim().is_empty())
+                        .unwrap_or_else(|| "AI 标记为需要人工确认".to_string()),
+                },
+            );
+        }
+        completed += chunk.len();
+        let saved_issues = issues_by_key.values().cloned().collect::<Vec<_>>();
+        save_proofread_job(
+            state,
+            book_id,
+            &source_fingerprint,
+            words.len(),
+            completed,
+            &saved_issues,
+        )?;
+        on_progress(completed, words.len(), issues_by_key.len());
+    }
+
+    Ok(words
+        .iter()
+        .filter_map(|word| issues_by_key.remove(&word.key))
+        .collect())
+}
+
+fn should_retry_proofread_error(error: &DbError) -> bool {
+    let message = error.to_string();
+    message.starts_with("无法连接 LLM API：")
+        || message.contains("HTTP 408")
+        || message.contains("HTTP 429")
+        || (message.contains("HTTP 5") && message.contains("LLM API 请求失败"))
+        || message.contains("LLM API 返回格式无法识别")
+        || message.contains("AI 校对结果")
+}
+
+fn parse_proofread_suggestions(raw: &str) -> Result<Vec<ProofreadSuggestion>, DbError> {
+    let trimmed = raw
+        .trim()
+        .trim_start_matches("```json")
+        .trim_start_matches("```")
+        .trim_end_matches("```")
+        .trim();
+    let candidate = if serde_json::from_str::<Value>(trimmed).is_ok() {
+        trimmed.to_string()
+    } else if let (Some(start), Some(end)) = (trimmed.find('['), trimmed.rfind(']')) {
+        trimmed[start..=end].to_string()
+    } else {
+        return Err(DbError::Message(
+            "AI 校对结果不是有效的 JSON 数组".to_string(),
+        ));
+    };
+    let value: Value = serde_json::from_str(&candidate)
+        .map_err(|_| DbError::Message("AI 校对结果不是有效的 JSON 数组".to_string()))?;
+    let array = match value {
+        Value::Array(items) => items,
+        Value::Object(mut object) => object
+            .remove("issues")
+            .and_then(|items| items.as_array().cloned())
+            .ok_or_else(|| DbError::Message("AI 校对结果缺少 issues 数组".to_string()))?,
+        _ => {
+            return Err(DbError::Message(
+                "AI 校对结果不是有效的 JSON 数组".to_string(),
+            ))
+        }
+    };
+    serde_json::from_value(Value::Array(array))
+        .map_err(|_| DbError::Message("AI 校对结果字段格式无法识别".to_string()))
+}
+
+pub fn apply_book_proofread(
+    state: &DbState,
+    book_id: &str,
+    changes: Vec<ProofreadIssue>,
+) -> Result<AppSnapshot, DbError> {
+    if changes.is_empty() {
+        return load_snapshot(state);
+    }
+    let connection = Connection::open(&state.path)?;
+    let transaction = connection.unchecked_transaction()?;
+    let book_exists: Option<String> = transaction
+        .query_row(
+            "SELECT id FROM books WHERE id = ?1",
+            params![book_id],
+            |row| row.get(0),
+        )
+        .optional()?;
+    if book_exists.is_none() {
+        return Err(DbError::Message("词书不存在".to_string()));
+    }
+
+    for change in changes {
+        let current: Option<(String, String, String)> = transaction
+            .query_row(
+                "SELECT word, part, meaning FROM words WHERE book_id = ?1 AND legacy_id = ?2",
+                params![book_id, change.key.trim()],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            )
+            .optional()?;
+        let Some((word, part, meaning)) = current else {
+            return Err(DbError::Message(format!(
+                "词书中找不到单词：{}",
+                change.key
+            )));
+        };
+        if word != change.original_word
+            || part != change.original_part
+            || meaning != change.original_meaning
+        {
+            return Err(DbError::Message(format!(
+                "“{}”在校对后已发生变化，请重新校对",
+                change.original_word
+            )));
+        }
+        let corrected_word = change.corrected_word.trim();
+        if corrected_word.is_empty() {
+            return Err(DbError::Message(format!("“{}”的修正单词不能为空", word)));
+        }
+        transaction.execute(
+            "UPDATE words SET word = ?1, part = ?2, meaning = ?3, senses_json = CASE WHEN part <> ?2 OR meaning <> ?3 THEN '[]' ELSE senses_json END WHERE book_id = ?4 AND legacy_id = ?5",
+            params![corrected_word, change.corrected_part.trim(), change.corrected_meaning.trim(), book_id, change.key.trim()],
+        )?;
+    }
+    transaction.execute(
+        "DELETE FROM proofread_jobs WHERE book_id = ?1",
+        params![book_id],
+    )?;
+    transaction.commit()?;
+    create_snapshot(state, "应用 AI 词书校对")?;
+    load_snapshot(state)
 }
 
 pub fn start_study(state: &DbState, mode: &str) -> Result<StudySessionSnapshot, DbError> {
@@ -961,7 +1561,7 @@ pub fn start_study_for_date(
         )
         .optional()?;
     if let Some(payload) = existing {
-        let value: Value = serde_json::from_str(&payload)?;
+        let mut value: Value = serde_json::from_str(&payload)?;
         let same_mode = value.get("mode").and_then(Value::as_str) == Some(normalized_mode);
         let same_date = value.get("date").and_then(Value::as_str) == Some(date.as_str());
         let completed = value
@@ -974,6 +1574,10 @@ pub fn start_study_for_date(
             .map(|queue| !queue.is_empty())
             .unwrap_or(false);
         if same_mode && same_date && (completed || has_queue) {
+            if has_queue {
+                commit_pending_unknown_answer(&mut value)?;
+                save_session(&connection, &book_id, &value)?;
+            }
             return session_snapshot(&connection, &book_id, value);
         }
     }
@@ -1297,6 +1901,7 @@ pub fn leave_study(state: &DbState) -> Result<StudySessionSnapshot, DbError> {
         .optional()?
         .ok_or_else(|| DbError::Message("当前没有学习会话".to_string()))?;
     let mut payload: Value = serde_json::from_str(&raw)?;
+    commit_pending_unknown_answer(&mut payload)?;
     let has_answer = payload.get("answer").and_then(Value::as_str).is_some();
     if let Some(object) = payload.as_object_mut() {
         object.insert("active".to_string(), json!(false));
@@ -1304,6 +1909,30 @@ pub fn leave_study(state: &DbState) -> Result<StudySessionSnapshot, DbError> {
     }
     save_session(&connection, &book_id, &payload)?;
     session_snapshot(&connection, &book_id, payload)
+}
+
+fn commit_pending_unknown_answer(payload: &mut Value) -> Result<(), DbError> {
+    if payload.get("answer").and_then(Value::as_str) != Some("unknown") {
+        return Ok(());
+    }
+    let queue = payload
+        .get_mut("queue")
+        .and_then(Value::as_array_mut)
+        .ok_or_else(|| DbError::Message("学习队列损坏".to_string()))?;
+    let current = queue
+        .first()
+        .and_then(Value::as_str)
+        .map(ToString::to_string)
+        .ok_or_else(|| DbError::Message("当前没有待学习单词".to_string()))?;
+    queue.remove(0);
+    queue.push(Value::String(current));
+    if let Some(object) = payload.as_object_mut() {
+        object.insert("answer".to_string(), Value::Null);
+        object.insert("revealed".to_string(), json!(false));
+        object.insert("previousProgress".to_string(), Value::Null);
+        object.insert("previousHistory".to_string(), Value::Null);
+    }
+    Ok(())
 }
 
 pub fn rename_book(
@@ -1345,6 +1974,10 @@ pub fn delete_book(state: &DbState, book_id: &str) -> Result<AppSnapshot, DbErro
     )?;
     transaction.execute(
         "DELETE FROM vocabulary_words WHERE book_id = ?1",
+        params![book_id],
+    )?;
+    transaction.execute(
+        "DELETE FROM proofread_jobs WHERE book_id = ?1",
         params![book_id],
     )?;
     let deleted = transaction.execute("DELETE FROM books WHERE id = ?1", params![book_id])?;
@@ -2652,6 +3285,51 @@ fn normalize_chat_endpoint(raw: &str) -> Result<String, DbError> {
     }
 }
 
+fn normalize_tts_endpoint(raw: &str) -> Result<String, DbError> {
+    let trimmed = raw.trim().trim_end_matches('/');
+    let is_local_http = trimmed.starts_with("http://localhost")
+        || trimmed.starts_with("http://127.0.0.1")
+        || trimmed.starts_with("http://[::1]");
+    if !trimmed.starts_with("https://") && !is_local_http {
+        return Err(DbError::Message(
+            "接口必须使用 HTTPS；本机 localhost 接口可以使用 HTTP".to_string(),
+        ));
+    }
+    if trimmed.contains("tokendance.space/gateway/v1") {
+        return Ok(trimmed.replace("/gateway/v1", "/gateway/minimax/v1") + "/t2a_v2");
+    }
+    if trimmed.ends_with("/t2a_v2") {
+        return Ok(trimmed.to_string());
+    }
+    if trimmed.ends_with("/chat/completions") {
+        return Ok(format!(
+            "{}/t2a_v2",
+            trimmed.trim_end_matches("/chat/completions")
+        ));
+    }
+    if trimmed.ends_with("/v1") {
+        Ok(format!("{}/t2a_v2", trimmed))
+    } else {
+        Ok(format!("{}/v1/t2a_v2", trimmed))
+    }
+}
+
+fn is_tokendance_endpoint(raw: &str) -> bool {
+    raw.contains("tokendance.space/gateway")
+}
+
+fn normalize_tts_model(model: &str, endpoint: &str) -> String {
+    let trimmed = model.trim();
+    if is_tokendance_endpoint(endpoint) {
+        match trimmed {
+            "speech-2.8-turbo" => return "minimax-speech-2.8-turbo".to_string(),
+            "speech-2.8-hd" => return "minimax-speech-2.8-hd".to_string(),
+            _ => {}
+        }
+    }
+    trimmed.to_string()
+}
+
 fn keychain_read() -> Result<Option<String>, DbError> {
     let output = Command::new("/usr/bin/security")
         .args([
@@ -2960,6 +3638,82 @@ mod tests {
     }
 
     #[test]
+    fn parses_fenced_proofread_json() {
+        let parsed = parse_proofread_suggestions(
+            "```json\n[{\"key\":\"1\",\"correctedWord\":\"receive\",\"correctedPart\":null,\"correctedMeaning\":null,\"category\":\"拼写/符号\",\"reason\":\"多了一个字母\"}]\n```",
+        )
+        .unwrap();
+        assert_eq!(parsed.len(), 1);
+        assert_eq!(parsed[0].key, "1");
+        assert_eq!(parsed[0].corrected_word.as_deref(), Some("receive"));
+    }
+
+    #[test]
+    fn applies_selected_proofread_changes_without_resetting_progress() {
+        let (path, state) = new_test_state("jian-ci-proofread-apply-test");
+        let snapshot = import_book(
+            &state,
+            "校对测试",
+            "",
+            vec![ImportWordInput {
+                legacy_id: Some("1".to_string()),
+                chapter: "List 01".to_string(),
+                word: "recieve".to_string(),
+                phonetic: Some("/rɪˈsiːv/".to_string()),
+                part: Some("n.".to_string()),
+                meaning: Some("收到".to_string()),
+                definition: None,
+                example: None,
+                translation: None,
+                tag: Some("TOEFL".to_string()),
+                senses: None,
+            }],
+        )
+        .unwrap();
+        let book_id = snapshot.current_book.unwrap().id;
+        let connection = Connection::open(&state.path).unwrap();
+        connection
+            .execute(
+                "INSERT INTO progress(book_id, word_key, status) VALUES(?1, '1', 'mastered')",
+                params![book_id],
+            )
+            .unwrap();
+        drop(connection);
+
+        apply_book_proofread(
+            &state,
+            &book_id,
+            vec![ProofreadIssue {
+                key: "1".to_string(),
+                original_word: "recieve".to_string(),
+                corrected_word: "receive".to_string(),
+                original_part: "n.".to_string(),
+                corrected_part: "v.".to_string(),
+                original_meaning: "收到".to_string(),
+                corrected_meaning: "收到；接收".to_string(),
+                category: "拼写/符号".to_string(),
+                reason: "拼写错误".to_string(),
+            }],
+        )
+        .unwrap();
+
+        let words = get_book_words(&state, &book_id).unwrap();
+        assert_eq!(words[0].word, "receive");
+        assert_eq!(words[0].part, "v.");
+        assert_eq!(words[0].meaning, "收到；接收");
+        let connection = Connection::open(&state.path).unwrap();
+        let progress_status: String = connection
+            .query_row(
+                "SELECT status FROM progress WHERE book_id = ?1 AND word_key = '1'",
+                params![book_id],
+                |row| row.get(0),
+            )
+            .unwrap();
+        assert_eq!(progress_status, "mastered");
+        remove_test_db(&path);
+    }
+
+    #[test]
     fn migrated_session_converts_legacy_numeric_queue() {
         let (path, state) = new_test_state("jian-ci-session-migration-test");
         let date = today();
@@ -3002,7 +3756,7 @@ mod tests {
     }
 
     #[test]
-    fn leaving_after_answer_keeps_answer_revealed_for_resume() {
+    fn leaving_after_known_answer_keeps_answer_revealed_for_resume() {
         let (path, state) = new_test_state("jian-ci-leave-session-test");
         let connection = Connection::open(&state.path).unwrap();
         connection
@@ -3031,6 +3785,136 @@ mod tests {
         assert!(!resumed.active);
         assert!(resumed.revealed);
         assert_eq!(resumed.answer.as_deref(), Some("known"));
+
+        remove_test_db(&path);
+    }
+
+    #[test]
+    fn leaving_after_unknown_answer_moves_word_to_saved_queue_tail() {
+        let (path, state) = new_test_state("jian-ci-leave-unknown-session-test");
+        let connection = Connection::open(&state.path).unwrap();
+        connection.execute("INSERT INTO words(book_id, legacy_id, chapter, word, order_index) VALUES('empty-book', '1', 'List 01', 'one', 0), ('empty-book', '2', 'List 01', 'two', 1), ('empty-book', '3', 'List 01', 'three', 2)", []).unwrap();
+        connection
+            .execute(
+                "INSERT INTO schedule_days(book_id, day_index, date, study_chapters_json) VALUES('empty-book', 0, ?1, '[\"List 01\"]')",
+                params![today()],
+            )
+            .unwrap();
+        drop(connection);
+
+        let started = start_study(&state, "learn").unwrap();
+        assert_eq!(started.current.as_ref().unwrap().key, "1");
+        answer_word(&state, "1", false).unwrap();
+        let left = leave_study(&state).unwrap();
+        assert!(!left.active);
+        assert!(!left.revealed);
+        assert!(left.answer.is_none());
+        assert_eq!(left.current.as_ref().unwrap().key, "2");
+
+        let connection = Connection::open(&state.path).unwrap();
+        let raw: String = connection
+            .query_row(
+                "SELECT payload_json FROM study_sessions WHERE book_id = 'empty-book'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        let payload: Value = serde_json::from_str(&raw).unwrap();
+        let queued = payload
+            .get("queue")
+            .and_then(Value::as_array)
+            .unwrap()
+            .iter()
+            .filter_map(Value::as_str)
+            .collect::<Vec<_>>();
+        assert_eq!(queued, vec!["2", "3", "1"]);
+        drop(connection);
+
+        let resumed = start_study(&state, "learn").unwrap();
+        assert_eq!(resumed.current.unwrap().key, "2");
+
+        remove_test_db(&path);
+    }
+
+    #[test]
+    fn reopening_after_unknown_answer_moves_word_to_saved_queue_tail() {
+        let (path, state) = new_test_state("jian-ci-reopen-unknown-session-test");
+        let connection = Connection::open(&state.path).unwrap();
+        connection.execute("INSERT INTO words(book_id, legacy_id, chapter, word, order_index) VALUES('empty-book', '1', 'List 01', 'one', 0), ('empty-book', '2', 'List 01', 'two', 1), ('empty-book', '3', 'List 01', 'three', 2)", []).unwrap();
+        connection
+            .execute(
+                "INSERT INTO schedule_days(book_id, day_index, date, study_chapters_json) VALUES('empty-book', 0, ?1, '[\"List 01\"]')",
+                params![today()],
+            )
+            .unwrap();
+        drop(connection);
+
+        let started = start_study(&state, "learn").unwrap();
+        let first_key = started.current.unwrap().key;
+        answer_word(&state, &first_key, false).unwrap();
+
+        let resumed = start_study(&state, "learn").unwrap();
+        assert_eq!(resumed.current.as_ref().unwrap().key, "2");
+        assert!(resumed.answer.is_none());
+        assert!(!resumed.revealed);
+
+        let connection = Connection::open(&state.path).unwrap();
+        let raw: String = connection
+            .query_row(
+                "SELECT payload_json FROM study_sessions WHERE book_id = 'empty-book'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        let payload: Value = serde_json::from_str(&raw).unwrap();
+        assert_eq!(
+            payload
+                .get("queue")
+                .and_then(Value::as_array)
+                .and_then(|queue| queue.last())
+                .and_then(Value::as_str),
+            Some(first_key.as_str())
+        );
+
+        remove_test_db(&path);
+    }
+
+    #[test]
+    fn reopening_vocabulary_after_unknown_answer_moves_word_to_saved_queue_tail() {
+        let (path, state) = new_test_state("jian-ci-reopen-vocabulary-unknown-test");
+        let connection = Connection::open(&state.path).unwrap();
+        connection.execute("INSERT INTO words(book_id, legacy_id, chapter, word, order_index) VALUES('empty-book', '1', 'List 01', 'one', 0), ('empty-book', '2', 'List 01', 'two', 1), ('empty-book', '3', 'List 01', 'three', 2)", []).unwrap();
+        drop(connection);
+        for key in ["1", "2", "3"] {
+            set_vocabulary_word(&state, key, true).unwrap();
+        }
+
+        let started = start_vocabulary_study(&state).unwrap();
+        let first_key = started.current.unwrap().key;
+        answer_vocabulary_word(&state, &first_key, false).unwrap();
+
+        let resumed = start_vocabulary_study(&state).unwrap();
+        assert_ne!(resumed.current.as_ref().unwrap().key, first_key);
+        assert!(resumed.answer.is_none());
+        assert!(!resumed.revealed);
+
+        let connection = Connection::open(&state.path).unwrap();
+        let raw: String = connection
+            .query_row(
+                "SELECT payload_json FROM vocabulary_sessions WHERE book_id = 'empty-book'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        let payload: Value = serde_json::from_str(&raw).unwrap();
+        assert_eq!(
+            payload
+                .get("queue")
+                .and_then(Value::as_array)
+                .and_then(|queue| queue.last())
+                .and_then(Value::as_str),
+            Some(first_key.as_str())
+        );
 
         remove_test_db(&path);
     }
@@ -3260,15 +4144,34 @@ mod tests {
         drop(connection);
 
         answer_vocabulary_word(&state, &first_key, false).unwrap();
-        let after_unknown = next_vocabulary_word(&state).unwrap();
+        let after_unknown = leave_vocabulary_study(&state).unwrap();
         assert_eq!(after_unknown.remaining_count, 3);
+        assert!(after_unknown.answer.is_none());
+        assert!(!after_unknown.revealed);
         assert_ne!(after_unknown.current.as_ref().unwrap().key, first_key);
-        leave_vocabulary_study(&state).unwrap();
         let resumed = start_vocabulary_study(&state).unwrap();
         assert_eq!(
-            resumed.current.unwrap().key,
-            after_unknown.current.unwrap().key
+            resumed.current.as_ref().unwrap().key,
+            after_unknown.current.as_ref().unwrap().key
         );
+        let connection = Connection::open(&state.path).unwrap();
+        let raw: String = connection
+            .query_row(
+                "SELECT payload_json FROM vocabulary_sessions WHERE book_id = 'empty-book'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap();
+        let payload: Value = serde_json::from_str(&raw).unwrap();
+        assert_eq!(
+            payload
+                .get("queue")
+                .and_then(Value::as_array)
+                .and_then(|queue| queue.last())
+                .and_then(Value::as_str),
+            Some(first_key.as_str())
+        );
+        drop(connection);
         assert_eq!(get_vocabulary_words(&state).unwrap().len(), 3);
         let daily_after = load_snapshot(&state).unwrap().today;
         assert_eq!(daily_after.studied_count, daily_before.studied_count);
